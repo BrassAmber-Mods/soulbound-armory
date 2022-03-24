@@ -61,8 +61,9 @@ dependencies {
     mappings("net.fabricmc:yarn:$gameVersion+build.$yarn:v2")
     forge("net.minecraftforge:forge:$gameVersion-$forgeVersion+")
 
+    lib("net.auoeke:eson")
     lib("net.auoeke:reflect")
-    lib("net.gudenau.lib:unsafe")
+    lib("net.auoeke:unsafe")
 }
 
 tasks.withType(JavaCompile) {
