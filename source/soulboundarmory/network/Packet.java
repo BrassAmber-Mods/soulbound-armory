@@ -12,7 +12,8 @@ import soulboundarmory.module.gui.widget.Widget;
  <p>
  Packets are message containers and handlers. They are constructed internally when sending and receiving messages.
 
- @param <T> the type of the message that may be stored in this packet */
+ @param <T> the type of the message that may be stored in this packet
+ */
 public abstract class Packet<T> {
 	protected NetworkEvent.Context context;
 	protected T message;

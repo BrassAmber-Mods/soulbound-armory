@@ -18,13 +18,11 @@ public class SoulboundSwordItem extends SoulboundMeleeWeapon {
 		super(3, -2.4F, 0);
 	}
 
-	@Override
-	public UseAction getUseAction(ItemStack stack) {
+	@Override public UseAction getUseAction(ItemStack stack) {
 		return UseAction.BLOCK;
 	}
 
-	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+	@Override public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		var stack = player.getStackInHand(hand);
 		var component = (SwordComponent) ItemComponent.of(player, stack).get();
 

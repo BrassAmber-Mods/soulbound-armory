@@ -200,8 +200,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 	public void mined(BlockState state, BlockPos position) {}
 
-	@Override
-	public final boolean isClient() {
+	@Override public final boolean isClient() {
 		return this.player.world.isClient;
 	}
 
@@ -721,7 +720,6 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 							}
 						} else if (itemStacks.previousIndex() != slot) {
 							inventory.removeOne(stack);
-
 							continue;
 						}
 
@@ -861,16 +859,14 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return new EntityAttributeModifier(attribute, "Tool modifier", this.attributeRelative(statistic), EntityAttributeModifier.Operation.ADDITION);
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		tag.put("statistics", this.statistics.serialize());
 		tag.put("enchantments", this.enchantments.serialize());
 		tag.put("skills", this.skills.serialize());
 		tag.putBoolean("unlocked", this.unlocked);
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		this.statistics.deserialize(tag.getCompound("statistics"));
 		this.enchantments.deserialize(tag.getCompound("enchantments"));
 		this.skills.deserialize(tag.getCompound("skills"));

@@ -15,19 +15,16 @@ public class SoulboundBigswordItem extends SoulboundMeleeWeapon {
 		super(4, 1, 3);
 	}
 
-	@Override
-	public int getMaxUseTime(ItemStack stack) {
+	@Override public int getMaxUseTime(ItemStack stack) {
 		return 200;
 	}
 
-	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+	@Override public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		player.setCurrentHand(hand);
 		return TypedActionResult.pass(player.getStackInHand(hand));
 	}
 
-	@Override
-	public void onStoppedUsing(ItemStack itemStack, World world, LivingEntity user, int timeLeft) {
+	@Override public void onStoppedUsing(ItemStack itemStack, World world, LivingEntity user, int timeLeft) {
 		ItemComponentType.bigsword.nullable(user).filter(BigswordComponent::canCharge).ifPresent(component -> {
 			var look = user.getRotationVector();
 			var speed = 1.5;

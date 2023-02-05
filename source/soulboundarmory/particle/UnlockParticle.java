@@ -31,8 +31,7 @@ public class UnlockParticle extends TotemParticle {
 		}
 
 		@Nullable
-		@Override
-		public Particle createParticle(DefaultParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+		@Override public Particle createParticle(DefaultParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
 			return new UnlockParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.sprite);
 		}
 	}

@@ -15,8 +15,7 @@ public class EnchantmentTab extends Tab {
 		super(Translations.guiButtonEnchantments);
 	}
 
-	@Override
-	public void initialize() {
+	@Override public void initialize() {
 		var component = this.container().item();
 		var enchantments = component.enchantments;
 		var length = Math.max(this.container().xpBar.width(), width(enchantments.reference2IntEntrySet().stream().map(entry -> entry.getKey().getName(entry.getIntValue()))) + 60);

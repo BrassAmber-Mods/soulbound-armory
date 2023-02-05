@@ -18,8 +18,7 @@ public class Statistic extends Number implements Comparable<Number>, Serializabl
 		this.category = statistic.category;
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return "Statistic {name: %s, type: %s, min: %.3f, max: %.3f, value: %s}".formatted(this.type.id(), this.category.id(), this.min, this.max, this.value);
 	}
 
@@ -80,23 +79,19 @@ public class Statistic extends Number implements Comparable<Number>, Serializabl
 		this.value = BigDecimal.valueOf(value.doubleValue());
 	}
 
-	@Override
-	public int intValue() {
+	@Override public int intValue() {
 		return this.value.intValue();
 	}
 
-	@Override
-	public long longValue() {
+	@Override public long longValue() {
 		return this.value.longValue();
 	}
 
-	@Override
-	public float floatValue() {
+	@Override public float floatValue() {
 		return this.value.floatValue();
 	}
 
-	@Override
-	public double doubleValue() {
+	@Override public double doubleValue() {
 		return this.value.doubleValue();
 	}
 
@@ -130,20 +125,17 @@ public class Statistic extends Number implements Comparable<Number>, Serializabl
 		// this.max = this.defaultMax;
 	}
 
-	@Override
-	public int compareTo(Number number) {
+	@Override public int compareTo(Number number) {
 		return number instanceof BigDecimal big ? this.value.compareTo(big) : Double.compare(this.value.doubleValue(), number.doubleValue());
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		tag.putDouble("min", this.min);
 		tag.putDouble("max", this.max);
 		tag.putString("value", this.value.toString());
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		this.value = new BigDecimal(tag.getString("value"));
 		var dMin = this.min - tag.getDouble("min");
 

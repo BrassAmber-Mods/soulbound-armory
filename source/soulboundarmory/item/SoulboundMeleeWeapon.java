@@ -20,8 +20,7 @@ public abstract class SoulboundMeleeWeapon extends SwordItem implements Soulboun
 		this.attackSpeed = attackSpeed;
 	}
 
-	@Override
-	public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
+	@Override public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
 		var modifiers = HashMultimap.<EntityAttribute, EntityAttributeModifier>create();
 
 		if (slot == EquipmentSlot.MAINHAND) {

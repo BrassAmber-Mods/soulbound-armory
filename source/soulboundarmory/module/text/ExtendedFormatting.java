@@ -17,9 +17,8 @@ public class ExtendedFormatting /*extends Formatting*/ {
 		return (Formatting) (Object) this;
 	}
 
-	// @Override
 	@Nullable
-	public Integer getColor() {
+	/*@Override*/ public Integer getColor() {
 		var color = this.super$getColor();
 
 		if (this.colorFunction != null && color != null) {

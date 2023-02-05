@@ -28,13 +28,11 @@ public class SoulboundDaggerItem extends SoulboundMeleeWeapon {
 		return Math.min(1, attackSpeed * (USE_TIME - timeLeft) / 40F);
 	}
 
-	@Override
-	public int getMaxUseTime(ItemStack stack) {
+	@Override public int getMaxUseTime(ItemStack stack) {
 		return USE_TIME;
 	}
 
-	@Override
-	public UseAction getUseAction(ItemStack stack) {
+	@Override public UseAction getUseAction(ItemStack stack) {
 		return UseAction.SPEAR;
 	}
 
@@ -48,8 +46,7 @@ public class SoulboundDaggerItem extends SoulboundMeleeWeapon {
 		return ActionResult.PASS;
 	}
 
-	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+	@Override public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		if (ItemComponentType.dagger.of(player).hasSkill(Skills.throwing)) {
 			player.setCurrentHand(hand);
 
@@ -59,8 +56,7 @@ public class SoulboundDaggerItem extends SoulboundMeleeWeapon {
 		return TypedActionResult.fail(player.getStackInHand(hand));
 	}
 
-	@Override
-	public void onStoppedUsing(ItemStack itemStack, World world, LivingEntity entity, int timeLeft) {
+	@Override public void onStoppedUsing(ItemStack itemStack, World world, LivingEntity entity, int timeLeft) {
 		if (entity instanceof ServerPlayerEntity player) {
 			var attackSpeed = ItemComponentType.dagger.of(player).attributeTotal(StatisticType.attackSpeed);
 			var damageRatio = damageRatio(attackSpeed, timeLeft);
@@ -72,8 +68,7 @@ public class SoulboundDaggerItem extends SoulboundMeleeWeapon {
 		}
 	}
 
-	@Override
-	public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
+	@Override public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
 		return Components.dagger.of(stack) == null && super.canPerformAction(stack, toolAction);
 	}
 }

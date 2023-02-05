@@ -56,7 +56,8 @@ import soulboundarmory.util.Util2;
  A node in a tree of GUI elements.
 
  @param <B> the base type wherewith this node can interact (have as parents or children)
- @param <T> the type of the node */
+ @param <T> the type of the node
+ */
 @OnlyIn(Dist.CLIENT)
 public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends DrawableHelper implements Drawable, Element, Cloneable {
 	public static final MinecraftClient client = MinecraftClient.getInstance();
@@ -326,8 +327,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		return lines.stream().map(line -> textHandler.wrapLines(line, width, Style.EMPTY)).flatMap(List::stream).toList();
 	}
 
-	@Override
-	public T clone() {
+	@Override public T clone() {
 		return (T) super.clone();
 	}
 
@@ -766,8 +766,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		}
 	}
 
-	@Override
-	public void render(MatrixStack matrixes, int mouseX, int mouseY, float delta) {
+	@Override public void render(MatrixStack matrixes, int mouseX, int mouseY, float delta) {
 		if (this.isPresent()) {
 			this.listChildren().forEach(child -> child.render(matrixes, mouseX, mouseY, delta));
 		}
@@ -776,8 +775,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public void mouseMoved(double mouseX, double mouseY) {
+	@Override public void mouseMoved(double mouseX, double mouseY) {
 		if (this.isPresent()) {
 			this.listChildren().forEach(child -> child.mouseMoved(mouseX, mouseY));
 		}
@@ -786,64 +784,56 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	@Override public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		return this.isPresent() && this.childrenReverse().anyMatch(child -> child.mouseClicked(mouseX, mouseY, button));
 	}
 
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	@Override public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		return this.isPresent() && this.childrenReverse().anyMatch(child -> child.mouseReleased(mouseX, mouseY, button));
 	}
 
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	@Override public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		return this.isPresent() && this.childrenReverse().anyMatch(child -> child.mouseDragged(mouseX, mouseY, button, deltaX, deltaY));
 	}
 
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	@Override public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		return this.isPresent() && this.childrenReverse().anyMatch(widget -> widget.mouseScrolled(mouseX, mouseY, amount));
 	}
 
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	@Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		return this.isPresent() && this.childrenReverse().anyMatch(child -> child.keyPressed(keyCode, scanCode, modifiers));
 	}
 
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+	@Override public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 		return this.isPresent() && this.childrenReverse().anyMatch(child -> child.keyReleased(keyCode, scanCode, modifiers));
 	}
 
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public boolean charTyped(char character, int modifiers) {
+	@Override public boolean charTyped(char character, int modifiers) {
 		return this.isPresent() && this.childrenReverse().anyMatch(child -> child.charTyped(character, modifiers));
 	}
 
 	/**
 	 {@inheritDoc}
 	 */
-	@Override
-	public boolean isMouseOver(double mouseX, double mouseY) {
+	@Override public boolean isMouseOver(double mouseX, double mouseY) {
 		return this.isPresent() && this.contains(mouseX, mouseY);
 	}
 

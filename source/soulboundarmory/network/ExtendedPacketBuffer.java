@@ -52,55 +52,46 @@ public class ExtendedPacketBuffer extends PacketByteBuf {
 		return registry.getValue(this.readIdentifier());
 	}
 
-	@Override
-	public ExtendedPacketBuffer writeBoolean(boolean value) {
+	@Override public ExtendedPacketBuffer writeBoolean(boolean value) {
 		super.writeBoolean(value);
 
 		return this;
 	}
 
-	@Override
-	public Identifier readIdentifier() {
+	@Override public Identifier readIdentifier() {
 		return new Identifier(this.readString());
 	}
 
-	@Override
-	public ExtendedPacketBuffer writeIdentifier(Identifier identifier) {
+	@Override public ExtendedPacketBuffer writeIdentifier(Identifier identifier) {
 		return this.writeString(identifier.toString());
 	}
 
-	@Override
-	public String readString() {
+	@Override public String readString() {
 		return this.readCharSequence(this.readInt(), StandardCharsets.UTF_8).toString();
 	}
 
-	@Override
-	public ExtendedPacketBuffer writeString(String string) {
+	@Override public ExtendedPacketBuffer writeString(String string) {
 		this.writeInt(string.length());
 		this.writeCharSequence(string, StandardCharsets.UTF_8);
 
 		return this;
 	}
 
-	@Override
-	public ExtendedPacketBuffer writeItemStack(ItemStack itemStack) {
+	@Override public ExtendedPacketBuffer writeItemStack(ItemStack itemStack) {
 		return (ExtendedPacketBuffer) super.writeItemStack(itemStack, false);
 	}
 
-	@Override
-	public ExtendedPacketBuffer writeUuid(UUID id) {
+	@Override public ExtendedPacketBuffer writeUuid(UUID id) {
 		return (ExtendedPacketBuffer) super.writeUuid(id);
 	}
 
-	@Override
-	public ExtendedPacketBuffer writeInt(int value) {
+	@Override public ExtendedPacketBuffer writeInt(int value) {
 		super.writeInt(value);
 
 		return this;
 	}
 
-	@Override
-	public ExtendedPacketBuffer writeByte(int B) {
+	@Override public ExtendedPacketBuffer writeByte(int B) {
 		super.writeByte(B);
 
 		return this;
@@ -127,8 +118,7 @@ public class ExtendedPacketBuffer extends PacketByteBuf {
 		return ItemComponentType.get(this.readIdentifier()).of(player);
 	}
 
-	@Override
-	public ExtendedPacketBuffer writeNbt(NbtCompound tag) {
+	@Override public ExtendedPacketBuffer writeNbt(NbtCompound tag) {
 		super.writeNbt(tag);
 
 		return this;

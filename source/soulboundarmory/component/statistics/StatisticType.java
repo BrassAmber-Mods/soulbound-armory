@@ -44,8 +44,7 @@ public class StatisticType extends Identifiable {
 		return statistic;
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return "statistic type " + this.id();
 	}
 }

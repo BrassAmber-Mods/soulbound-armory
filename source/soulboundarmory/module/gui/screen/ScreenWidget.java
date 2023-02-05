@@ -46,8 +46,7 @@ public abstract class ScreenWidget<T extends ScreenWidget<T>> extends Widget<T> 
 		client.setScreen(this.screen.parent);
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	@Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (super.keyPressed(keyCode, scanCode, modifiers)) {
 			return true;
 		}
@@ -61,8 +60,7 @@ public abstract class ScreenWidget<T extends ScreenWidget<T>> extends Widget<T> 
 		return false;
 	}
 
-	@Override
-	protected void render() {
+	@Override protected void render() {
 		this.renderBackground(this.matrixes);
 	}
 }

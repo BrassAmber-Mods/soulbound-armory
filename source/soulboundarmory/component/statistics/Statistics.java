@@ -86,22 +86,19 @@ public class Statistics extends Reference2ReferenceOpenHashMap<Category, Map<Sta
 		return tag;
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		for (var category : this.keySet()) {
 			tag.put(category.id().toString(), this.serialize(category));
 		}
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		for (var key : tag.getKeys()) {
 			this.deserialize(tag.getCompound(key), Category.registry().getValue(new Identifier(key)));
 		}
 	}
 
-	@Override
-	public Iterator<Statistic> iterator() {
+	@Override public Iterator<Statistic> iterator() {
 		return this.values().stream().flatMap(category -> category.values().stream()).iterator();
 	}
 

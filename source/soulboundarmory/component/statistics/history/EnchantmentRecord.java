@@ -22,8 +22,7 @@ public final class EnchantmentRecord extends Record {
 		super(component);
 	}
 
-	@Override
-	public boolean revert(int level) {
+	@Override public boolean revert(int level) {
 		var interval = Configuration.levelsPerEnchantment;
 		var change = this.component.level() / interval - level / interval;
 		var deduction = Math.min(this.points, change);
@@ -33,19 +32,16 @@ public final class EnchantmentRecord extends Record {
 		return this.points + deduction >= change;
 	}
 
-	@Override
-	public void pop() {
+	@Override public void pop() {
 		this.component.addEnchantment(this.enchantment, -this.points);
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		tag.putString("enchantment", ForgeRegistries.ENCHANTMENTS.getKey(this.enchantment).toString());
 		tag.putInt("points", this.points);
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		this.enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new Identifier(tag.getString("enchantment")));
 		this.points = tag.getInt("points");
 	}

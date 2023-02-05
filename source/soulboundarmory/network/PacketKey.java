@@ -12,7 +12,8 @@ import soulboundarmory.util.Util;
  A key to a registered packet type; used for sending packets.
 
  @param <T> the message type of {@link P}
- @param <P> the packet type to which this key corresponds */
+ @param <P> the packet type to which this key corresponds
+ */
 public abstract sealed class PacketKey<T, P extends Packet<T>> permits PacketKey.Client, PacketKey.Server {
 	public final Class<P> type;
 

@@ -1,6 +1,5 @@
 package soulboundarmory.network.client;
 
-import java.util.Optional;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -8,6 +7,8 @@ import soulboundarmory.SoulboundArmory;
 import soulboundarmory.component.Components;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.network.BufferPacket;
+
+import java.util.Optional;
 
 /**
  A server-to-client packet that unlocks an item that was selected for the player's first time.
@@ -17,9 +18,8 @@ import soulboundarmory.network.BufferPacket;
  - ItemStack (unlocked item) <br>
  */
 public final class S2CUnlock extends BufferPacket {
-	@Override
 	@OnlyIn(Dist.CLIENT)
-	protected void execute() {
+	@Override protected void execute() {
 		this.message.<AbstractClientPlayerEntity>readEntity().ifPresent(player -> {
 			var marker = Components.marker.of(this.message.readItemStack());
 			Components.entityData.of(player).unlockedStack = Optional.of(marker);

@@ -17,8 +17,7 @@ import soulboundarmory.mixin.EmptyMixinPlugin;
 import soulboundarmory.mixin.MixinUtil;
 
 public class Transformer implements EmptyMixinPlugin {
-	@Override
-	public void preApply(String targetClassName, ClassNode target, String mixinClassName, IMixinInfo mixinInfo) {
+	@Override public void preApply(String targetClassName, ClassNode target, String mixinClassName, IMixinInfo mixinInfo) {
 		switch (mixinClassName) {
 			case "soulboundarmory.module.text.mixin.StyleMixin" -> {
 				var methodNames = new HashSet<>(List.of(MixinUtil.mapMethod(131152), MixinUtil.mapMethod(131157), MixinUtil.mapMethod(131164)));

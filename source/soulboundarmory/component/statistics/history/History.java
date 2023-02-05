@@ -35,8 +35,7 @@ public abstract class History<T extends Record> implements Serializable {
 		}
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		tag.getList("records", NbtElement.COMPOUND_TYPE).forEach(element -> {
 			var record = this.skeleton();
 			record.deserialize((NbtCompound) element);
@@ -44,8 +43,7 @@ public abstract class History<T extends Record> implements Serializable {
 		});
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		tag.put("records", this.records.stream().map(Record::serialize).collect(NbtList::new, NbtList::add, Util2::nul)); // Throws if combiner is null.
 	}
 

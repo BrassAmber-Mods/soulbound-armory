@@ -22,13 +22,11 @@ public class MasterWeaponComponent extends MasterComponent<MasterWeaponComponent
 		this.store(new TridentComponent(this));
 	}
 
-	@Override
-	public EntityComponentKey<MasterWeaponComponent> key() {
+	@Override public EntityComponentKey<MasterWeaponComponent> key() {
 		return Components.weapon;
 	}
 
-	@Override
-	public boolean accepts(ItemStack stack) {
+	@Override public boolean accepts(ItemStack stack) {
 		return stack.getItem() instanceof SoulboundWeaponItem;
 	}
 }

@@ -5,8 +5,7 @@ package soulboundarmory.module.text;
  */
 @FunctionalInterface
 public interface ColorSupplier extends ColorFunction {
-	@Override
-	default int apply(int previous) {
+	@Override default int apply(int previous) {
 		return this.get();
 	}
 

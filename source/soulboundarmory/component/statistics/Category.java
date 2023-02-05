@@ -15,8 +15,7 @@ public class Category extends Identifiable {
 
 	@Registry("category") public static native IForgeRegistry<Category> registry();
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return "category " + this.id();
 	}
 }

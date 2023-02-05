@@ -1,6 +1,5 @@
 package soulboundarmory.component.soulbound.item.tool;
 
-import java.util.stream.Stream;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,6 +13,8 @@ import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.item.SoulboundItems;
+
+import java.util.stream.Stream;
 
 public class PickaxeComponent extends ToolComponent<PickaxeComponent> {
 	public PickaxeComponent(MasterComponent<?> component) {
@@ -30,28 +31,23 @@ public class PickaxeComponent extends ToolComponent<PickaxeComponent> {
 		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
 	}
 
-	@Override
-	public ItemComponentType<PickaxeComponent> type() {
+	@Override public ItemComponentType<PickaxeComponent> type() {
 		return ItemComponentType.pickaxe;
 	}
 
-	@Override
-	public Item item() {
+	@Override public Item item() {
 		return SoulboundItems.pickaxe;
 	}
 
-	@Override
-	public Item consumableItem() {
+	@Override public Item consumableItem() {
 		return Items.WOODEN_PICKAXE;
 	}
 
-	@Override
-	public Text name() {
+	@Override public Text name() {
 		return Translations.guiPickaxe;
 	}
 
-	@Override
-	public double increase(StatisticType type) {
+	@Override public double increase(StatisticType type) {
 		if (type == StatisticType.efficiency) return 0.5;
 		if (type == StatisticType.reach) return 0.1;
 		if (type == StatisticType.upgradeProgress) return 0.2;
@@ -59,13 +55,11 @@ public class PickaxeComponent extends ToolComponent<PickaxeComponent> {
 		return 0;
 	}
 
-	@Override
-	protected TagKey<Block> tag() {
+	@Override protected TagKey<Block> tag() {
 		return BlockTags.PICKAXE_MINEABLE;
 	}
 
-	@Override
-	protected boolean canAbsorb(ItemStack stack) {
+	@Override protected boolean canAbsorb(ItemStack stack) {
 		return stack.canPerformAction(ToolActions.PICKAXE_DIG);
 	}
 }

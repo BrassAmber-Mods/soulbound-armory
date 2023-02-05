@@ -6,7 +6,8 @@ import soulboundarmory.serial.Serializable;
 /**
  A persistent attachment to a game object.
 
- @param <T> the type of the implementing component */
+ @param <T> the type of the implementing component
+ */
 public interface Component<C extends Component<C>> extends Serializable {
 	/**
 	 Invoked at the beginning of every tick.
@@ -18,8 +19,7 @@ public interface Component<C extends Component<C>> extends Serializable {
 
 	 @param tag an empty compound tag for this component
 	 */
-	@Override
-	default void serialize(NbtCompound tag) {}
+	@Override default void serialize(NbtCompound tag) {}
 
 	/**
 	 Deserialize this component from `tag`.
@@ -27,8 +27,7 @@ public interface Component<C extends Component<C>> extends Serializable {
 
 	 @param tag a tag containing the same information from the last call to {@link #serialize()} on this component
 	 */
-	@Override
-	default void deserialize(NbtCompound tag) {}
+	@Override default void deserialize(NbtCompound tag) {}
 
 	/**
 	 Invoked after the object is copied if it has the same component attached.

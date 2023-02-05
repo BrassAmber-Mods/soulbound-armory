@@ -58,23 +58,20 @@ public class ItemMarkerComponent implements ItemStackComponent<ItemMarkerCompone
 		return new ExperienceBar().item(this.item()).width(Widget.width(this.stack.getName()));
 	}
 
-	@Override
-	public void tickStart() {
+	@Override public void tickStart() {
 		if (Util.isClient() && this.animating() && this.animationTick++ % 2 == 0) {
 			this.upload();
 		}
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		this.optionalItem().ifPresent(item -> {
 			tag.putUuid("player", item.player.getUuid());
 			tag.putString("item", item.type().string());
 		});
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		if (!Util.isClient()) {
 			this.item = ItemComponentType.get(tag.getString("item")).of(Util.server().getPlayerManager().getPlayer(tag.getUuid("player")));
 		}

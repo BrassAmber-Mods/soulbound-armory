@@ -9,8 +9,7 @@ public final class CircumspectionSkill extends Skill {
 		super("circumspection", 1);
 	}
 
-	@Override
-	public int cost(int level) {
+	@Override public int cost(int level) {
 		return 1;
 	}
 

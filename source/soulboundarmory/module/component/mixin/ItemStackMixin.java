@@ -1,6 +1,5 @@
 package soulboundarmory.module.component.mixin;
 
-import java.util.Map;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -18,18 +17,18 @@ import soulboundarmory.module.component.access.ItemStackAccess;
 import soulboundarmory.util.Util;
 import soulboundarmory.util.Util2;
 
+import java.util.Map;
+
 @Mixin(ItemStack.class)
 abstract class ItemStackMixin implements ItemStackAccess {
 	@Unique
 	private Map<ItemStackComponentKey<?>, ItemStackComponent<?>> components;
 
-	@Override
-	public ItemStackComponent<?> soulboundarmory$component(ItemStackComponentKey<?> key) {
+	@Override public ItemStackComponent<?> soulboundarmory$component(ItemStackComponentKey<?> key) {
 		return this.components == null ? null : this.components.get(key);
 	}
 
-	@Override
-	public ItemStackComponent<?> soulboundarmory$component(ItemStackComponentKey<?> key, ItemStackComponent<?> component) {
+	@Override public ItemStackComponent<?> soulboundarmory$component(ItemStackComponentKey<?> key, ItemStackComponent<?> component) {
 		return this.components().put(key, component);
 	}
 

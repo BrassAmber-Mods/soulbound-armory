@@ -1,7 +1,5 @@
 package soulboundarmory.component.soulbound.item.weapon;
 
-import java.util.List;
-import java.util.stream.Stream;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.Item;
@@ -16,6 +14,9 @@ import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.Math2;
 import soulboundarmory.util.Util2;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 public class GreatswordComponent extends WeaponComponent<GreatswordComponent> {
 	public int leapDuration;
@@ -38,18 +39,15 @@ public class GreatswordComponent extends WeaponComponent<GreatswordComponent> {
 		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.leaping, Skills.freezing);
 	}
 
-	@Override
-	public ItemComponentType<GreatswordComponent> type() {
+	@Override public ItemComponentType<GreatswordComponent> type() {
 		return ItemComponentType.greatsword;
 	}
 
-	@Override
-	public Item item() {
+	@Override public Item item() {
 		return SoulboundItems.greatsword;
 	}
 
-	@Override
-	public Text name() {
+	@Override public Text name() {
 		return Translations.guiGreatsword;
 	}
 
@@ -89,13 +87,11 @@ public class GreatswordComponent extends WeaponComponent<GreatswordComponent> {
 		}
 	}
 
-	@Override
-	public List<StatisticType> screenAttributes() {
+	@Override public List<StatisticType> screenAttributes() {
 		return Util2.add(super.screenAttributes(), StatisticType.efficiency);
 	}
 
-	@Override
-	public double increase(StatisticType type) {
+	@Override public double increase(StatisticType type) {
 		if (type == StatisticType.attackSpeed) return 0.02;
 		if (type == StatisticType.attackDamage) return 0.1;
 		if (type == StatisticType.criticalHitRate) return 0.01;
@@ -104,8 +100,7 @@ public class GreatswordComponent extends WeaponComponent<GreatswordComponent> {
 		return 0;
 	}
 
-	@Override
-	public void tick() {
+	@Override public void tick() {
 		if (this.leapDuration > 0) {
 			if (--this.leapDuration == 0) {
 				this.resetLeapForce();
@@ -113,8 +108,7 @@ public class GreatswordComponent extends WeaponComponent<GreatswordComponent> {
 		}
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		super.serialize(tag);
 
 		tag.putInt("leapDuration", this.leapDuration);
@@ -122,8 +116,7 @@ public class GreatswordComponent extends WeaponComponent<GreatswordComponent> {
 		tag.put("cannotFreeze", this.cannotFreeze);
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		super.deserialize(tag);
 
 		this.cannotFreeze = tag.getCompound("cannotFreeze");

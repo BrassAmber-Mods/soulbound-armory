@@ -14,13 +14,11 @@ public class MasterToolComponent extends MasterComponent<MasterToolComponent> {
 		this.store(new PickaxeComponent(this));
 	}
 
-	@Override
-	public EntityComponentKey<MasterToolComponent> key() {
+	@Override public EntityComponentKey<MasterToolComponent> key() {
 		return Components.tool;
 	}
 
-	@Override
-	public boolean accepts(ItemStack stack) {
+	@Override public boolean accepts(ItemStack stack) {
 		return stack.getItem() instanceof SoulboundToolItem;
 	}
 }

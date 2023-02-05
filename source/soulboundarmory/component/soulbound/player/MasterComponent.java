@@ -60,8 +60,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	/**
 	 @return what the name suggests
 	 */
-	@Override
-	public final boolean isClient() {
+	@Override public final boolean isClient() {
 		return this.player.world.isClient;
 	}
 
@@ -227,16 +226,14 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	/**
 	 Update item components' item stacks and synchronize them.
 	 */
-	@Override
-	public void spawn() {
+	@Override public void spawn() {
 		if (this.isServer()) {
 			this.items.values().forEach(ItemComponent::updateItemStack);
 			Packets.clientSync.send(this.player, new ExtendedPacketBuffer(this).writeNbt(this.serialize()));
 		}
 	}
 
-	@Override
-	public void copy(C copy) {
+	@Override public void copy(C copy) {
 		EntityComponent.super.copy(copy);
 
 		if (!this.player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
@@ -248,8 +245,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		}
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		if (this.item != null) {
 			tag.putString("item", this.item.type().id().toString());
 		}
@@ -262,8 +258,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		tag.putInt("slot", this.boundSlot);
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		var type = ItemComponentType.get(tag.getString("item"));
 
 		if (type != null) {

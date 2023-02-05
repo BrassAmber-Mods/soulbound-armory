@@ -1,6 +1,5 @@
 package soulboundarmory.client.gui.screen;
 
-import java.util.Map;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceLinkedOpenHashMap;
@@ -10,6 +9,8 @@ import soulboundarmory.module.gui.coordinate.Offset;
 import soulboundarmory.module.gui.widget.ScalableWidget;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.skill.SkillInstance;
+
+import java.util.Map;
 
 /**
  The skill tab; design (not code of course) blatantly copied from the advancement screen.
@@ -35,8 +36,7 @@ public class SkillTab extends Tab {
 		super(Translations.guiSkills);
 	}
 
-	@Override
-	public void initialize() {
+	@Override public void initialize() {
 		if (!this.dim()) {
 			this.chroma = 1;
 		}
@@ -58,8 +58,7 @@ public class SkillTab extends Tab {
 		}
 	}
 
-	@Override
-	protected void render() {
+	@Override protected void render() {
 		var delta = 20 * tickDelta() / 255F;
 		this.chroma = this.dim() ? Math.max(this.chroma - delta, 175 / 255F) : Math.min(this.chroma + delta, 1);
 		chroma(this.chroma);

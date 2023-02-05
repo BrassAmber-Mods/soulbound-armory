@@ -16,11 +16,11 @@ import soulboundarmory.network.ItemComponentPacket;
  - int (enchentment level) <br>
  - int (remaining enchantment points) <br>
 
- @see ItemComponent#addEnchantment */
+ @see ItemComponent#addEnchantment
+ */
 public final class S2CEnchant extends ItemComponentPacket {
-	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void execute(ItemComponent<?> component) {
+	@Override public void execute(ItemComponent<?> component) {
 		component.enchantments.put(this.message.readRegistryEntry(ForgeRegistries.ENCHANTMENTS), this.message.readInt());
 		component.set(StatisticType.enchantmentPoints, this.message.readInt());
 	}

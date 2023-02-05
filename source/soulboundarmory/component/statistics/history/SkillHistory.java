@@ -12,8 +12,7 @@ public final class SkillHistory extends History<SkillRecord> {
 		this.record(new SkillRecord(this.component, skill, points));
 	}
 
-	@Override
-	protected SkillRecord skeleton() {
+	@Override protected SkillRecord skeleton() {
 		return new SkillRecord(this.component);
 	}
 }

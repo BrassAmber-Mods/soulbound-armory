@@ -1,7 +1,5 @@
 package soulboundarmory.component.soulbound.item.weapon;
 
-import java.util.List;
-import java.util.stream.Stream;
 import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 import soulboundarmory.client.i18n.Translations;
@@ -11,6 +9,9 @@ import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.Util2;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 public class DaggerComponent extends WeaponComponent<DaggerComponent> {
 	public DaggerComponent(MasterComponent<?> component) {
@@ -26,28 +27,23 @@ public class DaggerComponent extends WeaponComponent<DaggerComponent> {
 		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.throwing, Skills.shadowClone, Skills.returning, Skills.sneakReturn);
 	}
 
-	@Override
-	public ItemComponentType<DaggerComponent> type() {
+	@Override public ItemComponentType<DaggerComponent> type() {
 		return ItemComponentType.dagger;
 	}
 
-	@Override
-	public Item item() {
+	@Override public Item item() {
 		return SoulboundItems.dagger;
 	}
 
-	@Override
-	public Text name() {
+	@Override public Text name() {
 		return Translations.guiDagger;
 	}
 
-	@Override
-	public List<StatisticType> screenAttributes() {
+	@Override public List<StatisticType> screenAttributes() {
 		return Util2.add(super.screenAttributes(), StatisticType.efficiency);
 	}
 
-	@Override
-	public double increase(StatisticType type) {
+	@Override public double increase(StatisticType type) {
 		if (type == StatisticType.attackSpeed) return 0.04;
 		if (type == StatisticType.attackDamage) return 0.05;
 		if (type == StatisticType.criticalHitRate) return 0.02;

@@ -8,8 +8,7 @@ import soulboundarmory.module.gui.widget.Widget;
 public interface TooltipProvider<T extends Widget<T>> extends TooltipRenderer<T> {
 	List<? extends StringVisitable> get();
 
-	@Override
-	default void render(T widget, MatrixStack matrixes, double x, double y) {
+	@Override default void render(T widget, MatrixStack matrixes, double x, double y) {
 		widget.renderTooltip(x, y, this.get());
 	}
 }

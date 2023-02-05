@@ -1,17 +1,19 @@
 package soulboundarmory.module.component;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import soulboundarmory.module.component.access.EntityAccess;
 import soulboundarmory.util.Util2;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 /**
  A key that corresponds to a registered entity component; used for extracting components from entities.
 
  @param <E> the base type of the entities for which the component is registered
- @param <C> the type of the component */
+ @param <C> the type of the component
+ */
 public final class EntityComponentKey<C extends EntityComponent<C>> extends ComponentKey<Entity, C> {
 	public final Class<? extends Entity> type;
 
@@ -21,8 +23,7 @@ public final class EntityComponentKey<C extends EntityComponent<C>> extends Comp
 		this.type = type;
 	}
 
-	@Override
-	public C attach(Entity entity) {
+	@Override public C attach(Entity entity) {
 		if (this.type.isInstance(entity)) {
 			var component = this.instantiate.apply(Util2.cast(entity));
 			var previous = ((EntityAccess) entity).soulboundarmory$components().put(this, component);
@@ -37,8 +38,7 @@ public final class EntityComponentKey<C extends EntityComponent<C>> extends Comp
 		return null;
 	}
 
-	@Override
-	public C of(Entity entity) {
+	@Override public C of(Entity entity) {
 		return entity == null ? null : (C) ((EntityAccess) entity).soulboundarmory$components().get(this);
 	}
 }

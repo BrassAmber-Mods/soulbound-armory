@@ -16,16 +16,13 @@ public final class ConfigComponent implements EntityComponent<ConfigComponent> {
 		this.player = player;
 	}
 
-	@Override
-	public void spawn() {
+	@Override public void spawn() {
 		if (this.player.world.isClient) {
 			Packets.serverConfig.send(new ExtendedPacketBuffer().writeBoolean(Configuration.Client.levelupNotifications).writeBoolean(Configuration.Client.enchantmentGlint));
 		}
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {}
+	@Override public void serialize(NbtCompound tag) {}
 
-	@Override
-	public void deserialize(NbtCompound tag) {}
+	@Override public void deserialize(NbtCompound tag) {}
 }

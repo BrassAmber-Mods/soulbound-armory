@@ -19,18 +19,15 @@ public class SoulboundGreatswordItem extends SoulboundMeleeWeapon {
 		super(5, -3.2F, 3);
 	}
 
-	@Override
-	public int getMaxUseTime(ItemStack stack) {
+	@Override public int getMaxUseTime(ItemStack stack) {
 		return 200;
 	}
 
-	@Override
-	public UseAction getUseAction(ItemStack stack) {
+	@Override public UseAction getUseAction(ItemStack stack) {
 		return UseAction.BOW;
 	}
 
-	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+	@Override public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		if (ItemComponentType.greatsword.of(player).hasSkill(Skills.leaping)) {
 			player.setCurrentHand(hand);
 
@@ -40,8 +37,7 @@ public class SoulboundGreatswordItem extends SoulboundMeleeWeapon {
 		return TypedActionResult.fail(player.getStackInHand(hand));
 	}
 
-	@Override
-	public void onStoppedUsing(ItemStack itemStack, World world, LivingEntity user, int timeLeft) {
+	@Override public void onStoppedUsing(ItemStack itemStack, World world, LivingEntity user, int timeLeft) {
 		ItemComponentType.greatsword.nullable(user).ifPresent(component -> {
 			var timeTaken = 200 - timeLeft;
 
@@ -57,9 +53,8 @@ public class SoulboundGreatswordItem extends SoulboundMeleeWeapon {
 		});
 	}
 
-	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void inventoryTick(ItemStack itemStack, World world, Entity entity, int itemSlot, boolean isSelected) {
+	@Override public void inventoryTick(ItemStack itemStack, World world, Entity entity, int itemSlot, boolean isSelected) {
 		if (entity instanceof ClientPlayerEntity user && isSelected && user.getActiveItem().getItem() == this) {
 			user.input.movementForward *= 4.5;
 			user.input.movementSideways *= 4.5;

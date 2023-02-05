@@ -12,8 +12,7 @@ import soulboundarmory.skill.Skills;
  - Identifier (skill's registry name) <br>
  */
 public final class C2SSkill extends ItemComponentPacket {
-	@Override
-	public void execute(ItemComponent<?> component) {
+	@Override public void execute(ItemComponent<?> component) {
 		component.upgrade(component.skill(Skills.registry().getValue(this.message.readIdentifier())));
 	}
 }

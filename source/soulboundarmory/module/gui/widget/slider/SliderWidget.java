@@ -17,8 +17,7 @@ public class SliderWidget extends ScalableWidget<SliderWidget> {
 		this.slider().height(20).updateMessage();
 	}
 
-	@Override
-	public SliderWidget text(Text label) {
+	@Override public SliderWidget text(Text label) {
 		this.label = label;
 		this.updateMessage();
 

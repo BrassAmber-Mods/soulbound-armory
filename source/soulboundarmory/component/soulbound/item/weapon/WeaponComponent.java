@@ -1,6 +1,5 @@
 package soulboundarmory.component.soulbound.item.weapon;
 
-import java.util.List;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -15,6 +14,8 @@ import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.util.EntityUtil;
 import soulboundarmory.util.Util2;
+
+import java.util.List;
 
 public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemComponent<T> {
 	protected double criticalHitProgress;
@@ -40,20 +41,17 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 		return false;
 	}
 
-	@Override
-	public Item consumableItem() {
+	@Override public Item consumableItem() {
 		return Items.WOODEN_SWORD;
 	}
 
-	@Override
-	public int levelXP(int level) {
+	@Override public int levelXP(int level) {
 		return this.canLevelUp()
 			? Configuration.initialWeaponXP + 3 * (int) Math.round(Math.pow(level, 1.65))
 			: -1;
 	}
 
-	@Override
-	public void killed(LivingEntity entity) {
+	@Override public void killed(LivingEntity entity) {
 		if (this.isServer()) {
 			var damage = EntityUtil.attribute(entity, EntityAttributes.GENERIC_ATTACK_DAMAGE);
 			var speed = EntityUtil.attribute(entity, EntityAttributes.GENERIC_ATTACK_SPEED);
@@ -81,8 +79,7 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 		}
 	}
 
-	@Override
-	public double attributeTotal(StatisticType attribute) {
+	@Override public double attributeTotal(StatisticType attribute) {
 		if (attribute == StatisticType.efficiency && this.statistic(StatisticType.efficiency).min() == 0) {
 			return this.doubleValue(attribute) == 0 ? 0 : super.attributeTotal(attribute) - this.increase(attribute);
 		}
@@ -90,13 +87,11 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 		return super.attributeTotal(attribute);
 	}
 
-	@Override
-	public List<StatisticType> screenAttributes() {
+	@Override public List<StatisticType> screenAttributes() {
 		return ReferenceArrayList.of(StatisticType.attackDamage, StatisticType.attackSpeed, StatisticType.criticalHitRate);
 	}
 
-	@Override
-	public List<Text> tooltip() {
+	@Override public List<Text> tooltip() {
 		var tooltip = Util2.list(
 			Translations.tooltipAttackDamage.translate(this.formatValue(StatisticType.attackDamage)),
 			Translations.tooltipAttackSpeed.translate(this.formatValue(StatisticType.attackSpeed))
@@ -108,15 +103,13 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 		return tooltip;
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		super.serialize(tag);
 
 		tag.putDouble("criticalHitProgress", this.criticalHitProgress);
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		super.deserialize(tag);
 
 		this.criticalHitProgress = tag.getDouble("criticalHitProgress");

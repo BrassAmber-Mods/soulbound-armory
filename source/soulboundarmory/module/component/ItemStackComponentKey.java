@@ -14,8 +14,7 @@ public final class ItemStackComponentKey<C extends ItemStackComponent<C>> extend
 		super(id, predicate, instantiate);
 	}
 
-	@Override
-	public C attach(ItemStack stack) {
+	@Override public C attach(ItemStack stack) {
 		if (stack != null && (this.predicate == null || this.predicate.test(Util2.cast(stack)))) {
 			var component = this.instantiate.apply(Util2.cast(stack));
 			var previous = ((ItemStackAccess) (Object) stack).soulboundarmory$component(this, component);
@@ -32,8 +31,7 @@ public final class ItemStackComponentKey<C extends ItemStackComponent<C>> extend
 		return null;
 	}
 
-	@Override
-	public C of(ItemStack stack) {
+	@Override public C of(ItemStack stack) {
 		return stack == null ? null : (C) ((ItemStackAccess) (Object) stack).soulboundarmory$component(this);
 	}
 }

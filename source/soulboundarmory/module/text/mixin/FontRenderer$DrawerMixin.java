@@ -1,6 +1,5 @@
 package soulboundarmory.module.text.mixin;
 
-import java.util.List;
 import net.minecraft.client.font.FontStorage;
 import net.minecraft.client.font.Glyph;
 import net.minecraft.client.font.GlyphRenderer;
@@ -20,64 +19,52 @@ import soulboundarmory.module.text.ExtendedFormatting;
 import soulboundarmory.module.text.access.ExtendedStyle;
 import soulboundarmory.module.text.access.FontRenderer$DrawerAccess;
 
+import java.util.List;
+
 @SuppressWarnings("public-target")
 @Mixin(targets = "net.minecraft.client.font.TextRenderer$Drawer")
 abstract class FontRenderer$DrawerMixin implements FontRenderer$DrawerAccess {
-	@Override
 	@Accessor("light")
-	public abstract int light();
+	@Override public abstract int light();
 
-	@Override
 	@Accessor("brightnessMultiplier")
-	public abstract float brightnessMultiplier();
+	@Override public abstract float brightnessMultiplier();
 
-	@Override
 	@Accessor("red")
-	public abstract float r();
+	@Override public abstract float r();
 
-	@Override
 	@Accessor("green")
-	public abstract float g();
+	@Override public abstract float g();
 
-	@Override
 	@Accessor("blue")
-	public abstract float b();
+	@Override public abstract float b();
 
-	@Override
 	@Accessor("alpha")
-	public abstract float a();
+	@Override public abstract float a();
 
-	@Override
 	@Accessor("x")
-	public abstract float x();
+	@Override public abstract float x();
 
-	@Override
 	@Accessor("y")
-	public abstract float y();
+	@Override public abstract float y();
 
-	@Override
 	@Accessor("shadow")
-	public abstract boolean shadow();
+	@Override public abstract boolean shadow();
 
-	@Override
 	@Accessor("matrix")
-	public abstract Matrix4f pose();
+	@Override public abstract Matrix4f pose();
 
-	@Override
 	@Accessor("rectangles")
-	public abstract List<GlyphRenderer.Rectangle> rectangles();
+	@Override public abstract List<GlyphRenderer.Rectangle> rectangles();
 
-	@Override
 	@Accessor("vertexConsumers")
-	public abstract VertexConsumerProvider vertexConsumers();
+	@Override public abstract VertexConsumerProvider vertexConsumers();
 
-	@Override
 	@Invoker("drawLayer")
-	public abstract float invokeFinish(int underlineColor, float x);
+	@Override public abstract float invokeFinish(int underlineColor, float x);
 
-	@Override
 	@Invoker("addRectangle")
-	public abstract void invokeAddRectangle(GlyphRenderer.Rectangle rectangle);
+	@Override public abstract void invokeAddRectangle(GlyphRenderer.Rectangle rectangle);
 
 	@Inject(method = "accept",
 	        at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/client/font/TextRenderer$Drawer;x:F"),

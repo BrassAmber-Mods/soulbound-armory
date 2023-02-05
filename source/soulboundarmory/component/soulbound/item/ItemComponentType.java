@@ -61,8 +61,7 @@ public final class ItemComponentType<C extends ItemComponent<C>> extends Identif
 		return Optional.ofNullable(this.of(entity));
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return "item component type " + this.id();
 	}
 }

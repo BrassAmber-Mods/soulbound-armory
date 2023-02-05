@@ -1,7 +1,5 @@
 package soulboundarmory.component.soulbound.item.tool;
 
-import java.util.List;
-import java.util.Objects;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -22,6 +20,9 @@ import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
+
+import java.util.List;
+import java.util.Objects;
 
 public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComponent<T> {
 	protected ToolMaterial material = ToolMaterials.WOOD;
@@ -58,15 +59,13 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		}
 	}
 
-	@Override
-	public int levelXP(int level) {
+	@Override public int levelXP(int level) {
 		return this.canLevelUp()
 			? Configuration.initialToolXP + (int) Math.round(4 * Math.pow(level, 1.25))
 			: -1;
 	}
 
-	@Override
-	public void mined(BlockState state, BlockPos position) {
+	@Override public void mined(BlockState state, BlockPos position) {
 		if (this.isServer() && this.itemStack.isSuitableFor(state)) {
 			var delta = Math.max(1, state.calcBlockBreakingDelta(this.player, this.player.world, position));
 			var xp = Math.round(state.getHardness(this.player.world, position)) + 4 * (1 - delta);
@@ -74,13 +73,11 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		}
 	}
 
-	@Override
-	public ToolMaterial material() {
+	@Override public ToolMaterial material() {
 		return SoulboundItems.material(this.material);
 	}
 
-	@Override
-	public void addAttribute(StatisticType type, int points) {
+	@Override public void addAttribute(StatisticType type, int points) {
 		super.addAttribute(type, points);
 
 		var upgrade = this.statistic(StatisticType.upgradeProgress);
@@ -98,8 +95,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		}
 	}
 
-	@Override
-	public void reset() {
+	@Override public void reset() {
 		super.reset();
 
 		this.nextMaterial = null;
@@ -116,8 +112,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		return super.format(statistic);
 	}
 
-	@Override
-	public List<StatisticType> screenAttributes() {
+	@Override public List<StatisticType> screenAttributes() {
 		var types = ReferenceArrayList.of(StatisticType.efficiency, StatisticType.reach);
 
 		if (this.nextMaterial != null) {
@@ -127,8 +122,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		return types;
 	}
 
-	@Override
-	public List<Text> tooltip() {
+	@Override public List<Text> tooltip() {
 		return List.of(
 			Translations.tooltipReach.translate(this.formatValue(StatisticType.reach)),
 			Translations.tooltipEfficiency.translate(this.formatValue(StatisticType.efficiency)),
@@ -136,8 +130,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		);
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		super.serialize(tag);
 
 		if (this.material != null) {
@@ -149,8 +142,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		}
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		super.deserialize(tag);
 
 		this.material = Objects.requireNonNullElse(TierSortingRegistry.byName(new Identifier(tag.getString("material"))), this.material);

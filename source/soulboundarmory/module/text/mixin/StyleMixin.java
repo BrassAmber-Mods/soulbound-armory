@@ -1,13 +1,6 @@
 package soulboundarmory.module.text.mixin;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Set;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
+import com.google.gson.*;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -27,6 +20,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import soulboundarmory.module.text.ExtendedFormatting;
 import soulboundarmory.module.text.access.ExtendedStyle;
 
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Set;
+
 @SuppressWarnings("ConstantConditions")
 @Mixin(Style.class)
 abstract class StyleMixin implements ExtendedStyle {
@@ -39,19 +36,16 @@ abstract class StyleMixin implements ExtendedStyle {
 	@Unique
 	private static Boolean previousObfuscated;
 
-	@Override
 	@Unique
-	public Set<Formatting> formattings() {
+	@Override public Set<Formatting> formattings() {
 		return this.formattings;
 	}
 
-	@Override
-	public boolean has(Formatting formatting) {
+	@Override public boolean has(Formatting formatting) {
 		return this.formattings.contains(formatting);
 	}
 
-	@Override
-	public void add(Style to) {
+	@Override public void add(Style to) {
 		this.add((ExtendedStyle) to);
 	}
 
@@ -60,8 +54,7 @@ abstract class StyleMixin implements ExtendedStyle {
 		style.add(this.formattings);
 	}
 
-	@Override
-	public void add(Formatting formatting) {
+	@Override public void add(Formatting formatting) {
 		this.formattings.add(formatting);
 	}
 

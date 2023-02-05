@@ -118,18 +118,15 @@ public class TextWidget extends Widget<TextWidget> {
 		return this.hasStroke ? this.adjustColor(this.stroke, 0xFF000000) : 0;
 	}
 
-	@Override
-	public int width() {
+	@Override public int width() {
 		return this.adjustSize(this.text().mapToInt(textRenderer::getWidth).max().orElse(0));
 	}
 
-	@Override
-	public int height() {
+	@Override public int height() {
 		return this.adjustSize(fontHeight() * (int) this.text().count());
 	}
 
-	@Override
-	protected void render() {
+	@Override protected void render() {
 		this.withZ(() -> Util.enumerate(this.text().toList(), (text, row) -> {
 			var y = this.absoluteY() + fontHeight() * row;
 

@@ -14,8 +14,7 @@ public class ReturnSkill extends Skill {
 		return Collections.singleton(Skills.throwing);
 	}
 
-	@Override
-	public int cost(int level) {
+	@Override public int cost(int level) {
 		return 2;
 	}
 }

@@ -32,8 +32,7 @@ public class Translation extends TranslatableTextContent {
 		return MutableText.of(this);
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return this.text().getString();
 	}
 }

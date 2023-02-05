@@ -7,8 +7,7 @@ public final class AmbidexteritySkill extends Skill {
 		super("ambidexterity", 1);
 	}
 
-	@Override
-	public int cost(int level) {
+	@Override public int cost(int level) {
 		return 5;
 	}
 }

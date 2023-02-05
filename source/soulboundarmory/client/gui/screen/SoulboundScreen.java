@@ -1,7 +1,5 @@
 package soulboundarmory.client.gui.screen;
 
-import java.util.List;
-import java.util.function.Supplier;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -21,6 +19,9 @@ import soulboundarmory.module.gui.widget.slider.SliderWidget;
 import soulboundarmory.network.ExtendedPacketBuffer;
 import soulboundarmory.network.Packets;
 import soulboundarmory.util.Util;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  The main menu of this mod.
@@ -89,8 +90,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 		super.tick();
 	}
 
-	@Override
-	public void initialize() {
+	@Override public void initialize() {
 		this.tabs.clear();
 		this.baseTick();
 		this.add(this.xpBar);
@@ -123,8 +123,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 		this.add(this.options);
 	}
 
-	@Override
-	public boolean mouseScrolled(double x, double y, double d) {
+	@Override public boolean mouseScrolled(double x, double y, double d) {
 		if (super.mouseScrolled(x, y, d)) {
 			return true;
 		}
@@ -142,8 +141,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 		return false;
 	}
 
-	@Override
-	public boolean shouldClose(int keyCode, int scanCode, int modifiers) {
+	@Override public boolean shouldClose(int keyCode, int scanCode, int modifiers) {
 		return super.shouldClose(keyCode, scanCode, modifiers) || modifiers == 0 && GUIKeyBinding.instance.matchesKey(keyCode, scanCode);
 	}
 

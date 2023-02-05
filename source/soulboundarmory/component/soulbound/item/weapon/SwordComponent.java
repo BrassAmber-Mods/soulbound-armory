@@ -1,7 +1,5 @@
 package soulboundarmory.component.soulbound.item.weapon;
 
-import java.util.List;
-import java.util.stream.Stream;
 import com.google.common.collect.Multimap;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -18,6 +16,9 @@ import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.AttributeModifierIdentifiers;
 import soulboundarmory.util.Util2;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 public class SwordComponent extends WeaponComponent<SwordComponent> {
 	protected int lightningCooldown;
@@ -36,18 +37,15 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.summonLightning);
 	}
 
-	@Override
-	public Text name() {
+	@Override public Text name() {
 		return Translations.guiSword;
 	}
 
-	@Override
-	public Item item() {
+	@Override public Item item() {
 		return SoulboundItems.sword;
 	}
 
-	@Override
-	public ItemComponentType<SwordComponent> type() {
+	@Override public ItemComponentType<SwordComponent> type() {
 		return ItemComponentType.sword;
 	}
 
@@ -61,21 +59,18 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 		}
 	}
 
-	@Override
-	public void attributeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> modifiers, EquipmentSlot slot) {
+	@Override public void attributeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> modifiers, EquipmentSlot slot) {
 		if (slot == EquipmentSlot.MAINHAND) {
 			modifiers.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, this.weaponModifier(AttributeModifierIdentifiers.ItemAccess.attackDamageModifier, StatisticType.attackDamage));
 			modifiers.put(EntityAttributes.GENERIC_ATTACK_SPEED, this.weaponModifier(AttributeModifierIdentifiers.ItemAccess.attackSpeedModifier, StatisticType.attackSpeed));
 		}
 	}
 
-	@Override
-	public List<StatisticType> screenAttributes() {
+	@Override public List<StatisticType> screenAttributes() {
 		return Util2.add(super.screenAttributes(), StatisticType.efficiency);
 	}
 
-	@Override
-	public double increase(StatisticType type) {
+	@Override public double increase(StatisticType type) {
 		if (type == StatisticType.attackSpeed) return 0.03;
 		if (type == StatisticType.attackDamage) return 0.07;
 		if (type == StatisticType.criticalHitRate) return 0.015;
@@ -84,8 +79,7 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 		return 0;
 	}
 
-	@Override
-	public void tick() {
+	@Override public void tick() {
 		if (this.isServer()) {
 			if (this.lightningCooldown > 0) {
 				this.lightningCooldown--;
@@ -93,15 +87,13 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 		}
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		super.serialize(tag);
 
 		tag.putInt("lightningCooldown", this.lightningCooldown());
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		super.deserialize(tag);
 
 		this.lightningCooldown = tag.getInt("lightningCooldown");

@@ -137,8 +137,7 @@ public abstract class TextBufferWidget<T extends TextBufferWidget<T>> extends Wi
 		return String.join("\n", this.lines);
 	}
 
-	@Override
-	protected void render() {
+	@Override protected void render() {
 		this.update();
 	}
 

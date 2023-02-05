@@ -145,13 +145,11 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 		return this.textureWidth(width).textureHeight(height);
 	}
 
-	@Override
-	public int width() {
+	@Override public int width() {
 		return this.resolve(this.width, this.textureWidth);
 	}
 
-	@Override
-	public int height() {
+	@Override public int height() {
 		return this.resolve(this.height, this.textureHeight);
 	}
 
@@ -284,8 +282,7 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 		return this.texture(GUI_ICONS_TEXTURE).v(64).slice(1, 138, 182, 1, 4, 5);
 	}
 
-	@Override
-	protected void render() {
+	@Override protected void render() {
 		var viewHeight = unscale(this.viewHeight());
 
 		if (this.viewWidth() < this.width() || this.viewHeight() < this.height()) {

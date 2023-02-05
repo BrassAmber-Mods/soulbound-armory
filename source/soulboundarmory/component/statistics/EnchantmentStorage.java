@@ -32,8 +32,7 @@ public class EnchantmentStorage extends Reference2IntLinkedOpenHashMap<Enchantme
 			.forEach(enchantment -> this.put(enchantment, 0));
 	}
 
-	@Override
-	public Integer get(Object enchantment) {
+	@Override public Integer get(Object enchantment) {
 		// Can't use getOrDefault here due to recursion.
 		var level = super.get(enchantment);
 		return level == null ? 0 : level;
@@ -50,8 +49,7 @@ public class EnchantmentStorage extends Reference2IntLinkedOpenHashMap<Enchantme
 		}
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		for (var enchantment : this) {
 			var level = this.get(enchantment);
 
@@ -65,8 +63,7 @@ public class EnchantmentStorage extends Reference2IntLinkedOpenHashMap<Enchantme
 		}
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		for (var key : tag.getKeys()) {
 			var enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new Identifier(key));
 
@@ -76,8 +73,7 @@ public class EnchantmentStorage extends Reference2IntLinkedOpenHashMap<Enchantme
 		}
 	}
 
-	@Override
-	public Iterator<Enchantment> iterator() {
+	@Override public Iterator<Enchantment> iterator() {
 		return this.keySet().iterator();
 	}
 }

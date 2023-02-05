@@ -39,8 +39,7 @@ public class SoulboundLightningEntity extends LightningEntity implements Lightni
 		this(world, pos.x, pos.y, pos.z, caster);
 	}
 
-	@Override
-	public void tick() {
+	@Override public void tick() {
 		if (this.isServer()) {
 			this.setFlag(6, this.isGlowing());
 		}
@@ -152,23 +151,20 @@ public class SoulboundLightningEntity extends LightningEntity implements Lightni
 		this.caster = caster.getUuid();
 	}
 
-	@Override
-	public NbtCompound serializeNBT() {
+	@Override public NbtCompound serializeNBT() {
 		var tag = super.serializeNBT();
 		tag.putUuid("casterUUID", this.caster);
 
 		return tag;
 	}
 
-	@Override
-	public void deserializeNBT(NbtCompound tag) {
+	@Override public void deserializeNBT(NbtCompound tag) {
 		super.deserializeNBT(tag);
 
 		this.caster = tag.getUuid("casterUUID");
 	}
 
-	@Override
-	public boolean isClient() {
+	@Override public boolean isClient() {
 		return this.world.isClient;
 	}
 }

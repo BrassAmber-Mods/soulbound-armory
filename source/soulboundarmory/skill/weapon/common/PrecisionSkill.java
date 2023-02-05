@@ -9,8 +9,7 @@ public class PrecisionSkill extends Skill {
 		super("precision", 1);
 	}
 
-	@Override
-	public int cost(int level) {
+	@Override public int cost(int level) {
 		return 1;
 	}
 

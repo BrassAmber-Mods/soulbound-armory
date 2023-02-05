@@ -18,8 +18,7 @@ public final class GUIKeyBinding extends KeyBinding {
 		super("key.%s.%s".formatted(SoulboundArmory.ID, "menu"), GLFW.GLFW_KEY_R, "key.categories.%s".formatted(SoulboundArmory.ID));
 	}
 
-	@Override
-	public void setPressed(boolean pressed) {
+	@Override public void setPressed(boolean pressed) {
 		this.wasPressed = this.isPressed();
 
 		if (pressed && !this.wasPressed) {

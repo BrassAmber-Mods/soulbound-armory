@@ -89,8 +89,7 @@ public final class EntityData implements EntityComponent<EntityData> {
 		return this.isFrozen() ? 0x3EDBFF : 0;
 	}
 
-	@Override
-	public void tickStart() {
+	@Override public void tickStart() {
 		if (!this.entity.world.isClient) {
 			if (this.isFrozen()) {
 				if (--this.freezeTicks == 0) {
@@ -110,14 +109,12 @@ public final class EntityData implements EntityComponent<EntityData> {
 		}
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		tag.putInt("freezeTicks", this.freezeTicks);
 		tag.putInt("blockTeleportTicks", this.blockTeleportTicks);
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		this.freezeTicks = tag.getInt("freezeTicks");
 		this.blockTeleportTicks = tag.getInt("blockTeleportTicks");
 	}

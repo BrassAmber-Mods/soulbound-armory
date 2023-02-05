@@ -75,8 +75,7 @@ public final class SkillInstance implements Comparable<SkillInstance>, Serializa
 		return this.level > 0;
 	}
 
-	@Override
-	public int compareTo(SkillInstance other) {
+	@Override public int compareTo(SkillInstance other) {
 		var tierDifference = this.skill.tier() - other.skill.tier();
 		return tierDifference == 0 ? this.level() - other.level() : tierDifference;
 	}
@@ -97,13 +96,11 @@ public final class SkillInstance implements Comparable<SkillInstance>, Serializa
 		this.level = 0;
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		tag.putInt("level", this.level);
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		this.level = tag.getInt("level");
 	}
 }

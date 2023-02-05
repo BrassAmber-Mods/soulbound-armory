@@ -22,8 +22,7 @@ abstract class EntityMixin implements EntityAccess {
 	@Unique
 	private final Map<EntityComponentKey<?>, EntityComponent<?>> components = new Reference2ReferenceOpenHashMap<>();
 
-	@Override
-	public Map<EntityComponentKey<?>, EntityComponent<?>> soulboundarmory$components() {
+	@Override public Map<EntityComponentKey<?>, EntityComponent<?>> soulboundarmory$components() {
 		return this.components;
 	}
 

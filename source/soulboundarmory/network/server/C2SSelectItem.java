@@ -7,10 +7,10 @@ import soulboundarmory.network.ItemComponentPacket;
 /**
  A client-to-server packet that is sent when a client selects an item.
 
- @see SelectionTab */
+ @see SelectionTab
+ */
 public final class C2SSelectItem extends ItemComponentPacket {
-	@Override
-	protected void execute(ItemComponent<?> component) {
+	@Override protected void execute(ItemComponent<?> component) {
 		component.select(this.message.readInt());
 	}
 }

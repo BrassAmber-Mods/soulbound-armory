@@ -20,8 +20,7 @@ public class ExperienceBarTexture extends ResourceTexture {
 		Node.textureManager.registerTexture(this.location, this);
 	}
 
-	@Override
-	protected TextureData loadTextureData(ResourceManager manager) {
+	@Override protected TextureData loadTextureData(ResourceManager manager) {
 		var image = Resources.readTexture(DrawableHelper.GUI_ICONS_TEXTURE);
 		var raster = image.getRaster();
 		var styles = BarStyle.styles;

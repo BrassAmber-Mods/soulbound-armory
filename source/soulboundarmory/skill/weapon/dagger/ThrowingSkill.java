@@ -9,13 +9,11 @@ public class ThrowingSkill extends Skill {
 		super("throwing", 1);
 	}
 
-	@Override
-	public int cost(int level) {
+	@Override public int cost(int level) {
 		return 2;
 	}
 
-	@Override
-	public void render(Widget<?> tab, int level) {
+	@Override public void render(Widget<?> tab, int level) {
 		tab.renderGuiItem(Items.TRIDENT, tab.absoluteX(), tab.absoluteY());
 	}
 }

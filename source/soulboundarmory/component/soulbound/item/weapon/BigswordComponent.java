@@ -1,6 +1,5 @@
 package soulboundarmory.component.soulbound.item.weapon;
 
-import java.util.stream.Stream;
 import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 import soulboundarmory.client.i18n.Translations;
@@ -9,6 +8,8 @@ import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
+
+import java.util.stream.Stream;
 
 public class BigswordComponent extends WeaponComponent<BigswordComponent> {
 	private int chargeDelay;
@@ -27,23 +28,19 @@ public class BigswordComponent extends WeaponComponent<BigswordComponent> {
 		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment);
 	}
 
-	@Override
-	public ItemComponentType<BigswordComponent> type() {
+	@Override public ItemComponentType<BigswordComponent> type() {
 		return ItemComponentType.bigsword;
 	}
 
-	@Override
-	public Item item() {
+	@Override public Item item() {
 		return SoulboundItems.bigsword;
 	}
 
-	@Override
-	public Text name() {
+	@Override public Text name() {
 		return Translations.guiBigsword;
 	}
 
-	@Override
-	public double increase(StatisticType type) {
+	@Override public double increase(StatisticType type) {
 		if (type == StatisticType.attackDamage) return 0.12;
 		if (type == StatisticType.attackSpeed) return 0.025;
 		if (type == StatisticType.criticalHitRate) return 0.008;

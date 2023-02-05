@@ -40,23 +40,19 @@ public class ExperienceBar extends ScalableWidget<ExperienceBar> {
 		return this;
 	}
 
-	@Override
-	public int getWidth(TextRenderer textRenderer) {
+	@Override public int getWidth(TextRenderer textRenderer) {
 		return this.isPresent() ? this.width() + 8 : 0;
 	}
 
-	@Override
-	public int getHeight() {
+	@Override public int getHeight() {
 		return this.isPresent() ? this.height() + this.offset() + 6 : 0;
 	}
 
-	@Override
-	public boolean isPresent() {
+	@Override public boolean isPresent() {
 		return this.component != null && Configuration.Client.Color.alpha > 25 && super.isPresent();
 	}
 
-	@Override
-	public void render() {
+	@Override public void render() {
 		this.v(Configuration.Client.style.v).viewWidth(1D).color4f(Configuration.Client.Color.getf(0), Configuration.Client.Color.getf(1), Configuration.Client.Color.getf(2), Configuration.Client.Color.getf(3));
 		super.render();
 
@@ -68,8 +64,7 @@ public class ExperienceBar extends ScalableWidget<ExperienceBar> {
 		super.render();
 	}
 
-	@Override
-	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrixes, ItemRenderer itemRenderer, int z) {
+	@Override public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrixes, ItemRenderer itemRenderer, int z) {
 		this.x(x).y(y + this.offset()).z(z).render(matrixes);
 	}
 

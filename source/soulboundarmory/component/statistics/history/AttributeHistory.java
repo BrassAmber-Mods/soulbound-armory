@@ -12,8 +12,7 @@ public final class AttributeHistory extends History<AttributeRecord> {
 		this.record(new AttributeRecord(this.component, attribute, points));
 	}
 
-	@Override
-	protected AttributeRecord skeleton() {
+	@Override protected AttributeRecord skeleton() {
 		return new AttributeRecord(this.component);
 	}
 }

@@ -19,13 +19,11 @@ public class SoulboundDaggerEntityRenderer extends EntityRenderer<SoulboundDagge
 		super(context);
 	}
 
-	@Override
-	public Identifier getTexture(SoulboundDaggerEntity entity) {
+	@Override public Identifier getTexture(SoulboundDaggerEntity entity) {
 		return entity.component().map(component -> Node.itemRenderer.getModel(component.stack(), entity.world, component.player, component.player.getId()).getParticleSprite().getId()).orElse(id);
 	}
 
-	@Override
-	public void render(SoulboundDaggerEntity dagger, float yaw, float tickDelta, MatrixStack matrixes, VertexConsumerProvider vertexConsumers, int light) {
+	@Override public void render(SoulboundDaggerEntity dagger, float yaw, float tickDelta, MatrixStack matrixes, VertexConsumerProvider vertexConsumers, int light) {
 		matrixes.push();
 		Util.rotate(matrixes, Vec3f.POSITIVE_Y, MathHelper.lerp(tickDelta, dagger.prevYaw, dagger.getYaw()) + 90);
 		Util.rotate(matrixes, Vec3f.POSITIVE_Z, 45 - MathHelper.lerp(tickDelta, dagger.prevPitch, dagger.getPitch()));

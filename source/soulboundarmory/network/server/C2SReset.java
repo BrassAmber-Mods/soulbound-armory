@@ -8,8 +8,7 @@ import soulboundarmory.network.ItemComponentPacket;
  A client-to-server packet that is sent when a client requests to reset a category.
  */
 public final class C2SReset extends ItemComponentPacket {
-	@Override
-	public void execute(ItemComponent<?> component) {
+	@Override public void execute(ItemComponent<?> component) {
 		var category = this.message.readRegistryEntry(Category.registry());
 
 		if (category == null) {

@@ -8,7 +8,8 @@ import net.minecraft.util.Identifier;
 /**
  A key that corresponds to a registered component; used for extracting components from objects.
 
- @param <C> the type of the component */
+ @param <C> the type of the component
+ */
 public abstract class ComponentKey<B, C extends Component<C>> {
 	public final Identifier id;
 	public final String key;

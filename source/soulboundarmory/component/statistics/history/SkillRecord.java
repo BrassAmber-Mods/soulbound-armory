@@ -24,8 +24,7 @@ public final class SkillRecord extends Record {
 		super(component);
 	}
 
-	@Override
-	public boolean revert(int level) {
+	@Override public boolean revert(int level) {
 		var interval = Configuration.levelsPerSkillPoint;
 		var change = this.component.level() / interval - level / interval;
 		var deduction = Math.min(this.points, change);
@@ -41,20 +40,17 @@ public final class SkillRecord extends Record {
 		return true;
 	}
 
-	@Override
-	public void pop() {
+	@Override public void pop() {
 		this.component.skill(this.skill).downgrade();
 		this.component.add(StatisticType.skillPoints, -this.points);
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		this.skill = Skills.registry().getValue(new Identifier(tag.getString("skill")));
 		this.points = tag.getInt("points");
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		tag.putString("skill", this.skill.string());
 		tag.putInt("points", this.points);
 	}

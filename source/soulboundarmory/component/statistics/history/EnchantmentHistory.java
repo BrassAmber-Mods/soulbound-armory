@@ -12,8 +12,7 @@ public final class EnchantmentHistory extends History<EnchantmentRecord> {
 		this.record(new EnchantmentRecord(this.component, enchantment, points));
 	}
 
-	@Override
-	protected EnchantmentRecord skeleton() {
+	@Override protected EnchantmentRecord skeleton() {
 		return new EnchantmentRecord(this.component);
 	}
 }

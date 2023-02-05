@@ -14,8 +14,7 @@ public class OverlineFormatter implements TextFormatter {
 		this.yMultiplier = level;
 	}
 
-	@Override
-	public void format(
+	@Override public void format(
 		FontRenderer$DrawerAccess drawer,
 		Style style,
 		int charIndex,

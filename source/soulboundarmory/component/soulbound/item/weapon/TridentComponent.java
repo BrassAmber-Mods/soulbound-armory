@@ -1,6 +1,5 @@
 package soulboundarmory.component.soulbound.item.weapon;
 
-import java.util.stream.Stream;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
@@ -10,6 +9,8 @@ import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
+
+import java.util.stream.Stream;
 
 public class TridentComponent extends WeaponComponent<TridentComponent> {
 	public TridentComponent(MasterComponent<?> component) {
@@ -26,28 +27,23 @@ public class TridentComponent extends WeaponComponent<TridentComponent> {
 		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment);
 	}
 
-	@Override
-	public ItemComponentType<TridentComponent> type() {
+	@Override public ItemComponentType<TridentComponent> type() {
 		return ItemComponentType.trident;
 	}
 
-	@Override
-	public Item item() {
+	@Override public Item item() {
 		return SoulboundItems.trident;
 	}
 
-	@Override
-	public Item consumableItem() {
+	@Override public Item consumableItem() {
 		return Items.TRIDENT;
 	}
 
-	@Override
-	public Text name() {
+	@Override public Text name() {
 		return Translations.guiTrident;
 	}
 
-	@Override
-	public double increase(StatisticType type) {
+	@Override public double increase(StatisticType type) {
 		if (type == StatisticType.attackDamage) return 0.15;
 		if (type == StatisticType.attackSpeed) return 0.03;
 		if (type == StatisticType.criticalHitRate) return 0.005;

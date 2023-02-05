@@ -61,8 +61,7 @@ public class Slider extends ScalableWidget<Slider> {
 		return this.max - this.min;
 	}
 
-	@Override
-	public void scroll(double amount) {
+	@Override public void scroll(double amount) {
 		super.scroll(amount);
 
 		var addition = Screen.hasShiftDown() ? 0.05 * this.range()
@@ -100,28 +99,23 @@ public class Slider extends ScalableWidget<Slider> {
 		return this;
 	}
 
-	@Override
-	public boolean focusable() {
+	@Override public boolean focusable() {
 		return this.isActive();
 	}
 
-	@Override
-	public boolean isFocused() {
+	@Override public boolean isFocused() {
 		return super.isFocused() || this.owner().isHovered();
 	}
 
-	@Override
-	public void drag() {
+	@Override public void drag() {
 		this.progress(MathHelper.clamp(mouseX() - this.owner().absoluteX(), 0D, this.maxX()) / this.maxX());
 	}
 
-	@Override
-	public boolean isValidPrimaryClick(int button) {
+	@Override public boolean isValidPrimaryClick(int button) {
 		return button == 0;
 	}
 
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	@Override public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (super.mouseScrolled(mouseX, mouseY, amount)) {
 			return true;
 		}
@@ -135,8 +129,7 @@ public class Slider extends ScalableWidget<Slider> {
 		return false;
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	@Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (super.keyPressed(keyCode, scanCode, modifiers)) {
 			return true;
 		}
@@ -156,14 +149,12 @@ public class Slider extends ScalableWidget<Slider> {
 		return false;
 	}
 
-	@Override
-	protected void primaryClick() {
+	@Override protected void primaryClick() {
 		super.primaryClick();
 		this.drag();
 	}
 
-	@Override
-	protected boolean clicked() {
+	@Override protected boolean clicked() {
 		return this.owner().isHovered() || this.isHovered();
 	}
 

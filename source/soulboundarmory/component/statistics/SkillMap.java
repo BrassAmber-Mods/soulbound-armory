@@ -25,8 +25,7 @@ public class SkillMap extends Reference2ObjectLinkedOpenHashMap<Skill, SkillInst
 		this.values().forEach(container -> container.initializeDependencies(this));
 	}
 
-	@Override
-	public void serialize(NbtCompound tag) {
+	@Override public void serialize(NbtCompound tag) {
 		for (var skill : this.values()) {
 			if (skill != null) {
 				tag.put(skill.skill.string(), skill.serialize());
@@ -34,8 +33,7 @@ public class SkillMap extends Reference2ObjectLinkedOpenHashMap<Skill, SkillInst
 		}
 	}
 
-	@Override
-	public void deserialize(NbtCompound tag) {
+	@Override public void deserialize(NbtCompound tag) {
 		for (var identifier : tag.getKeys()) {
 			var skill = this.get(Skills.registry().getValue(new Identifier(identifier)));
 

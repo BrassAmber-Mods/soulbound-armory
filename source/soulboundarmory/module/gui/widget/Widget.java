@@ -37,7 +37,8 @@ import soulboundarmory.util.Util2;
 /**
  A flexible and fluent element that supports nesting.
 
- @param <T> the type of the widget */
+ @param <T> the type of the widget
+ */
 @OnlyIn(Dist.CLIENT)
 public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements TooltipComponent {
 	public Optional<Widget<?>> parent = Optional.empty();
@@ -441,33 +442,27 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		return this.y() + this.height();
 	}
 
-	@Override
-	public int absoluteX() {
+	@Override public int absoluteX() {
 		return this.x.resolve(this::width, () -> this.parent.map(Widget::absoluteX).orElse(0), () -> this.parent.map(Widget::width).orElseGet(Node::windowWidth));
 	}
 
-	@Override
-	public int absoluteY() {
+	@Override public int absoluteY() {
 		return this.y.resolve(this::height, () -> this.parent.map(Widget::absoluteY).orElse(0), () -> this.parent.map(Widget::height).orElseGet(Node::windowHeight));
 	}
 
-	@Override
-	public int z() {
+	@Override public int z() {
 		return super.z() + this.parent.map(Widget::z).orElse(0);
 	}
 
-	@Override
-	public boolean isPresent() {
+	@Override public boolean isPresent() {
 		return this.present.getAsBoolean() && super.isPresent();
 	}
 
-	@Override
-	public boolean isVisible() {
+	@Override public boolean isVisible() {
 		return this.visible.getAsBoolean() && super.isVisible();
 	}
 
-	@Override
-	public boolean isActive() {
+	@Override public boolean isActive() {
 		return this.active.getAsBoolean() && super.isActive();
 	}
 
@@ -495,13 +490,11 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		return this.isTooltip() && this.parent.get().mouseFocused || this.parent.get().isSelected() && isControlDown() || this.isFocused();
 	}
 
-	@Override
-	public Optional<? extends Widget<?>> parent() {
+	@Override public Optional<? extends Widget<?>> parent() {
 		return this.parent;
 	}
 
-	@Override
-	public List<? extends Widget<?>> listChildren() {
+	@Override public List<? extends Widget<?>> listChildren() {
 		return this.children;
 	}
 
@@ -525,8 +518,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 
 	 @return {@code true} if an element has been selected
 	 */
-	@Override
-	public boolean changeFocus(boolean forward) {
+	@Override public boolean changeFocus(boolean forward) {
 		if (this.isPresent()) {
 			var direction = forward ? 1 : -1;
 			var degree = this.degree();
@@ -628,8 +620,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		}
 	}
 
-	@Override
-	public void render(MatrixStack matrixes, int mouseX, int mouseY, float delta) {
+	@Override public void render(MatrixStack matrixes, int mouseX, int mouseY, float delta) {
 		this.render(matrixes);
 	}
 
@@ -736,8 +727,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		renderTooltip(this.matrixes, text, x, y);
 	}
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	@Override public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (this.isPresent()) {
 			if (super.mouseClicked(mouseX, mouseY, button)) {
 				return true;
@@ -764,8 +754,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		return false;
 	}
 
-	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	@Override public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		if (this.isPresent()) {
 			if (super.mouseReleased(mouseX, mouseY, button)) {
 				return true;
@@ -782,8 +771,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		return false;
 	}
 
-	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	@Override public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (this.isPresent()) {
 			if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
 				return true;
@@ -799,8 +787,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		return false;
 	}
 
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	@Override public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (this.isPresent()) {
 			if (super.mouseScrolled(mouseX, mouseY, amount)) {
 				return true;
@@ -816,8 +803,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		return false;
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	@Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (this.isPresent()) {
 			if (keyCode == GLFW.GLFW_KEY_TAB && this.changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0) || super.keyPressed(keyCode, scanCode, modifiers)) {
 				return true;
@@ -841,18 +827,15 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		return false;
 	}
 
-	@Override
-	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrixes, ItemRenderer itemRenderer, int z) {
+	@Override public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrixes, ItemRenderer itemRenderer, int z) {
 		this.x(x).y(y).z(z).render(matrixes);
 	}
 
-	@Override
-	public int getHeight() {
+	@Override public int getHeight() {
 		return this.height();
 	}
 
-	@Override
-	public int getWidth(TextRenderer textRenderer) {
+	@Override public int getWidth(TextRenderer textRenderer) {
 		return this.width();
 	}
 
