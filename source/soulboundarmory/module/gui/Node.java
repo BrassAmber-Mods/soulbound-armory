@@ -182,8 +182,8 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 	}
 
-	public static void chroma(float chroma) {
-		RenderSystem.setShaderColor(chroma, chroma, chroma, -1);
+	public static void colorValue(float value) {
+		RenderSystem.setShaderColor(value, value, value, -1);
 	}
 
 	public static void fill(MatrixStack matrices, int x1, int y1, int x2, int y2, float z, int color) {
@@ -837,7 +837,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		return this.isPresent() && this.contains(mouseX, mouseY);
 	}
 
-	public void renderBackground(Identifier identifier, int x, int y, int width, int height, int chroma, int alpha) {
+	public void renderBackground(Identifier identifier, int x, int y, int width, int height, int value, int alpha) {
 		var tessellator = Tessellator.getInstance();
 		var buffer = tessellator.getBuffer();
 		float f = 32;
@@ -849,15 +849,15 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 
 		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-		buffer.vertex(x, endY, this.z() - 1000).color(chroma, chroma, chroma, 255).texture(0, endY / f + alpha).next();
-		buffer.vertex(endX, endY, this.z() - 1000).color(chroma, chroma, chroma, 255).texture(endX / f, endY / f + alpha).next();
-		buffer.vertex(endX, y, this.z() - 1000).color(chroma, chroma, chroma, 255).texture(endX / f, alpha).next();
-		buffer.vertex(x, y, this.z() - 1000).color(chroma, chroma, chroma, 255).texture(0, alpha).next();
+		buffer.vertex(x, endY, this.z() - 1000).color(value, value, value, 255).texture(0, endY / f + alpha).next();
+		buffer.vertex(endX, endY, this.z() - 1000).color(value, value, value, 255).texture(endX / f, endY / f + alpha).next();
+		buffer.vertex(endX, y, this.z() - 1000).color(value, value, value, 255).texture(endX / f, alpha).next();
+		buffer.vertex(x, y, this.z() - 1000).color(value, value, value, 255).texture(0, alpha).next();
 		tessellator.draw();
 	}
 
-	public void renderBackground(Identifier identifier, int x, int y, int width, int height, int chroma) {
-		this.renderBackground(identifier, x, y, width, height, chroma, 0);
+	public void renderBackground(Identifier identifier, int x, int y, int width, int height, int value) {
+		this.renderBackground(identifier, x, y, width, height, value, 0);
 	}
 
 	public void renderBackground(Identifier identifier, int x, int y, int width, int height) {

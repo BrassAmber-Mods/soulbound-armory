@@ -93,7 +93,7 @@ public class SkillWidget extends Widget<SkillWidget> {
 			this.frame.color3f(1);
 			this.deferRender();
 		} else {
-			this.frame.color3f(this.tab.chroma);
+			this.frame.color3f(this.tab.colorValue);
 		}
 	}
 }

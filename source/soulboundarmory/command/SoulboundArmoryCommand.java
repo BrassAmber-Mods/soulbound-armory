@@ -1,10 +1,5 @@
 package soulboundarmory.command;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
@@ -17,10 +12,17 @@ import net.minecraft.util.Formatting;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.command.argument.RegistryArgumentType;
+import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.statistics.Category;
 import soulboundarmory.component.statistics.StatisticType;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -59,7 +61,9 @@ public final class SoulboundArmoryCommand {
 					.then(argument(ITEM, itemComponents()).executes(context -> reset(context, true, false, false))
 						.then(argument(CATEGORY, registry(Category.registry())).executes(context -> reset(context, true, false, true))
 							.then(argument(PLAYERS, EntityArgumentType.players()).executes(context -> reset(context, true, true, true))))
-						.then(argument(PLAYERS, EntityArgumentType.players()).executes(context -> reset(context, true, true, false)))))
+						.then(argument(PLAYERS, EntityArgumentType.players()).executes(context -> reset(context, true, true, false))))
+					.then(literal("cooldown").executes(context -> resetCooldown(context, false))
+						.then(argument(PLAYERS, EntityArgumentType.players()).executes(context -> set(context, true)))))
 		);
 	}
 
@@ -134,6 +138,15 @@ public final class SoulboundArmoryCommand {
 		}
 
 		return players.size();
+	}
+
+	private static int resetCooldown(CommandContext<ServerCommandSource> context, boolean hasPlayerArgument) {
+		players(context, hasPlayerArgument).stream().flatMap(Components::soulbound).forEach(component -> {
+			component.cooldown(0);
+			component.synchronize();
+		});
+
+		return 1;
 	}
 
 	private static Set<ItemComponentType<?>> componentTypes(CommandContext<ServerCommandSource> context) {

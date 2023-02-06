@@ -18,7 +18,7 @@ public class MasterToolComponent extends MasterComponent<MasterToolComponent> {
 		return Components.tool;
 	}
 
-	@Override public boolean accepts(ItemStack stack) {
+	@Override public boolean matches(ItemStack stack) {
 		return stack.getItem() instanceof SoulboundToolItem;
 	}
 }

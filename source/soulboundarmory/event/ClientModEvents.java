@@ -33,7 +33,7 @@ public class ClientModEvents {
 					Util.id("animating"),
 					(stack, world, holder, entityID) -> Components.marker.optional(stack)
 						.filter(ItemMarkerComponent::animating)
-						.or(() -> Components.entityData.optional(holder).flatMap(data -> data.unlockedStack).filter(marker -> marker.animating() && marker.item() != null && marker.item().accepts(stack)))
+						.or(() -> Components.entityData.optional(holder).flatMap(data -> data.unlockedStack).filter(marker -> marker.animating() && marker.item() != null && marker.item().matches(stack)))
 						.isPresent() ? 1 : 0
 				);
 

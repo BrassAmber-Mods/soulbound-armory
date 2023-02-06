@@ -1,14 +1,5 @@
 package soulboundarmory.component.soulbound.item;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import it.unimi.dsi.fastutil.objects.ReferenceList;
@@ -24,7 +15,6 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterial;
@@ -36,22 +26,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.registries.ForgeRegistries;
-import soulboundarmory.client.gui.screen.AttributeTab;
-import soulboundarmory.client.gui.screen.EnchantmentTab;
-import soulboundarmory.client.gui.screen.SelectionTab;
-import soulboundarmory.client.gui.screen.SkillTab;
-import soulboundarmory.client.gui.screen.SoulboundScreen;
-import soulboundarmory.client.gui.screen.Tab;
+import soulboundarmory.client.gui.screen.*;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
-import soulboundarmory.component.statistics.Category;
-import soulboundarmory.component.statistics.EnchantmentStorage;
-import soulboundarmory.component.statistics.SkillMap;
-import soulboundarmory.component.statistics.Statistic;
-import soulboundarmory.component.statistics.StatisticType;
-import soulboundarmory.component.statistics.Statistics;
+import soulboundarmory.component.statistics.*;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.entity.Attributes;
 import soulboundarmory.entity.SoulboundDaggerEntity;
@@ -69,10 +49,21 @@ import soulboundarmory.util.ItemUtil;
 import soulboundarmory.util.Math2;
 import soulboundarmory.util.Sided;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 public abstract class ItemComponent<T extends ItemComponent<T>> implements Serializable, Sided {
 	protected static final NumberFormat statisticFormat = DecimalFormat.getInstance();
 
-	public final MasterComponent<?> component;
+	public final MasterComponent<?> master;
 	public final PlayerEntity player;
 	public final EnchantmentStorage enchantments = new EnchantmentStorage(this);
 	public final Statistics statistics = new Statistics(this);
@@ -82,9 +73,9 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	protected boolean unlocked;
 	protected int animationTime;
 
-	public ItemComponent(MasterComponent<?> component) {
-		this.component = component;
-		this.player = component.player;
+	public ItemComponent(MasterComponent<?> master) {
+		this.master = master;
+		this.player = master.player;
 
 		this.skills.add(Skills.enderPull);
 	}
@@ -100,7 +91,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 @return the component attached to `entity` that matches `stack`
 	 */
 	public static Optional<ItemComponent<?>> of(Entity entity, ItemStack stack) {
-		return Components.soulbound(entity).filter(component -> component.accepts(stack)).flatMap(component -> component.items.values().stream().filter(item -> item.accepts(stack))).findAny();
+		return Components.soulbound(entity).filter(component -> component.matches(stack)).flatMap(component -> component.items.values().stream().filter(item -> item.matches(stack))).findAny();
 	}
 
 	/**
@@ -117,7 +108,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 		for (var stack : entity.getHandItems()) {
 			for (var component : components) {
-				if (component.accepts(stack)) {
+				if (component.matches(stack)) {
 					return component.component(stack);
 				}
 			}
@@ -271,7 +262,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 @param stack the item stack
 	 @return whether `stack` matches this component
 	 */
-	public boolean accepts(ItemStack stack) {
+	public boolean matches(ItemStack stack) {
 		return stack.getItem() == this.item();
 	}
 
@@ -308,7 +299,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 			if (this.isClient()) {
 				if (Widget.cellScreen() instanceof SoulboundScreen screen) {
 					screen.close();
-					this.component.tab(1);
+					this.master.tab(1);
 				}
 			} else {
 				Packets.clientUnlock.sendNearby(this.player, new ExtendedPacketBuffer().writeEntity(this.player).writeItemStack(this.itemStack));
@@ -318,18 +309,27 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 	public void select(int slot) {
 		if (this.isEnabled()) {
-			if (this.isClient()) {
+			if (this.master.isClient()) {
 				Packets.serverSelectItem.send(new ExtendedPacketBuffer(this).writeInt(slot));
 			}
 
-			if (this.isUnlocked() && this.component.cooledDown() || this.canConsume(this.player.getInventory().getStack(slot))) {
-				this.player.getInventory().setStack(slot, this.stack());
-				this.component.select(this);
-				this.updateInventory(slot);
-				this.synchronize();
-				this.component.refresh();
+			var inventory = this.player.getInventory();
+
+			if (!this.master.cooledDown()) {
+				var auxSlot = (int) ItemUtil.inventory(this.player)
+					.takeWhile(Predicate.not(this.canConsume(inventory.getStack(slot)) ? stack -> this.master.item().filter(active -> !active.matches(stack)).isEmpty() : this::canConsume))
+					.count();
+
+				if (auxSlot < inventory.size()) {
+					inventory.removeStack(auxSlot);
+				} else {
+					return; // todo error
+				}
 			}
-		}
+
+			inventory.setStack(slot, this.stack());
+			this.master.set(this, slot);
+		} else; // todo error
 	}
 
 	/**
@@ -685,55 +685,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 @return whether an item stack in any of the player's hands matches this component
 	 */
 	public boolean isItemEquipped() {
-		return ItemUtil.handStacks(this.player).anyMatch(this::accepts);
-	}
-
-	/**
-	 Scan the inventory and clean it up.
-	 <br>
-	 - Remove {@link #isEnabled disabled} soulbound items.
-	 <br>
-	 - If the player is not in creative mode,
-	 then remove their item stacks that do not correspond to this component or are not in the slot specified by `slot`.
-	 <br>
-	 - If `slot` is -1, a matching item stack is encountered and the bound slot does not match `slot`, then bind that slot.
-	 <br>
-	 - If a matching item stack is encountered and it does not equal {@link #itemStack}, then replace it by a copy thereof.
-
-	 @param slot the slot wherefrom to not remove
-	 */
-	public void updateInventory(int slot) {
-		var inventory = this.player.getInventory();
-		var itemStacks = ItemUtil.inventory(this.player).toList().listIterator();
-
-		while (itemStacks.hasNext()) {
-			var stack = itemStacks.next();
-
-			if (this.component.accepts(stack)) {
-				if (this.accepts(stack)) {
-					if (this.isEnabled()) {
-						if (slot == -1) {
-							slot = itemStacks.previousIndex();
-
-							if (this.component.hasBoundSlot()) {
-								this.component.bindSlot(slot);
-							}
-						} else if (itemStacks.previousIndex() != slot) {
-							inventory.removeOne(stack);
-							continue;
-						}
-
-						if (!stack.equals(this.itemStack, false)) {
-							inventory.setStack(slot, this.stack());
-						}
-					} else {
-						inventory.removeOne(stack);
-					}
-				} else if (!this.player.isCreative()) {
-					inventory.removeOne(stack);
-				}
-			}
-		}
+		return ItemUtil.handStacks(this.player).anyMatch(this::matches);
 	}
 
 	/**
@@ -788,13 +740,6 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	}
 
 	/**
-	 Replace the current itme stack by a {@linkplain #newItemStack new item stack}.
-	 */
-	public void updateItemStack() {
-		this.itemStack = this.newItemStack();
-	}
-
-	/**
 	 Invoked every tick.
 	 */
 	public void tick() {
@@ -802,9 +747,11 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	}
 
 	/**
-	 @return a new item stack with all statistics applied
+	 Sets {@link #itemStack} to a new item stack with the most recent statistics and returns it.
+
+	 @return the new item stack
 	 */
-	protected ItemStack newItemStack() {
+	public ItemStack updateItemStack() {
 		this.itemStack = this.item().getDefaultStack();
 		Components.marker.of(this.itemStack).item(this);
 

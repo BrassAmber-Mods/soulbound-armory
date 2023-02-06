@@ -31,7 +31,6 @@ public abstract class Packet<T> {
 	public final void execute(NetworkEvent.Context context) {
 		this.context = context;
 		this.execute();
-		context.setPacketHandled(true);
 	}
 
 	/**

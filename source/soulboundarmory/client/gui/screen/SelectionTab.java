@@ -8,7 +8,7 @@ import soulboundarmory.module.gui.widget.WidgetBox;
 import soulboundarmory.util.ItemUtil;
 
 /**
- The item selection tab, which adds a button for each {@linkplain ItemComponent#canConsume unlockable} item in the inventory and each {@linkplain ItemComponent#isUnlocked unlocked} item.
+ The item selection tab, which adds a button for each {@linkplain ItemComponent#canConsume unlockable} item and each {@linkplain ItemComponent#isUnlocked unlocked} item.
  When a button is pressed, {@link ItemComponent#select} is invoked.
  */
 public class SelectionTab extends Tab {
@@ -29,11 +29,13 @@ public class SelectionTab extends Tab {
 
 		component.items.values().stream()
 			.filter(ItemComponent::isEnabled)
-			.filter(item -> item.isUnlocked() && component.accepts(parent.stack) || item.canConsume(parent.stack))
-			.forEach(tool -> box.add(new SelectionEntryWidget(tool))
+			.filter(item -> item.isUnlocked() && component.matches(parent.stack) || item.canConsume(parent.stack))
+			.forEach(item -> box.add(new SelectionEntryWidget(item))
 				.center()
-				.primaryAction(() -> tool.select(parent.slot))
-				.active(() -> (tool.canConsume(parent.stack) || component.cooledDown()) && (!parent.displayTabs() || ItemUtil.inventory(player()).noneMatch(tool::accepts)))
+				.primaryAction(() -> item.select(parent.slot))
+				.active(() -> ItemUtil.inventory(player()).noneMatch(item::matches)
+					&& (component.cooledDown() || ItemUtil.inventory(player()).anyMatch(item.canConsume(parent.stack) ? stack -> component.item().filter(active -> !active.matches(stack)).isEmpty() : item::canConsume))
+				)
 			);
 	}
 }

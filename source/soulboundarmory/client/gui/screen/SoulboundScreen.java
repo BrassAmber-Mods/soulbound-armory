@@ -77,9 +77,9 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 				return;
 			}
 
-			if (this.item.component != this.component) {
+			if (this.item.master != this.component) {
 				this.close();
-				this.item.component.tryOpenGUI(this.stack, this.slot);
+				this.item.master.tryOpenGUI(this.stack, this.slot);
 
 				return;
 			}

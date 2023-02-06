@@ -8,6 +8,7 @@ import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.module.gui.widget.ScalableWidget;
+import soulboundarmory.util.ItemUtil;
 
 import static org.lwjgl.opengl.GL11C.*;
 
@@ -20,7 +21,7 @@ public class SelectionEntryWidget extends ScalableWidget<SelectionEntryWidget> {
 
 	public SelectionEntryWidget(ItemComponent<?> item) {
 		this.item = item;
-		this.component = item.component;
+		this.component = item.master;
 
 		if (this.icon) {
 			this.spikedRectangle(item.isUnlocked() ? 0 : 1)
@@ -60,7 +61,7 @@ public class SelectionEntryWidget extends ScalableWidget<SelectionEntryWidget> {
 		setPositionColorShader();
 
 		if (!this.isActive()) {
-			y = this.component.item() == this.item ? y : (int) (y + this.height() * (1 - this.component.cooldown() / 600F));
+			y = ItemUtil.inventory(player()).anyMatch(this.item::matches) ? y : (int) (y + this.height() * (1 - this.component.cooldown() / 600F));
 			fill(this.matrixes, x, y, this.absoluteEndX(), this.absoluteEndY(), this.z(), NativeImage.packColor(95, 0, 0, 0));
 		}
 

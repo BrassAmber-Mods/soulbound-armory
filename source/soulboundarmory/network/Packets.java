@@ -50,7 +50,10 @@ public final class Packets {
 
 				return packet;
 			},
-			(packet, context) -> context.get().enqueueWork(() -> packet.execute(context.get()))
+			(packet, context) -> {
+				context.get().enqueueWork(() -> packet.execute(context.get()));
+				context.get().setPacketHandled(true);
+			}
 		);
 
 		return key;

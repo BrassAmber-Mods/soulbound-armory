@@ -7,13 +7,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.GameRules;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
@@ -28,7 +22,6 @@ import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.soulbound.item.tool.ToolComponent;
 import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
-import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.entity.SoulboundDaggerEntity;
@@ -49,9 +42,9 @@ public final class CommonEvents {
 		if (event.getEntity() instanceof PlayerEntity player) {
 			if (!player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
 				Components.soulbound(player)
-					.map(MasterComponent::item)
+					.flatMap(masterComponent -> masterComponent.item().stream())
 					.filter(component -> component != null && component.level() >= Configuration.preservationLevel)
-					.forEach(component -> event.getDrops().removeIf(drop -> component.accepts(drop.getStack()) && player.getInventory().insertStack(drop.getStack())));
+					.forEach(component -> event.getDrops().removeIf(drop -> component.matches(drop.getStack()) && player.getInventory().insertStack(drop.getStack())));
 			}
 		} else {
 			ItemComponent.fromAttacker(event.getEntity(), event.getSource()).ifPresent(component -> {

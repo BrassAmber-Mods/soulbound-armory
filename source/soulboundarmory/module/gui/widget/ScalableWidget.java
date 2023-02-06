@@ -210,8 +210,8 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 		return this.color4f(r, g, b, 1);
 	}
 
-	public T color3f(float chroma) {
-		return this.color3f(chroma, chroma, chroma);
+	public T color3f(float value) {
+		return this.color3f(value, value, value);
 	}
 
 	public T yellowRectangle() {
@@ -379,8 +379,8 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 		if (this.isActive()) {
 			RenderSystem.setShaderColor(this.r, this.g, this.b, this.a);
 		} else {
-			var chroma = 160F / 255;
-			RenderSystem.setShaderColor(this.r * chroma, this.g * chroma, this.b * chroma, this.a);
+			var value = 160F / 255;
+			RenderSystem.setShaderColor(this.r * value, this.g * value, this.b * value, this.a);
 		}
 	}
 }

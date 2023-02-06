@@ -23,7 +23,7 @@ public class SkillTab extends Tab {
 		.text(text -> text.stroke().text(this.title).x(0, 8).y(6).color(0xEEEEEE))
 		.text(text -> text.stroke().text(() -> this.pointText(this.container().item().skillPoints())).alignRight().alignUp().x(1, -15).y(25).color(0xEEEEEE));
 
-	protected float chroma = 1;
+	protected float colorValue = 1;
 	protected int insideWidth;
 	protected int insideHeight;
 	protected int insideCenterY;
@@ -38,7 +38,7 @@ public class SkillTab extends Tab {
 
 	@Override public void initialize() {
 		if (!this.dim()) {
-			this.chroma = 1;
+			this.colorValue = 1;
 		}
 
 		this.window.x(Math.max(this.button.absoluteEndX() + this.window.width() / 2 + 4, this.absoluteMiddleX())).y(Math.min(this.container().xpBar.absoluteY() - 16 - this.window.height() / 2, this.absoluteMiddleY())).center();
@@ -60,10 +60,10 @@ public class SkillTab extends Tab {
 
 	@Override protected void render() {
 		var delta = 20 * tickDelta() / 255F;
-		this.chroma = this.dim() ? Math.max(this.chroma - delta, 175 / 255F) : Math.min(this.chroma + delta, 1);
-		chroma(this.chroma);
+		this.colorValue = this.dim() ? Math.max(this.colorValue - delta, 175 / 255F) : Math.min(this.colorValue + delta, 1);
+		colorValue(this.colorValue);
 		RenderSystem.enableBlend();
-		this.renderBackground(background, this.insideX, this.insideY, this.insideWidth, this.insideHeight, (int) (128 * this.chroma));
+		this.renderBackground(background, this.insideX, this.insideY, this.insideWidth, this.insideHeight, (int) (128 * this.colorValue));
 	}
 
 	private boolean dim() {

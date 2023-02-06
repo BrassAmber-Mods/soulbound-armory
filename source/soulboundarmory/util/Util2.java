@@ -1,26 +1,21 @@
 package soulboundarmory.util;
 
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
+import net.jodah.typetools.TypeResolver;
+import soulboundarmory.SoulboundArmory;
+
 import java.lang.annotation.Annotation;
 import java.lang.ref.Reference;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
-import net.jodah.typetools.TypeResolver;
-import soulboundarmory.SoulboundArmory;
 
 public class Util2 {
 	public static IllegalArgumentException illegalArgument(String message, Object... arguments) {

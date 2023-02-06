@@ -91,7 +91,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		}
 
 		if (type == upgrade.type) {
-			this.component.refresh();
+			this.master.refresh();
 		}
 	}
 
