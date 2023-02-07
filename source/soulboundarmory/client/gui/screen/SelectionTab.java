@@ -22,9 +22,9 @@ public class SelectionTab extends Tab {
 		var box = this.add(new WidgetBox<>().center());
 
 		if (Configuration.Client.selectionEntryType == SelectionEntryWidget.Type.ICON) {
-			box.xSpacing(64).x(0.5).y(1D);
+			box.xSpacing(16).x(0.5).y(1D);
 		} else {
-			box.ySpacing(24).x(1D).y(0.5);
+			box.ySpacing(8).x(1D).y(0.5);
 		}
 
 		component.items.values().stream()
