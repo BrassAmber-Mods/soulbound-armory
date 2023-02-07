@@ -28,6 +28,7 @@
 		"client.GameRendererMixin",
 		"client.HeldItemRendererMixin",
 		"client.InGameHudMixin",
+		"client.ItemStackMixin",
 		"client.KeyboardMixin",
 		"client.LivingEntityRendererMixin"
 	]

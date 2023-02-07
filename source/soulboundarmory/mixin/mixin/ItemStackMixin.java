@@ -13,24 +13,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.ItemComponent;
-import soulboundarmory.component.soulbound.item.ItemMarkerComponent;
 import soulboundarmory.component.soulbound.item.tool.ToolComponent;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.Util2;
 
 @Mixin(ItemStack.class)
 abstract class ItemStackMixin {
-	@Inject(method = "hasGlint", at = @At("HEAD"), cancellable = true)
-	private void disableGlint(CallbackInfoReturnable<Boolean> info) {
-		Components.marker.optional((ItemStack) (Object) this)
-			.map(ItemMarkerComponent::item)
-			.map(component -> Components.config.of(component.player))
-			.filter(component -> !component.glint)
-			.ifPresent(component -> info.setReturnValue(false));
-	}
-
 	@Inject(method = "postMine", at = @At("RETURN"))
 	private void addXPByEnderPull(World world, BlockState state, BlockPos pos, PlayerEntity miner, CallbackInfo info) {
 		ItemComponent.of(miner, Util2.cast(this)).ifPresent(component -> component.mined(state, pos));
