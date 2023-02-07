@@ -9,11 +9,11 @@ public class PropertyWidget extends EntryWidget<PropertyWidget> {
 	private final Property<?> property;
 	private final Widget<?> value;
 
-	public PropertyWidget(Property<?> property) {
+	public PropertyWidget(Property<?> property, int depth) {
 		super(property.comment);
 
 		this.property = property;
-		this.text(text -> text.text(this.property.name).centerY().x(8).y(.5));
+		this.text(text -> text.text(this.property.name).centerY().x(8 + 24 * depth).y(.5));
 
 		if (Types.equals(property.type, int.class)) {
 			if (property.interval == null) {
