@@ -22,16 +22,15 @@ public class SelectionTab extends Tab {
 		var box = this.add(new WidgetBox<>().center());
 
 		if (Configuration.Client.selectionEntryType == SelectionEntryWidget.Type.ICON) {
-			box.xSpacing(80).x(0.5).y(1D);
+			box.xSpacing(64).x(0.5).y(1D);
 		} else {
-			box.ySpacing(24).x(1D).y(0.5D);
+			box.ySpacing(24).x(1D).y(0.5);
 		}
 
 		component.items.values().stream()
 			.filter(ItemComponent::isEnabled)
 			.filter(item -> item.isUnlocked() && component.matches(parent.stack) || item.canConsume(parent.stack))
 			.forEach(item -> box.add(new SelectionEntryWidget(item))
-				.center()
 				.primaryAction(() -> item.select(parent.slot))
 				.active(() -> ItemUtil.inventory(player()).noneMatch(item::matches)
 					&& (component.cooledDown() || ItemUtil.inventory(player()).anyMatch(item.canConsume(parent.stack) ? stack -> component.item().filter(active -> !active.matches(stack)).isEmpty() : item::canConsume))

@@ -24,6 +24,7 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 	public final Rectangle[] corners = Util2.fill(new Rectangle[4], Rectangle::new);
 	public final Rectangle border = new Rectangle();
 	public AbstractTexture texture;
+	public ScaleMode scaleMode = ScaleMode.SLICE;
 	public int u, v;
 	public float r = 1;
 	public float g = 1;
@@ -37,7 +38,6 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 
 	public T texture(AbstractTexture texture) {
 		this.texture = texture;
-
 		return (T) this;
 	}
 
@@ -58,18 +58,21 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 
 	public T u(int u) {
 		this.u = u;
-
 		return (T) this;
 	}
 
 	public T v(int v) {
 		this.v = v;
-
 		return (T) this;
 	}
 
 	public T uv(int u, int v) {
 		return this.u(u).v(v);
+	}
+
+	public T scaleMode(ScaleMode mode) {
+		this.scaleMode = mode;
+		return (T) this;
 	}
 
 	/**
@@ -131,13 +134,11 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 
 	public T textureWidth(int width) {
 		this.textureWidth = width;
-
 		return (T) this;
 	}
 
 	public T textureHeight(int height) {
 		this.textureHeight = height;
-
 		return (T) this;
 	}
 
@@ -167,25 +168,21 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 
 	public T viewWidth(int width) {
 		this.viewWidth.base(width);
-
 		return (T) this;
 	}
 
 	public T viewWidth(double width) {
 		this.viewWidth.base(width);
-
 		return (T) this;
 	}
 
 	public T viewHeight(int height) {
 		this.viewHeight.base(height);
-
 		return (T) this;
 	}
 
 	public T viewHeight(double height) {
 		this.viewHeight.base(height);
-
 		return (T) this;
 	}
 
@@ -292,8 +289,26 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 		RenderSystem.enableBlend();
 		shaderTexture(this.texture);
 		this.resetColor();
-		this.renderCorners();
-		this.renderMiddles();
+
+		switch (this.scaleMode) {
+			case SLICE -> {
+				this.renderCorners();
+				this.renderMiddles();
+			}
+			case STRETCH -> drawTexture(
+				this.matrixes,
+				this.absoluteX(),
+				this.absoluteY(),
+				this.width(),
+				this.height(),
+				this.u,
+				this.v,
+				this.corners[3].end.x - this.corners[0].start.x,
+				this.corners[3].end.y - this.corners[0].start.y,
+				this.textureWidth(),
+				this.textureHeight()
+			);
+		}
 
 		if (this.isFocused() && this.isActive()) {
 			this.drawBorder();
