@@ -6,8 +6,6 @@ plugins {
 	id("dev.architectury.loom").version("latest.release")
 }
 
-plugins.apply("dev.architectury.loom")
-
 group("net.auoeke")
 version("3.3.1")
 javaVersion(17)
@@ -57,6 +55,9 @@ dependencies {
 	minecraft("com.mojang:minecraft:" + versions.minecraft)
 	mappings("net.fabricmc:yarn:${versions.minecraft}+build.${versions.yarn}:v2")
 	forge("net.minecraftforge:forge:${versions.minecraft}-+")
+
+	annotationProcessor("net.auoeke:dycon-javac")
+	compileOnly("net.auoeke:dycon")
 
 	lib(
 		"net.auoeke:structured-properties",
