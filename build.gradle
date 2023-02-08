@@ -112,8 +112,7 @@ loom {
 	forge.mixinConfig(
 		"soulbound-armory.mixins.json",
 		"soulbound-armory.components.mixins.json",
-		"soulbound-armory.text.mixins.json",
-		"soulbound-armory.transform.mixins.json"
+		"soulbound-armory.text.mixins.json"
 	)
 
 	if (Boolean.getBoolean("idea.sync.active")) {

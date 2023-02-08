@@ -9,7 +9,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.util.Iteratable;
-import soulboundarmory.util.Util2;
 
 /**
  This class adds a transformer that strips inner classes from the wrong environment in order to prevent errors arising from {@link Class#getDeclaredClasses}.
@@ -26,9 +25,6 @@ public class SideStripper {
 			var node = new ClassNode();
 			var classFile = Classes.classFile(SideStripper.class.getClassLoader(), innerClass.name);
 
-			if (type.name.contains("Configuration")) {
-				var bp = true;
-			}
 			if (classFile != null) {
 				new ClassReader(classFile).accept(node, ClassReader.SKIP_CODE);
 
@@ -55,8 +51,6 @@ public class SideStripper {
 	}
 
 	static {
-		// Load them here in order to prevent a class loading circle later.
-		Classes.cast(Util2.nul(Iteratable.class));
 		TransformerManager.addTransformer(SideStripper::transform);
 	}
 }
