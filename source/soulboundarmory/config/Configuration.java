@@ -1,6 +1,5 @@
 package soulboundarmory.config;
 
-import java.util.stream.Collectors;
 import com.google.common.base.Functions;
 import it.unimi.dsi.fastutil.objects.Object2BooleanLinkedOpenHashMap;
 import net.minecraft.util.Identifier;
@@ -9,42 +8,49 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import soulboundarmory.client.gui.bar.BarStyle;
 import soulboundarmory.client.gui.widget.SelectionEntryWidget;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
-import soulboundarmory.module.config.Category;
-import soulboundarmory.module.config.Comment;
-import soulboundarmory.module.config.ConfigurationFile;
-import soulboundarmory.module.config.Flat;
-import soulboundarmory.module.config.Interval;
-import soulboundarmory.module.config.Name;
+import soulboundarmory.module.config.*;
 import soulboundarmory.util.Math2;
+
+import java.util.stream.Collectors;
 
 @ConfigurationFile
 public final class Configuration {
-	@Comment("experience points required to reach the first level for tools")
+	@Comment("The number of experience points required to reach the first level for tools.")
 	public static int initialToolXP = 16;
 
-	@Comment("experience points required to reach the first level for weapons")
+	@Comment("The number of experience points required to reach the first level for weapons.")
 	public static int initialWeaponXP = 64;
 
-	@Comment("levels required in order to gain an enchantment point")
+	@Comment("The number of experience levels required per enchantment point.")
 	public static int levelsPerEnchantment = 10;
 
-	@Comment("levels required in order to gain a skill point")
+	@Comment("The number of experience levels required per skill point.")
 	public static int levelsPerSkillPoint = 5;
 
-	@Comment({"maximum level", "maximum level < 0 => no limit"})
+	@Comment({
+		"The maximum level.",
+		"maxLevel < 0 => no limit."
+	})
 	public static int maxLevel = -1;
 
-	@Comment("minimum level for items to be preserved after death")
+	@Comment("The minimum level wherefrom items are preserved after death.")
 	public static int preservationLevel = 0;
 
-	@Comment("free point restoration")
+	@Comment("Point restoration does not cost experience levels.")
 	public static boolean freeRestoration = true;
+
+	// @Comment({
+	// 	"Allow items added by this mod to be modified externally.",
+	// 	"If false, then the mod will replace such modified items by their unmodified versions when it detects them.",
+	// 	"Example: the mod detects a soulbound sword enchanted by a command and replaces it by a soulbound sword with the statistics and enchantments as displayed in the menu."
+	// })
+	// public static boolean externalModification;
 
 	@Flat
 	@Category("items")
 	public static class Items {
 		public static Object2BooleanLinkedOpenHashMap<String> enabled = new Object2BooleanLinkedOpenHashMap<>(
-			ItemComponentType.registry().getKeys().stream().collect(Collectors.toMap(Identifier::toString, Functions.constant(true)))
+			ItemComponentType.registry().getKeys().stream().collect(Collectors.toMap(Identifier::getPath, Functions.constant(true)))
 		);
 
 		@Name("dagger")
@@ -61,64 +67,58 @@ public final class Configuration {
 	@Flat
 	@Category("experience multipliers")
 	public static class Multipliers {
-		@Comment("1 + (armor multiplier) * armor")
+		@Comment("1 + value * armor")
 		public static double armor = 0.2;
 
-		@Comment("1 + (attack damage multiplier) * damage")
+		@Comment("1 + value * damage")
 		public static double attackDamage = 0.35;
 
-		@Comment("1 + (attack speed multiplier) * damage")
+		@Comment("1 + value * speed")
 		public static double attackSpeed = 0.5;
 
-		@Comment({"(difficulty multiplier) * difficulty (peaceful = 0; hard = 3)"})
+		@Comment({
+			"value * difficulty",
+			"peaceful = 0; hard = 3"
+		})
 		public static double difficulty = 0.5;
 
-		@Comment("peaceful mode multiplier")
-		public static double peaceful = 0;
-
-		@Comment("hostile baby kill experience multiplier")
-		public static double baby = 2;
-
-		@Comment("boss kill experience multiplier")
-		public static double boss = 3;
-
-		@Comment("hardcore mode experience multiplier")
-		public static double hardcore = 2;
-
-		@Comment("passive entity kill experience multiplier")
 		public static double passive = 0;
+		public static double hostileBaby = 2;
+		public static double boss = 3;
+		public static double peaceful = 0;
+		public static double hardcore = 2;
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	@Flat
 	@Category("client")
 	public static class Client {
-		@Comment("receive levelup notifications above the hotbar")
-		public static boolean levelupNotifications = false;
+		@Comment("Receive levelup notifications above the hotbar.")
+		public static boolean levelupNotifications;
 
-		@Comment("display option button and sliders in the menu")
-		public static boolean displayOptions = false;
+		@Comment("Display option button and sliders in the menu.")
+		public static boolean displayOptions;
 
-		@Comment("use a custom experience bar for the currently held soulbound item")
+		@Comment("Use a custom experience bar for the currently held soulbound item.")
 		public static boolean overlayExperienceBar = true;
 
-		@Comment("enable enchantment glint for enchanted items")
-		public static boolean enchantmentGlint = false;
+		@Comment("Enable enchantment glint.")
+		public static boolean enchantmentGlint;
 
-		@Comment("display attributes in tooltips")
-		public static boolean tooltipAttributes = true;
+		// @Comment("Display attributes in tooltips.")
+		// public static boolean tooltipAttributes = true;
 
-		@Comment("experience bar style")
+		@Comment("Experience bar style.")
 		public static BarStyle style = BarStyle.EXPERIENCE;
 
 		@Comment({
-			"the style of selection entries",
-			"ICON: white (locked) or yellow (unlocked) advancement box with item's icon",
-			"TEXT: button with item's name"
+			"The style of selection entries.",
+			"ICON: white (locked) or yellow (unlocked) advancement box with item's icon.",
+			"TEXT: button with item's name."
 		})
-		public static SelectionEntryWidget.Type selectionEntryType = SelectionEntryWidget.Type.TEXT;
+		public static SelectionEntryWidget.Type selectionEntryType = SelectionEntryWidget.Type.ICON;
 
-		@Comment("experience bar color")
+		@Name("experience bar color")
 		public static class Color {
 			@Interval(max = 255)
 			public static int red = 160;

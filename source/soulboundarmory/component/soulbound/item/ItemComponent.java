@@ -282,7 +282,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 @return whether this item is enabled
 	 */
 	public final boolean isEnabled() {
-		return Configuration.Items.enabled.getBoolean(this.type().string());
+		return Configuration.Items.enabled.getBoolean(this.type().id().getPath());
 	}
 
 	/**

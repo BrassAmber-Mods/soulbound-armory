@@ -1,6 +1,5 @@
 package soulboundarmory.component.soulbound.item;
 
-import java.util.Optional;
 import net.minecraft.client.item.TooltipData;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.item.ItemStack;
@@ -13,6 +12,8 @@ import soulboundarmory.module.component.ItemStackComponent;
 import soulboundarmory.module.gui.Node;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.util.Util;
+
+import java.util.Optional;
 
 public class ItemMarkerComponent implements ItemStackComponent<ItemMarkerComponent>, TooltipData {
 	public final ItemStack stack;

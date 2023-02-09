@@ -72,7 +72,7 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 			}
 
 			if (damage > 0 && entity.isBaby()) {
-				xp *= Configuration.Multipliers.baby;
+				xp *= Configuration.Multipliers.hostileBaby;
 			}
 
 			this.add(StatisticType.experience, Math.round(xp));
