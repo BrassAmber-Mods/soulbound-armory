@@ -18,8 +18,6 @@ import java.util.Map;
  The skill tab; design (not code of course) blatantly copied from the advancement screen.
  */
 public class SkillTab extends Tab {
-	// protected static final Identifier background = new Identifier("textures/block/cobbled_deepslate.png");
-
 	protected final Map<SkillInstance, SkillWidget> skills = new Reference2ReferenceLinkedOpenHashMap<>();
 	protected final Widget<?> container = new Widget<>().movable();
 
@@ -30,13 +28,6 @@ public class SkillTab extends Tab {
 	}
 
 	@Override public Widget<?> icon() {
-		/*
-		return new ScalableWidget<>()
-			.texture(Util.id("textures/skill/shadow_clone.png"))
-			.textureSize(16, 16)
-			.slice(0, 16, 16, 0, 16, 16)
-			.scaleMode(ScaleMode.STRETCH);
-		*/
 		return new ItemWidget().item(Items.PAPER);
 	}
 
@@ -69,7 +60,6 @@ public class SkillTab extends Tab {
 		this.brightness = this.dim() ? Math.max(this.brightness - delta, 175 / 255F) : Math.min(this.brightness + delta, 1);
 		brightness(this.brightness);
 		RenderSystem.enableBlend();
-		// this.renderBackground(background, 0, 0, this.width(), this.height(), (int) (128 * this.colorValue));
 	}
 
 	private boolean dim() {
