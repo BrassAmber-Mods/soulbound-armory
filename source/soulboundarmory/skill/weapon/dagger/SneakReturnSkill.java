@@ -16,7 +16,7 @@ public class SneakReturnSkill extends Skill {
 	}
 
 	@Override public Set<Skill> dependencies() {
-		return Collections.singleton(Skills.returning);
+		return Collections.singleton(Skills.returne);
 	}
 
 	@Override public int cost(int level) {

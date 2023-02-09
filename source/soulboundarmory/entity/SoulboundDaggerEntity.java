@@ -97,7 +97,7 @@ public class SoulboundDaggerEntity extends ExtendedProjectile implements IEntity
 
 			if (this.seeking()
 				|| component.hasSkill(Skills.sneakReturn) && owner.isSneaking() && this.age >= 60 / attackSpeed
-				|| component.hasSkill(Skills.returning) && (this.ticksInGround >= 60 / attackSpeed || this.getY() < this.world.getBottomY())
+				|| component.hasSkill(Skills.returne) && (this.ticksInGround >= 60 / attackSpeed || this.getY() < this.world.getBottomY())
 			) {
 				this.inGround = false;
 				this.setNoClip(true);
@@ -170,7 +170,7 @@ public class SoulboundDaggerEntity extends ExtendedProjectile implements IEntity
 			}
 		}
 
-		if (this.clone && this.component().filter(component -> component.hasSkill(Skills.returning)).isEmpty()) {
+		if (this.clone && this.component().filter(component -> component.hasSkill(Skills.returne)).isEmpty()) {
 			this.discard();
 		}
 	}

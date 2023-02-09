@@ -27,7 +27,7 @@ public class Skills {
 	@Register("leaping") public static final Skill leaping = new LeapingSkill();
 	@Register("nourishment") public static final Skill nourishment = new NourishmentSkill();
 	@Register("precision") public static final Skill precision = new PrecisionSkill();
-	@Register("returning") public static final Skill returning = new ReturnSkill();
+	@Register("return") public static final Skill returne = new ReturnSkill();
 	@Register("shadow_clone") public static final Skill shadowClone = new ShadowCloneSkill();
 	@Register("sneak_return") public static final Skill sneakReturn = new SneakReturnSkill();
 	@Register("summon_lightning") public static final Skill summonLightning = new SummonLightningSkill();
