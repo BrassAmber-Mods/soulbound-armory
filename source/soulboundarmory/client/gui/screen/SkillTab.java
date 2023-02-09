@@ -4,14 +4,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntPredicate;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceLinkedOpenHashMap;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.MathHelper;
 import soulboundarmory.client.i18n.Translations;
-import soulboundarmory.module.gui.widget.ScalableWidget;
-import soulboundarmory.module.gui.widget.ScaleMode;
+import soulboundarmory.module.gui.widget.ItemWidget;
 import soulboundarmory.module.gui.widget.TextWidget;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.skill.SkillInstance;
-import soulboundarmory.util.Util;
 
 import java.util.Map;
 
@@ -31,11 +30,14 @@ public class SkillTab extends Tab {
 	}
 
 	@Override public Widget<?> icon() {
+		/*
 		return new ScalableWidget<>()
 			.texture(Util.id("textures/skill/shadow_clone.png"))
 			.textureSize(16, 16)
 			.slice(0, 16, 16, 0, 16, 16)
 			.scaleMode(ScaleMode.STRETCH);
+		*/
+		return new ItemWidget().item(Items.PAPER);
 	}
 
 	@Override public void initialize() {
