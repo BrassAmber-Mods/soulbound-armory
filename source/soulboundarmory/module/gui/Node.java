@@ -1,13 +1,8 @@
 package soulboundarmory.module.gui;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
-import java.util.stream.Stream;
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
+import it.unimi.dsi.fastutil.objects.ReferenceList;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
@@ -20,11 +15,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModelManager;
@@ -52,6 +43,14 @@ import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.util.Util;
 import soulboundarmory.util.Util2;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.stream.Stream;
+
 /**
  A node in a tree of GUI elements.
 
@@ -74,6 +73,8 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 	public static final BakedModelManager bakedModelManager = client.getBakedModelManager();
 	public static final GameRenderer gameRenderer = client.gameRenderer;
 	public static final SoundManager soundManager = client.getSoundManager();
+
+	protected static ReferenceArrayList<Scissor> scissors = ReferenceArrayList.of();
 
 	public int minWidth;
 	public int minHeight;
@@ -184,6 +185,22 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 
 	public static void brightness(float brightness) {
 		RenderSystem.setShaderColor(brightness, brightness, brightness, -1);
+	}
+
+	public static void pushScissor(int x, int y, int width, int height) {
+		var scissor = new Scissor(x, y, width, height);
+		scissors.push(scissor);
+		scissor.apply();
+	}
+
+	public static void popScissor() {
+		scissors.pop();
+
+		if (scissors.isEmpty()) {
+			disableScissor();
+		} else {
+			scissors.top().apply();
+		}
 	}
 
 	public static void fill(MatrixStack matrices, int x1, int y1, int x2, int y2, float z, int color) {
