@@ -1,10 +1,10 @@
 modLoader = "javafml"
 loaderVersion = "[43,)"
-issueTrackerURL = "https://github.com/auoeke/soulbound-armory"
-license = "GNU LGPL v3.0"
+issueTrackerURL = "https://github.com/BrassAmber-Mods/soulbound-armory"
+license = "undefined"
 
 [[mods]]
 modId = "soulboundarmory"
 version = "0VERSION" # FML wants a leading digit here.
 displayName = "soulbound armory"
-description = "old Better Dungeons' soul weapons with additions"
+description = """RPG-style equipment inspired by old Better Dungeons' "Soul" weapons"""
