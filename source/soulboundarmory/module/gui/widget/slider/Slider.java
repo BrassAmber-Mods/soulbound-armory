@@ -1,5 +1,6 @@
 package soulboundarmory.module.gui.widget.slider;
 
+import com.google.common.util.concurrent.Runnables;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
@@ -18,7 +19,7 @@ public class Slider extends ScalableWidget<Slider> {
 	protected double remainder;
 
 	public Slider() {
-		this.button().width(8).height(20);
+		this.button().width(8).height(20).primaryAction(Runnables.doNothing());
 	}
 
 	public Slider min(double min) {
@@ -107,12 +108,9 @@ public class Slider extends ScalableWidget<Slider> {
 		return super.isFocused() || this.owner().isHovered();
 	}
 
-	@Override public void drag() {
+	@Override public boolean drag(double x, double y) {
 		this.progress(MathHelper.clamp(mouseX() - this.owner().absoluteX(), 0D, this.maxX()) / this.maxX());
-	}
-
-	@Override public boolean isValidPrimaryClick(int button) {
-		return button == 0;
+		return true;
 	}
 
 	@Override public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
@@ -151,7 +149,7 @@ public class Slider extends ScalableWidget<Slider> {
 
 	@Override protected void primaryClick() {
 		super.primaryClick();
-		this.drag();
+		this.drag(0, 0);
 	}
 
 	@Override protected boolean clicked() {

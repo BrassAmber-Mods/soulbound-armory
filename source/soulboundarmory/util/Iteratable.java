@@ -3,6 +3,7 @@ package soulboundarmory.util;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public record Iteratable<T>(Iterator<T> iterator) implements Iterable<T>, Iterator<T> {
 	public static <T> Iteratable<T> of(Iterator<T> iterator) {
@@ -14,6 +15,10 @@ public record Iteratable<T>(Iterator<T> iterator) implements Iterable<T>, Iterat
 	}
 
 	public static <T> Iteratable<T> of(Iterable<T> iterable) {
+		return new Iteratable<>(iterable.iterator());
+	}
+
+	public static <T> Iteratable<T> of(Stream<T> iterable) {
 		return new Iteratable<>(iterable.iterator());
 	}
 

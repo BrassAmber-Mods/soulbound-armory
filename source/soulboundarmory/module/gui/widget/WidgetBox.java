@@ -8,7 +8,7 @@ public class WidgetBox<T extends WidgetBox<T>> extends Widget<T> {
 	public boolean horizontal = true;
 
 	@Override public int width() {
-		return this.horizontal ? Math.max(this.minWidth, this.children.stream().filter(Widget::isVisible).mapToInt(Node::width).sum() + this.xSpacing * Math.max(0, this.degree() - 1)) : super.width();
+		return this.horizontal ? Math.max(this.minWidth, this.children().filter(Widget::isVisible).mapToInt(Node::width).sum() + this.xSpacing * Math.max(0, this.degree() - 1)) : super.width();
 	}
 
 	@Override public int height() {

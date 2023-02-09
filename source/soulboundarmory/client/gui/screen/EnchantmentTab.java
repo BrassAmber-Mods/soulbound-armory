@@ -1,10 +1,12 @@
 package soulboundarmory.client.gui.screen;
 
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.statistics.Category;
 import soulboundarmory.component.statistics.StatisticType;
+import soulboundarmory.module.gui.widget.ItemWidget;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.module.gui.widget.WidgetBox;
 import soulboundarmory.network.ExtendedPacketBuffer;
@@ -13,6 +15,10 @@ import soulboundarmory.network.Packets;
 public class EnchantmentTab extends Tab {
 	public EnchantmentTab() {
 		super(Translations.guiButtonEnchantments);
+	}
+
+	@Override public Widget<?> icon() {
+		return new ItemWidget().item(Items.ENCHANTING_TABLE);
 	}
 
 	@Override public void initialize() {

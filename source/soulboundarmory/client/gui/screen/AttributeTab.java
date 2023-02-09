@@ -1,8 +1,10 @@
 package soulboundarmory.client.gui.screen;
 
+import net.minecraft.item.Items;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.statistics.Category;
 import soulboundarmory.component.statistics.Statistic;
+import soulboundarmory.module.gui.widget.ItemWidget;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.module.gui.widget.WidgetBox;
 import soulboundarmory.network.ExtendedPacketBuffer;
@@ -11,6 +13,10 @@ import soulboundarmory.network.Packets;
 public class AttributeTab extends Tab {
 	public AttributeTab() {
 		super(Translations.guiButtonAttributes);
+	}
+
+	@Override public Widget<?> icon() {
+		return new ItemWidget().item(Items.ANVIL);
 	}
 
 	@Override public void initialize() {

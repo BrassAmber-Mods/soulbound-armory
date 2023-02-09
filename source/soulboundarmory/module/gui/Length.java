@@ -1,8 +1,9 @@
 package soulboundarmory.module.gui;
 
+import soulboundarmory.util.Util;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
-import soulboundarmory.util.Util;
 
 public class Length {
 	public IntSupplier value = Util.zeroSupplier;
@@ -39,6 +40,6 @@ public class Length {
 	public enum Type {
 		EXACT,
 		PARENT_PROPORTION,
-		CHILD_SUM
+		CHILD_RANGE
 	}
 }

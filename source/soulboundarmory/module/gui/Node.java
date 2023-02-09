@@ -182,8 +182,8 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 	}
 
-	public static void colorValue(float value) {
-		RenderSystem.setShaderColor(value, value, value, -1);
+	public static void brightness(float brightness) {
+		RenderSystem.setShaderColor(brightness, brightness, brightness, -1);
 	}
 
 	public static void fill(MatrixStack matrices, int x1, int y1, int x2, int y2, float z, int color) {
@@ -425,7 +425,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		return Math.max(this.minWidth, this.width.value.getAsInt() + (int) switch (this.width.type) {
 			case EXACT -> this.width.base().getAsDouble();
 			case PARENT_PROPORTION -> this.width.base().getAsDouble() * this.parent().map(B::width).orElse(1);
-			case CHILD_SUM -> this.descendantWidth();
+			case CHILD_RANGE -> this.descendantWidth();
 		});
 	}
 
@@ -466,7 +466,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		return Math.max(this.minHeight, this.height.value.getAsInt() + (int) switch (this.height.type) {
 			case EXACT -> this.height.base().getAsDouble();
 			case PARENT_PROPORTION -> this.height.base().getAsDouble() * this.parent().map(B::height).orElse(1);
-			case CHILD_SUM -> this.descendantHeight();
+			case CHILD_RANGE -> this.descendantHeight();
 		});
 	}
 
@@ -509,7 +509,11 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 	}
 
 	public void renderGuiItem(Item item, int x, int y) {
-		this.withZ(() -> itemRenderer.renderGuiItemIcon(item.getDefaultStack(), x, y));
+		this.renderGuiItem(item.getDefaultStack(), x, y);
+	}
+
+	public void renderGuiItem(ItemStack item, int x, int y) {
+		this.withZ(() -> itemRenderer.renderGuiItemIcon(item, x, y));
 	}
 
 	/**
@@ -520,7 +524,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 			case 0 -> 0;
 			case 1 -> this.child(0).width();
 			default -> {
-				var filter = this.width.type == Length.Type.CHILD_SUM;
+				var filter = this.width.type == Length.Type.CHILD_RANGE;
 				yield (filter ? this.descendants().filter(node -> node.width.type != Length.Type.PARENT_PROPORTION) : this.descendants()).mapToInt(B::absoluteEndX).max().orElse(0)
 					- (filter ? this.descendants().filter(node -> node.width.type != Length.Type.PARENT_PROPORTION) : this.descendants()).mapToInt(B::absoluteX).min().orElse(0);
 			}
@@ -535,7 +539,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 			case 0 -> 0;
 			case 1 -> this.child(0).height();
 			default -> {
-				var filter = this.height.type == Length.Type.CHILD_SUM;
+				var filter = this.height.type == Length.Type.CHILD_RANGE;
 				yield (filter ? this.descendants().filter(node -> node.height.type != Length.Type.PARENT_PROPORTION) : this.descendants()).mapToInt(B::absoluteEndY).max().orElse(0)
 					- (filter ? this.descendants().filter(node -> node.height.type != Length.Type.PARENT_PROPORTION) : this.descendants()).mapToInt(B::absoluteY).min().orElse(0);
 			}

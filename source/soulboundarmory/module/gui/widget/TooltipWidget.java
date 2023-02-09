@@ -1,7 +1,8 @@
 package soulboundarmory.module.gui.widget;
 
-import java.util.function.Consumer;
 import soulboundarmory.module.gui.coordinate.Offset;
+
+import java.util.function.Consumer;
 
 public class TooltipWidget extends Widget<TooltipWidget> {
 	@Override public <C extends Widget> C add(int index, C child) {

@@ -59,14 +59,6 @@ public class Util2 {
 		return false;
 	}
 
-	public static <T> Iterable<T> iterate(Stream<T> stream) {
-		return stream::iterator;
-	}
-
-	public static <T> Iterable<T> iterate(Iterator<T> iterator) {
-		return () -> iterator;
-	}
-
 	public static <T> T[] fill(T[] array, Supplier<T> element) {
 		for (var index = 0; index < array.length; ++index) {
 			array[index] = element.get();

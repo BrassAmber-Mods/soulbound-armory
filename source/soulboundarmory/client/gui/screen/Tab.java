@@ -1,8 +1,5 @@
 package soulboundarmory.client.gui.screen;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.function.IntSupplier;
 import net.minecraft.text.Text;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -12,6 +9,10 @@ import soulboundarmory.module.gui.widget.ScalableWidget;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.network.ExtendedPacketBuffer;
 import soulboundarmory.network.Packets;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.function.IntSupplier;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class Tab extends Widget<Tab> {
@@ -24,6 +25,8 @@ public abstract class Tab extends Widget<Tab> {
 	public Tab(Text title) {
 		this.title = title;
 	}
+
+	public abstract Widget<?> icon();
 
 	@Override public Tab parent(Widget<?> parent) {
 		if (parent != null) {
@@ -51,9 +54,10 @@ public abstract class Tab extends Widget<Tab> {
 				.texture("soulboundarmory:textures/gui/counterclockwise_arrow.png")
 				.slice(0, 16, 16, 0, 16, 16)
 				.textureSize(16, 16)
-				.center())
+				.center()
+			)
 			.alignEnd()
-			.x(23D / 24)
+			.x(this.container().options)
 			.y(15D / 16)
 			.size(20)
 			.primaryAction(() -> this.reset(category));

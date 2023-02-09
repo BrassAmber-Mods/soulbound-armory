@@ -6,6 +6,7 @@ import net.minecraft.client.texture.NativeImage;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.config.Configuration;
+import soulboundarmory.module.gui.widget.ItemWidget;
 import soulboundarmory.module.gui.widget.ScalableWidget;
 import soulboundarmory.module.gui.widget.ScaleMode;
 import soulboundarmory.util.ItemUtil;
@@ -23,11 +24,14 @@ public class SelectionEntryWidget extends ScalableWidget<SelectionEntryWidget> {
 
 		if (this.icon) {
 			this.spikedRectangle(item.isUnlocked() ? 0 : 1)
-				.size(64, 64)
-				.scaleMode(ScaleMode.STRETCH);
+				.size(54, 54)
+				.scaleMode(ScaleMode.STRETCH)
+				.centerY()
+				.with(new ItemWidget().size(32).center().x(0.5).y(0.5).item(item.item()).tooltip());
 		} else {
 			this.button()
 				.size(128, 20)
+				.centerX()
 				.text(item.name());
 		}
 	}
@@ -45,14 +49,9 @@ public class SelectionEntryWidget extends ScalableWidget<SelectionEntryWidget> {
 
 		super.render();
 
-		if (this.icon) {
-			this.renderItem(x, y);
-		}
-
 		RenderSystem.disableDepthTest();
 		RenderSystem.stencilFunc(GL_EQUAL, 1, 0xFF);
 		RenderSystem.stencilMask(0);
-		setPositionColorShader();
 
 		if (!this.isActive()) {
 			y = ItemUtil.inventory(player()).anyMatch(this.item::matches) ? y : (int) (y + this.height() * (1 - this.component.cooldown() / 600F));
@@ -60,17 +59,6 @@ public class SelectionEntryWidget extends ScalableWidget<SelectionEntryWidget> {
 		}
 
 		glDisable(GL_STENCIL_TEST);
-	}
-
-	private void renderItem(int x, int y) {
-		var matrixes = RenderSystem.getModelViewStack();
-		var factor = 32F / 13;
-		matrixes.push();
-		matrixes.scale(factor, factor, 1);
-		matrixes.translate(x / factor - x, y / factor - y, 0);
-		this.renderGuiItem(this.item.item(), x + 5, y + 5);
-		matrixes.pop();
-		RenderSystem.applyModelViewMatrix();
 	}
 
 	@Override protected void resetColor() {

@@ -1,12 +1,5 @@
 package soulboundarmory.module.gui.widget;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
@@ -31,8 +24,17 @@ import soulboundarmory.module.gui.util.function.ObjectSupplier;
 import soulboundarmory.module.gui.widget.callback.PressCallback;
 import soulboundarmory.module.gui.widget.scroll.ContextScrollAction;
 import soulboundarmory.module.gui.widget.scroll.ScrollAction;
+import soulboundarmory.util.Iteratable;
 import soulboundarmory.util.Util;
 import soulboundarmory.util.Util2;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  A flexible and fluent element that supports nesting.
@@ -58,6 +60,8 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 	public NulliPredicate visible = NulliPredicate.ofTrue();
 	public NulliPredicate active = NulliPredicate.ofTrue();
 
+	public boolean movable;
+
 	/**
 	 Is the deepest element that is hovered by the mouse.
 	 */
@@ -69,11 +73,23 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 	 */
 	public MatrixStack matrixes;
 
+	protected double dragX;
+	protected double dragY;
+
 	private final Set<Widget<?>> renderDeferred = ReferenceLinkedOpenHashSet.of();
 
 	public void initialize() {}
 
-	public void drag() {}
+	public boolean drag(double x, double y) {
+		if (this.movable) {
+			this.dragX += x;
+			this.dragY += y;
+
+			return true;
+		}
+
+		return false;
+	}
 
 	public void drop() {}
 
@@ -211,6 +227,15 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 		return this.active(NulliPredicate.of(active));
 	}
 
+	public T movable(boolean movable) {
+		this.movable = movable;
+		return (T) this;
+	}
+
+	public T movable() {
+		return this.movable(true);
+	}
+
 	public T text(String text) {
 		return this.text(Stream.of(text.split("\n")).map(Text::of).toList());
 	}
@@ -250,7 +275,6 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 	}
 
 	/**
-	 @see #isValidPrimaryClick
 	 @see #isValidPrimaryKey
 	 */
 	public T primaryAction(PressCallback<T> action) {
@@ -419,11 +443,11 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 	}
 
 	public int x() {
-		return this.x.resolve(this::width, Util.zeroSupplier, () -> this.parent.map(Widget::width).orElseGet(Node::windowWidth));
+		return (int) this.dragX + this.x.resolve(this::width, Util.zeroSupplier, () -> this.parent.map(Widget::width).orElseGet(Node::windowWidth));
 	}
 
 	public int y() {
-		return this.y.resolve(this::height, Util.zeroSupplier, () -> this.parent.map(Widget::height).orElseGet(Node::windowHeight));
+		return (int) this.dragY + this.y.resolve(this::height, Util.zeroSupplier, () -> this.parent.map(Widget::height).orElseGet(Node::windowHeight));
 	}
 
 	public int middleX() {
@@ -443,11 +467,11 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 	}
 
 	@Override public int absoluteX() {
-		return this.x.resolve(this::width, () -> this.parent.map(Widget::absoluteX).orElse(0), () -> this.parent.map(Widget::width).orElseGet(Node::windowWidth));
+		return (int) this.dragX + this.x.resolve(this::width, () -> this.parent.map(Widget::absoluteX).orElse(0), () -> this.parent.map(Widget::width).orElseGet(Node::windowWidth));
 	}
 
 	@Override public int absoluteY() {
-		return this.y.resolve(this::height, () -> this.parent.map(Widget::absoluteY).orElse(0), () -> this.parent.map(Widget::height).orElseGet(Node::windowHeight));
+		return (int) this.dragY + this.y.resolve(this::height, () -> this.parent.map(Widget::absoluteY).orElse(0), () -> this.parent.map(Widget::height).orElseGet(Node::windowHeight));
 	}
 
 	@Override public int z() {
@@ -475,7 +499,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 	}
 
 	public boolean focusable() {
-		return this.isActive() && (this.primaryAction != null || this.secondaryAction != null || this.tertiaryAction != null || !this.tooltips.isEmpty());
+		return this.isActive() && (this.primaryAction != null || this.secondaryAction != null || this.tertiaryAction != null || !this.tooltips.isEmpty() || this.movable);
 	}
 
 	public boolean scrollable() {
@@ -591,7 +615,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 			if (this.isHovered()) {
 				mouseFocused:
 				if (this.focusable()) {
-					for (var ancestor : Util2.iterate(this.ancestors())) {
+					for (var ancestor : Iteratable.of(this.ancestors())) {
 						if (ancestor.z() > this.z() && ancestor.mouseFocused) {
 							break mouseFocused;
 						}
@@ -606,15 +630,16 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 			if (this.isVisible()) {
 				this.render();
 
-				for (var child : this.children) {
-					child.render(matrixes);
-				}
+				this.children()
+					.filter(child -> !child.isTooltip())
+					.forEach(child -> child.render(matrixes));
 
 				if (this.isRoot()) {
-					this.renderDeferred.forEach(widget -> {
-						RenderSystem.clear(GL46C.GL_DEPTH_BUFFER_BIT, false);
-						widget.render(matrixes);
-					});
+					Stream.concat(this.descendants().filter(Widget::isTooltip), this.renderDeferred.stream())
+						.forEach(widget -> {
+							RenderSystem.clear(GL46C.GL_DEPTH_BUFFER_BIT, false);
+							widget.render(matrixes);
+						});
 				}
 			}
 		}
@@ -628,33 +653,6 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 
 	protected void deferRender() {
 		this.root().renderDeferred.add(this);
-	}
-
-	/**
-	 Determine whether the click should trigger the primary action.
-
-	 @return `true` for left click (0) by default
-	 */
-	public boolean isValidPrimaryClick(int button) {
-		return this.primaryAction != null && button == 0;
-	}
-
-	/**
-	 Determine whether the click should trigger the secondary action.
-
-	 @return `true` for right click (1) by default
-	 */
-	public boolean isValidSecondaryClick(int button) {
-		return this.secondaryAction != null && button == 1;
-	}
-
-	/**
-	 Determine whether the click should trigger the tertiary action.
-
-	 @return `true` for middle click (2) by default
-	 */
-	public boolean isValidTertiaryClick(int button) {
-		return this.tertiaryAction != null && button == 2;
 	}
 
 	/**
@@ -734,17 +732,31 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 			}
 
 			if (this.clicked()) {
-				if (this.isValidPrimaryClick(button)) {
-					this.primaryPress();
-					this.primaryClick();
-				} else if (this.isValidSecondaryClick(button)) {
-					this.secondaryPress();
-					this.secondaryClick();
-				} else if (this.isValidTertiaryClick(button)) {
-					this.tertiaryPress();
-					this.tertiaryClick();
-				} else {
-					return false;
+				switch (button) {
+					case 0 -> {
+						if (this.primaryAction != null) {
+							this.primaryPress();
+						} else if (!this.movable) {
+							return false;
+						}
+
+						this.primaryClick();
+					}
+					case 1 -> {
+						if (this.secondaryAction != null) {
+							this.secondaryPress();
+							this.secondaryClick();
+						}
+					}
+					case 2 -> {
+						if (this.tertiaryAction != null) {
+							this.tertiaryPress();
+							this.tertiaryClick();
+						}
+					}
+					default -> {
+						return false;
+					}
 				}
 
 				return true;
@@ -777,11 +789,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 				return true;
 			}
 
-			if (this.dragging) {
-				this.drag();
-
-				return true;
-			}
+			return this.dragging && this.drag(deltaX, deltaY);
 		}
 
 		return false;

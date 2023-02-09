@@ -1,6 +1,5 @@
 package soulboundarmory.client.gui.screen;
 
-import java.util.List;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
@@ -10,6 +9,8 @@ import soulboundarmory.module.gui.widget.ScalableWidget;
 import soulboundarmory.module.gui.widget.TextWidget;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.skill.SkillInstance;
+
+import java.util.List;
 
 public class SkillWidget extends Widget<SkillWidget> {
 	private final ScalableWidget<?> frame = this.add(new ScalableWidget<>().width(24).height(24));
@@ -46,7 +47,8 @@ public class SkillWidget extends Widget<SkillWidget> {
 			sections.add(0, tooltip);
 
 			var height = 1 + (1 + tooltip.size()) * fontHeight();
-			var y = this.absoluteY() - 4 > this.tab.insideCenterY ? -56 : -7;
+			// var y = this.absoluteY() - 4 > this.tab.absoluteMiddleY() ? -56 : -7;
+			var y = -7;
 			var textY = 7;
 			this.clear();
 
@@ -93,7 +95,7 @@ public class SkillWidget extends Widget<SkillWidget> {
 			this.frame.color3f(1);
 			this.deferRender();
 		} else {
-			this.frame.color3f(this.tab.colorValue);
+			this.frame.color3f(this.tab.brightness);
 		}
 	}
 }

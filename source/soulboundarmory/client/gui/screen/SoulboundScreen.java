@@ -13,8 +13,7 @@ import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.module.config.ConfigurationManager;
 import soulboundarmory.module.gui.screen.ScreenWidget;
-import soulboundarmory.module.gui.widget.ScalableWidget;
-import soulboundarmory.module.gui.widget.WidgetBox;
+import soulboundarmory.module.gui.widget.*;
 import soulboundarmory.module.gui.widget.slider.SliderWidget;
 import soulboundarmory.network.ExtendedPacketBuffer;
 import soulboundarmory.network.Packets;
@@ -51,7 +50,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 			this.colorSlider(Translations.blue, 2),
 			this.colorSlider(Translations.alpha, 3),
 			this.optionButton(() -> Translations.style.text(Configuration.Client.style.text), () -> this.cycleStyle(1), () -> this.cycleStyle(-1)),
-			this.optionButton(() -> Translations.configure, () -> ConfigurationManager.instance(Configuration.class).screen(this.asScreen()).open(), null)
+			this.optionButton(() -> Translations.configure, () -> ConfigurationManager.instance(Configuration.class).screen(this.asScreen()).open("client"), null)
 		);
 	protected final MasterComponent<?> component;
 	protected final int slot;
@@ -102,19 +101,21 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 			this.tabs.add(this.tab = this.component.selectionTab());
 		}
 
+		var tabBox = this.add(new WidgetBox<>()).x(0.5).y(1D / 16).centerX().xSpacing(12);
+
 		Util.enumerate(this.tabs, (tab, index) -> {
 			tab.index = index;
-			tab.button = this.add(this.button(tab));
+			tab.button = tabBox.add(this.button(tab));
 		});
 
 		this.tab(this.tab);
 
 		this.add(new ScalableWidget<>())
 			.button()
-			.x(this.tab.button)
+			.x(this.options)
 			.y(15D / 16)
-			.centerY()
-			.width(button -> Math.max(this.tab.button.width(), button.descendantWidth() + 12))
+			.alignDown()
+			.width(button -> this.options.descendantWidth())
 			.height(20)
 			.text(() -> this.bound() ? Translations.guiButtonUnbind : Translations.guiButtonBind)
 			.present(this::displayTabs)
@@ -193,14 +194,18 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 			.onSlide(slider -> Configuration.Client.Color.set(id, (int) slider.value()));
 	}
 
-	private ScalableWidget<?> button(Tab tab) {
+	private Widget<?> button(Tab tab) {
 		return new ScalableWidget<>()
-			.button()
-			.x(1D / 24)
-			.y(this.optionY(tab.index))
-			.width(Math.max(96, Math.round(this.width() / 7.5F)))
-			.height(20)
-			.text(tab.title)
+			.grayRectangle()
+			.size(32)
+			.with(tab.icon()
+				.width(0.75)
+				.height(0.75)
+				.x(0.5)
+				.y(0.5)
+				.center()
+			)
+			.tooltip(new TooltipWidget().text(tab.title))
 			.primaryAction(() -> this.tab(tab))
 			.present(this::displayTabs)
 			.active(() -> tab != this.tab);
