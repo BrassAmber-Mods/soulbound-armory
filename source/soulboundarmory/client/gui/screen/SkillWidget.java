@@ -4,10 +4,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import soulboundarmory.client.i18n.Translations;
-import soulboundarmory.module.gui.widget.GraphicWidget;
-import soulboundarmory.module.gui.widget.ScalableWidget;
-import soulboundarmory.module.gui.widget.TextWidget;
-import soulboundarmory.module.gui.widget.Widget;
+import soulboundarmory.module.gui.widget.*;
 import soulboundarmory.skill.SkillInstance;
 
 import java.util.List;
@@ -47,22 +44,21 @@ public class SkillWidget extends Widget<SkillWidget> {
 			sections.add(0, tooltip);
 
 			var height = 1 + (1 + tooltip.size()) * fontHeight();
-			// var y = this.absoluteY() - 4 > this.tab.absoluteMiddleY() ? -56 : -7;
-			var y = -7;
+			var totalHeight = height + 20 * sections.size();
+			var y = this.absoluteY() + totalHeight > this.tab.endY() ? -totalHeight : -7;
 			var textY = 7;
 			this.clear();
 
+			var sectionBox = new WidgetBox<>().vertical().x(-4).y(1, y);
+			this.tooltip(sectionBox);
+
 			for (var section : sections) {
-				this.tooltip(new ScalableWidget<>()
+				sectionBox.add(new ScalableWidget<>())
 					.grayRectangle()
-					.x(-4)
-					.y(1, y)
 					.width(tooltipWidth)
 					.height(height)
-					.present(this::isFocused).with(new TextWidget().alignStart().x(5).y(textY).color(0x999999).with(t -> section.forEach(t::text)))
-				);
+					.present(this::isFocused).with(new TextWidget().alignStart().x(5).y(textY).color(0x999999).with(t -> section.forEach(t::text)));
 
-				y += height;
 				textY = 6;
 				height = 20;
 			}
