@@ -295,19 +295,24 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 				this.renderCorners();
 				this.renderMiddles();
 			}
-			case STRETCH -> drawTexture(
-				this.matrixes,
-				this.absoluteX(),
-				this.absoluteY(),
-				this.width(),
-				this.height(),
-				this.u,
-				this.v,
-				this.corners[3].end.x - this.corners[0].start.x,
-				this.corners[3].end.y - this.corners[0].start.y,
-				this.textureWidth(),
-				this.textureHeight()
-			);
+			case STRETCH -> {
+				this.matrixes.push();
+				this.matrixes.translate(0, 0, this.z());
+				drawTexture(
+					this.matrixes,
+					this.absoluteX(),
+					this.absoluteY(),
+					this.width(),
+					this.height(),
+					this.u,
+					this.v,
+					this.corners[3].end.x - this.corners[0].start.x,
+					this.corners[3].end.y - this.corners[0].start.y,
+					this.textureWidth(),
+					this.textureHeight()
+				);
+				this.matrixes.pop();
+			}
 		}
 
 		if (this.isFocused() && this.isActive()) {
