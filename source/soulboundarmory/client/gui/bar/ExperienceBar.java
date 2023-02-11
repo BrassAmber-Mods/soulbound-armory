@@ -18,7 +18,7 @@ public class ExperienceBar extends ScalableWidget<ExperienceBar> {
 		.y(5)
 		.centerX()
 		.alignDown()
-		.color(Configuration.Client.Color::argb)
+		.color(Configuration.Client.Bar::argb)
 		.stroke()
 		.text(() -> this.component.level())
 		.visible(() -> this.component.level() > 0)
@@ -49,18 +49,18 @@ public class ExperienceBar extends ScalableWidget<ExperienceBar> {
 	}
 
 	@Override public boolean isPresent() {
-		return this.component != null && Configuration.Client.Color.alpha > 25 && super.isPresent();
+		return this.component != null && Configuration.Client.Bar.alpha > 25 && super.isPresent();
 	}
 
 	@Override public void render() {
-		this.v(Configuration.Client.style.v).viewWidth(1D).color4f(Configuration.Client.Color.getf(0), Configuration.Client.Color.getf(1), Configuration.Client.Color.getf(2), Configuration.Client.Color.getf(3));
+		this.v(Configuration.Client.Bar.style.v).viewWidth(1D).color4f(Configuration.Client.Bar.getf(0), Configuration.Client.Bar.getf(1), Configuration.Client.Bar.getf(2), Configuration.Client.Bar.getf(3));
 		super.render();
 
 		if (this.component.canLevelUp()) {
 			this.viewWidth(Math.min(1, this.component.experience() / this.component.nextLevelXP()));
 		}
 
-		this.v(Configuration.Client.style.v + 5);
+		this.v(Configuration.Client.Bar.style.v + 5);
 		super.render();
 	}
 

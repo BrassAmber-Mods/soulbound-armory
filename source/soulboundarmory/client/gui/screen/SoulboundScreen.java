@@ -49,7 +49,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 			this.colorSlider(Translations.green, 1),
 			this.colorSlider(Translations.blue, 2),
 			this.colorSlider(Translations.alpha, 3),
-			this.optionButton(() -> Translations.style.text(Configuration.Client.style.text), () -> this.cycleStyle(1), () -> this.cycleStyle(-1)),
+			this.optionButton(() -> Translations.style.text(Configuration.Client.Bar.style.text), () -> this.cycleStyle(1), () -> this.cycleStyle(-1)),
 			this.optionButton(() -> Translations.configure, () -> ConfigurationManager.instance(Configuration.class).screen(this.asScreen()).open("client"), null)
 		);
 	protected final MasterComponent<?> component;
@@ -189,9 +189,9 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 			.min(0)
 			.max(255)
 			.discrete()
-			.value(Configuration.Client.Color.get(id))
+			.value(Configuration.Client.Bar.get(id))
 			.text(text)
-			.onSlide(slider -> Configuration.Client.Color.set(id, (int) slider.value()));
+			.onSlide(slider -> Configuration.Client.Bar.set(id, (int) slider.value()));
 	}
 
 	private Widget<?> button(Tab tab) {
@@ -218,7 +218,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 	}
 
 	private void cycleStyle(int change) {
-		var index = (Configuration.Client.style.ordinal() + change) % BarStyle.count;
-		Configuration.Client.style = BarStyle.styles.get(index >= 0 ? index : index + BarStyle.count);
+		var index = (Configuration.Client.Bar.style.ordinal() + change) % BarStyle.count;
+		Configuration.Client.Bar.style = BarStyle.styles.get(index >= 0 ? index : index + BarStyle.count);
 	}
 }

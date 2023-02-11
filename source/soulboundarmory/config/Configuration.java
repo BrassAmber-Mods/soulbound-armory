@@ -108,9 +108,6 @@ public final class Configuration {
 		// @Comment("Display attributes in tooltips.")
 		// public static boolean tooltipAttributes = true;
 
-		@Comment("Experience bar style.")
-		public static BarStyle style = BarStyle.EXPERIENCE;
-
 		@Comment({
 			"The style of selection entries.",
 			"ICON: white (locked) or yellow (unlocked) advancement box with item's icon.",
@@ -118,8 +115,10 @@ public final class Configuration {
 		})
 		public static SelectionEntryWidget.Type selectionEntryType = SelectionEntryWidget.Type.ICON;
 
-		@Name("experience bar color")
-		public static class Color {
+		@Name("experience bar")
+		public static class Bar {
+			public static BarStyle style = BarStyle.EXPERIENCE;
+
 			@Interval(max = 255)
 			public static int red = 160;
 
