@@ -26,7 +26,6 @@ import soulboundarmory.module.gui.widget.scroll.ContextScrollAction;
 import soulboundarmory.module.gui.widget.scroll.ScrollAction;
 import soulboundarmory.util.Iteratable;
 import soulboundarmory.util.Util;
-import soulboundarmory.util.Util2;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -801,11 +800,7 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 				return true;
 			}
 
-			if (this.scrollable() && this.mouseFocused) {
-				this.scroll(amount);
-
-				return true;
-			}
+			return this.mouseFocused && this.scroll(amount);
 		}
 
 		return false;
@@ -884,10 +879,13 @@ public class Widget<T extends Widget<T>> extends Node<Widget<?>, T> implements T
 
 	protected void tertiaryClick() {}
 
-	protected void scroll(double amount) {
-		if (this.scrollAction != null) {
-			this.scrollAction.scroll((T) this, amount);
+	protected boolean scroll(double amount) {
+		if (this.scrollAction == null) {
+			return false;
 		}
+
+		this.scrollAction.scroll((T) this, amount);
+		return true;
 	}
 
 	protected void execute(PressCallback<T> callback) {

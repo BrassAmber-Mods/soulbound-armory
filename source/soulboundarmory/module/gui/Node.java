@@ -187,19 +187,19 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 		RenderSystem.setShaderColor(brightness, brightness, brightness, -1);
 	}
 
-	public static void pushScissor(int x, int y, int width, int height) {
+	public static void pushScissor(MatrixStack matrixes, int x, int y, int width, int height) {
 		var scissor = new Scissor(x, y, width, height);
 		scissors.push(scissor);
-		scissor.apply();
+		scissor.apply(matrixes);
 	}
 
-	public static void popScissor() {
+	public static void popScissor(MatrixStack matrixes) {
 		scissors.pop();
 
 		if (scissors.isEmpty()) {
 			disableScissor();
 		} else {
-			scissors.top().apply();
+			scissors.top().apply(matrixes);
 		}
 	}
 
@@ -761,7 +761,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 	 @return whether this node is hovered my the cursor
 	 */
 	public boolean isHovered() {
-		return this.contains(Widget.mouseX(), Widget.mouseY());
+		return this.contains(mouseX(), mouseY());
 	}
 
 	/**
@@ -775,7 +775,7 @@ public abstract class Node<B extends Node<B, ?>, T extends Node<B, T>> extends D
 	 @return whether this node's area contains the given point
 	 */
 	public boolean contains(double x, double y) {
-		return Widget.contains(x, y, this.absoluteX(), this.absoluteY(), this.width(), this.height());
+		return contains(x, y, this.absoluteX(), this.absoluteY(), this.width(), this.height());
 	}
 
 	/**

@@ -280,7 +280,7 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 	}
 
 	@Override protected void render() {
-		pushScissor(this.absoluteX(), this.absoluteY(), this.viewWidth(), this.viewHeight());
+		pushScissor(this.matrixes, this.absoluteX(), this.absoluteY(), this.viewWidth(), this.viewHeight());
 		RenderSystem.enableBlend();
 		shaderTexture(this.texture);
 		this.resetColor();
@@ -314,7 +314,7 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 			this.drawBorder();
 		}
 
-		popScissor();
+		popScissor(this.matrixes);
 	}
 
 	protected void renderCorners() {

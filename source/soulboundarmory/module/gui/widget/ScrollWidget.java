@@ -2,7 +2,6 @@ package soulboundarmory.module.gui.widget;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
-import soulboundarmory.util.Math2;
 import soulboundarmory.util.Util;
 
 import java.util.function.Predicate;
@@ -10,16 +9,17 @@ import java.util.function.Predicate;
 public class ScrollWidget extends Widget<ScrollWidget> {
 	private final Widget<?> scrollbar = new ScalableWidget<>()
 		.texture(Util.id("textures/gui/scrollbar.png"))
-		.textureSize(8, 64)
+		.textureSize(16, 64)
+		.uv(8, 0)
 		.slice(0, 8, 8, 0, 8, 64)
 		.width(8)
-		.height(sb -> {
+		.heightProportion(sb -> {
 			var totalHeight = this.bodyHeight();
 			var height = this.height();
-			return totalHeight <= height ? height : Math2.square(height) / totalHeight;
+			return totalHeight <= height ? height : (double) height / totalHeight;
 		})
-		.x(1).alignEnd()
-		.y(sb -> this.scroll / this.max() * (this.height() - sb.height()))
+		.x(1D).alignRight()
+		.y(sb -> (int) (this.ratio() * (this.height() - sb.height())))
 		.present(() -> this.height() < this.bodyHeight());
 
 	private int scroll;
@@ -33,20 +33,20 @@ public class ScrollWidget extends Widget<ScrollWidget> {
 			- this.descendants().filter(Predicate.not(this.scrollbar::equals)).mapToInt(Widget::absoluteY).min().orElse(0);
 	}
 
+	@Override public boolean focusable() {
+		return this.isActive();
+	}
+
 	@Override public void render(MatrixStack matrixes) {
-		pushScissor(this.absoluteX(), this.absoluteY(), this.width(), this.height());
+		pushScissor(matrixes, this.absoluteX(), this.absoluteY(), this.width(), this.height());
 		matrixes.push();
 		matrixes.translate(0, -this.scroll, 0);
 		super.render(matrixes);
 		matrixes.pop();
-		popScissor();
+		popScissor(matrixes);
 	}
 
-	@Override public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (super.mouseScrolled(mouseX, mouseY, amount)) {
-			return true;
-		}
-
+	@Override protected boolean scroll(double amount) {
 		var max = this.max();
 
 		if (this.scroll >= max && amount < 0) {
@@ -59,9 +59,14 @@ public class ScrollWidget extends Widget<ScrollWidget> {
 			return false;
 		}
 
-		this.scroll = (int) MathHelper.clamp(this.scroll - 32 * amount, 0, max);
+		super.scroll(amount);
+		this.scroll = (int) MathHelper.clamp(this.scroll - 16 * amount, 0, max);
 
 		return true;
+	}
+
+	private double ratio() {
+		return (double) this.scroll / this.max();
 	}
 
 	private int max() {
