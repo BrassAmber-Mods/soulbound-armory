@@ -1445,9 +1445,9 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 					if (button == 0) {
 						this.primaryClick();
 					}
-				}
 
-				return true;
+					return true;
+				}
 			}
 		}
 
