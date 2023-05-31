@@ -1,6 +1,5 @@
 plugins {
 	id("java")
-	id("maven-publish")
 	id("net.auoeke.gronk").version("4.+")
 	id("com.github.johnrengelman.shadow").version("latest.release")
 	id("dev.architectury.loom").version("latest.release")
@@ -74,15 +73,6 @@ tasks.withType(JavaCompile) {
 processResources {
 	filesMatching("META-INF/mods.toml") {
 		filter(line -> line.replace("0VERSION", version as String).replaceFirst(/#.*/, ""))
-	}
-}
-
-publishing {
-	repositories {
-		maven(findProperty("maven.repository")) {
-			username(findProperty("maven.username"))
-			password(findProperty("maven.password"))
-		}
 	}
 }
 
