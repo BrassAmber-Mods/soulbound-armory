@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class TransformerManager {
-	private static final Instrumentation instrumentation = Reflect.instrument().value();
+	public static final Instrumentation instrumentation = Reflect.instrument().value();
 
 	public static void addSingleUseTransformer(String targetName, Consumer<ClassNode> transformer) {
 		instrumentation.addTransformer(transformer(node -> {
