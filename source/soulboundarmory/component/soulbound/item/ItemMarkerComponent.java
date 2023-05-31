@@ -9,7 +9,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import soulboundarmory.client.gui.bar.ExperienceBar;
 import soulboundarmory.module.component.ItemStackComponent;
-import soulboundarmory.module.gui.Node;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.util.Util;
 
@@ -86,7 +85,7 @@ public class ItemMarkerComponent implements ItemStackComponent<ItemMarkerCompone
 	@OnlyIn(Dist.CLIENT)
 	private void upload() {
 		var player = this.item.player;
-		var animation = (Sprite.Animation) Node.itemRenderer.getModel(this.stack, player.world, player, player.getId()).getParticleSprite().getAnimation();
+		var animation = (Sprite.Animation) Widget.itemRenderer.getModel(this.stack, player.world, player, player.getId()).getParticleSprite().getAnimation();
 		animation.frameTicks = Integer.MIN_VALUE;
 		Widget.bind(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
 		animation.upload(Math.max(0, this.animationTick - 5) / 2);

@@ -1,11 +1,12 @@
 package soulboundarmory.util;
 
-import java.awt.image.BufferedImage;
-import java.util.Optional;
-import javax.imageio.ImageIO;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
-import soulboundarmory.module.gui.Node;
+import soulboundarmory.module.gui.widget.Widget;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 public class Resources {
 	public static BufferedImage readTexture(Identifier identifier) {
@@ -13,7 +14,7 @@ public class Resources {
 	}
 
 	public static Optional<Resource> resource(Identifier identifier) {
-		return Node.resourceManager.getResource(identifier);
+		return Widget.resourceManager.getResource(identifier);
 	}
 
 	public static int[][][] pixels(BufferedImage image, int u, int v, int width, int height) {

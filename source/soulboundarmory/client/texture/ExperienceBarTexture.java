@@ -1,15 +1,16 @@
 package soulboundarmory.client.texture;
 
-import java.util.Arrays;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.resource.ResourceManager;
 import soulboundarmory.SoulboundArmory;
 import soulboundarmory.client.gui.bar.BarStyle;
-import soulboundarmory.module.gui.Node;
+import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.util.Math2;
 import soulboundarmory.util.Resources;
+
+import java.util.Arrays;
 
 public class ExperienceBarTexture extends ResourceTexture {
 	public static final ExperienceBarTexture instance = new ExperienceBarTexture();
@@ -17,7 +18,7 @@ public class ExperienceBarTexture extends ResourceTexture {
 	private ExperienceBarTexture() {
 		super(SoulboundArmory.id("gui/experience_bar"));
 
-		Node.textureManager.registerTexture(this.location, this);
+		Widget.textureManager.registerTexture(this.location, this);
 	}
 
 	@Override protected TextureData loadTextureData(ResourceManager manager) {

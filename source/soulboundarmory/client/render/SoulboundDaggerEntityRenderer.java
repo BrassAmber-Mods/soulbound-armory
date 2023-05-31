@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3f;
 import soulboundarmory.entity.SoulboundDaggerEntity;
-import soulboundarmory.module.gui.Node;
+import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.util.Util;
 
 public class SoulboundDaggerEntityRenderer extends EntityRenderer<SoulboundDaggerEntity> {
@@ -20,7 +20,7 @@ public class SoulboundDaggerEntityRenderer extends EntityRenderer<SoulboundDagge
 	}
 
 	@Override public Identifier getTexture(SoulboundDaggerEntity entity) {
-		return entity.component().map(component -> Node.itemRenderer.getModel(component.stack(), entity.world, component.player, component.player.getId()).getParticleSprite().getId()).orElse(id);
+		return entity.component().map(component -> Widget.itemRenderer.getModel(component.stack(), entity.world, component.player, component.player.getId()).getParticleSprite().getId()).orElse(id);
 	}
 
 	@Override public void render(SoulboundDaggerEntity dagger, float yaw, float tickDelta, MatrixStack matrixes, VertexConsumerProvider vertexConsumers, int light) {
@@ -36,7 +36,7 @@ public class SoulboundDaggerEntityRenderer extends EntityRenderer<SoulboundDagge
 
 		var size = .75F;
 		matrixes.scale(size, size, size);
-		Node.client.getItemRenderer().renderItem(dagger.asItemStack(), ModelTransformation.Mode.FIXED, light, 0, matrixes, vertexConsumers, dagger.age);
+		Widget.client.getItemRenderer().renderItem(dagger.asItemStack(), ModelTransformation.Mode.FIXED, light, 0, matrixes, vertexConsumers, dagger.age);
 		matrixes.pop();
 
 		super.render(dagger, yaw, tickDelta, matrixes, vertexConsumers, light);

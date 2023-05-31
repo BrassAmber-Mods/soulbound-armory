@@ -18,7 +18,7 @@ import soulboundarmory.config.Configuration;
 import soulboundarmory.module.component.ComponentRegistry;
 import soulboundarmory.module.component.EntityComponent;
 import soulboundarmory.module.component.EntityComponentKey;
-import soulboundarmory.module.gui.Node;
+import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.network.ExtendedPacketBuffer;
 import soulboundarmory.network.Packets;
 import soulboundarmory.util.ItemUtil;
@@ -214,7 +214,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	 */
 	public void refresh() {
 		if (this.isClient()) {
-			if (Node.cellScreen() instanceof SoulboundScreen screen) {
+			if (Widget.cellScreen() instanceof SoulboundScreen screen) {
 				screen.refresh();
 			}
 		} else {

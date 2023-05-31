@@ -1,18 +1,16 @@
 package soulboundarmory.module.gui.widget;
 
-import soulboundarmory.module.gui.Node;
-
 public class WidgetBox<T extends WidgetBox<T>> extends Widget<T> {
 	public int xSpacing;
 	public int ySpacing;
 	public boolean horizontal = true;
 
 	@Override public int width() {
-		return this.horizontal ? Math.max(this.minWidth, this.children().filter(Widget::isVisible).mapToInt(Node::width).sum() + this.xSpacing * Math.max(0, this.degree() - 1)) : super.width();
+		return this.horizontal ? Math.max(this.minWidth, this.children().filter(Widget::isVisible).mapToInt(Widget::width).sum() + this.xSpacing * Math.max(0, this.degree() - 1)) : super.width();
 	}
 
 	@Override public int height() {
-		return this.horizontal ? super.height() : Math.max(this.minHeight, this.children.stream().filter(Widget::isVisible).mapToInt(Node::height).sum() + this.ySpacing * Math.max(0, this.degree() - 1));
+		return this.horizontal ? super.height() : Math.max(this.minHeight, this.children.stream().filter(Widget::isVisible).mapToInt(Widget::height).sum() + this.ySpacing * Math.max(0, this.degree() - 1));
 	}
 
 	@Override public <C extends Widget> C add(int index, C child) {

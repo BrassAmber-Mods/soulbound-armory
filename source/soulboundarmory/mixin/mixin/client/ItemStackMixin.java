@@ -7,13 +7,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.config.Configuration;
-import soulboundarmory.module.gui.Node;
+import soulboundarmory.module.gui.widget.Widget;
 
 @Mixin(ItemStack.class)
 abstract class ItemStackMixin {
 	@Inject(method = "hasGlint", at = @At("HEAD"), cancellable = true)
 	private void disableGlint(CallbackInfoReturnable<Boolean> info) {
-		if (ItemComponent.of(Node.player(), (ItemStack) (Object) this).isPresent() && !Configuration.Client.enchantmentGlint) {
+		if (ItemComponent.of(Widget.player(), (ItemStack) (Object) this).isPresent() && !Configuration.Client.enchantmentGlint) {
 			info.setReturnValue(false);
 		}
 	}
