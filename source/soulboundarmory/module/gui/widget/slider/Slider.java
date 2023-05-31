@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.Runnables;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
+import soulboundarmory.SoulboundArmory;
 import soulboundarmory.module.gui.widget.ScalableWidget;
 import soulboundarmory.module.gui.widget.Widget;
 
@@ -111,6 +112,7 @@ public class Slider extends ScalableWidget<Slider> {
 
 	@Override public boolean drag(double x, double y) {
 		this.progress(MathHelper.clamp(mouseX() - this.owner().absoluteX(), 0D, this.maxX()) / this.maxX());
+		SoulboundArmory.logger.info("{} {}", x, y);
 		return true;
 	}
 
@@ -149,7 +151,7 @@ public class Slider extends ScalableWidget<Slider> {
 	}
 
 	@Override protected void primaryClick() {
-		super.primaryClick();
+		this.dragging = true;
 		this.drag(0, 0);
 	}
 

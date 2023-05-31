@@ -3,6 +3,7 @@ package soulboundarmory.module.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
+import net.auoeke.reflect.Flags;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
@@ -37,7 +38,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL46C;
 import soulboundarmory.module.gui.Length;
 import soulboundarmory.module.gui.Scissor;
@@ -51,6 +51,7 @@ import soulboundarmory.module.gui.util.function.ObjectSupplier;
 import soulboundarmory.module.gui.widget.callback.PressCallback;
 import soulboundarmory.module.gui.widget.scroll.ContextScrollAction;
 import soulboundarmory.module.gui.widget.scroll.ScrollAction;
+import soulboundarmory.module.gui.widget.slider.Slider;
 import soulboundarmory.util.Iteratable;
 import soulboundarmory.util.Util;
 import soulboundarmory.util.Util2;
@@ -61,6 +62,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.*;
 import java.util.stream.Stream;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  A node in a tree of GUI elements.
@@ -102,8 +105,6 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	public NulliPredicate present = () -> !this.isTooltip() || this.isPresentTooltip();
 	public NulliPredicate visible = NulliPredicate.ofTrue();
 	public NulliPredicate active = NulliPredicate.ofTrue();
-
-	public boolean movable;
 
 	/**
 	 Is the deepest element that is hovered by the mouse.
@@ -427,7 +428,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	public void initialize() {}
 
 	public boolean drag(double x, double y) {
-		if (this.movable) {
+		if (this.dragging) {
 			this.dragX += x;
 			this.dragY += y;
 
@@ -436,8 +437,6 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 
 		return false;
 	}
-
-	public void drop() {}
 
 	public T x(Offset.Type offset) {
 		this.x.offset.type = offset;
@@ -573,13 +572,9 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return this.active(NulliPredicate.of(active));
 	}
 
-	public T movable(boolean movable) {
-		this.movable = movable;
-		return (T) this;
-	}
-
 	public T movable() {
-		return this.movable(true);
+		this.primaryAction(() -> this.dragging = true);
+		return (T) this;
 	}
 
 	public T text(String text) {
@@ -619,9 +614,6 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return (T) this;
 	}
 
-	/**
-	 @see #isValidPrimaryKey
-	 */
 	public T primaryAction(PressCallback<T> action) {
 		this.primaryAction = action;
 		return (T) this;
@@ -1191,7 +1183,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	}
 
 	public boolean focusable() {
-		return this.isActive() && (this.primaryAction != null || this.secondaryAction != null || this.tertiaryAction != null || !this.tooltips.isEmpty() || this.movable);
+		return this.isActive() && (this.primaryAction != null || this.secondaryAction != null || this.tertiaryAction != null || !this.tooltips.isEmpty());
 	}
 
 	public boolean scrollable() {
@@ -1339,42 +1331,6 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		this.root().renderDeferred.add(this);
 	}
 
-	/**
-	 Determine whether the key press should trigger the primary action.
-
-	 @return `true` for the space bar by default
-	 */
-	public boolean isValidPrimaryKey(int keyCode, int scanCode, int modifiers) {
-		return this.primaryAction != null && this.isValidActionKey(keyCode, scanCode, modifiers);
-	}
-
-	/**
-	 Determine whether the key press should trigger the secondary action.
-
-	 @return `true` for the space bar when a shift key is pressed by default
-	 */
-	public boolean isValidSecondaryKey(int keyCode, int scanCode, int modifiers) {
-		return this.secondaryAction != null && this.isValidActionKey(keyCode, scanCode, modifiers) && (modifiers & GLFW.GLFW_MOD_SHIFT) != 0;
-	}
-
-	/**
-	 Determine whether the key press should trigger the tertiary action.
-
-	 @return `true` for the space bar when a control key is pressed by default
-	 */
-	public boolean isValidTertiaryKey(int keyCode, int scanCode, int modifiers) {
-		return this.tertiaryAction != null && this.isValidActionKey(keyCode, scanCode, modifiers) && (modifiers & GLFW.GLFW_MOD_CONTROL) != 0;
-	}
-
-	/**
-	 Determine whether the key press is a valid action key.
-
-	 @return `true` for space bar and return and enter keys
-	 */
-	public boolean isValidActionKey(int keyCode, int scanCode, int modifiers) {
-		return keyCode == GLFW.GLFW_KEY_SPACE || keyCode == GLFW.GLFW_KEY_ENTER;
-	}
-
 	public void renderBackground() {
 		this.renderBackground(this.matrixes);
 	}
@@ -1419,34 +1375,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		soundManager.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1));
 	}
 
-	protected void press() {
-		this.playSound();
-	}
-
-	protected void primaryPress() {
-		this.press();
-		this.execute(this.primaryAction);
-	}
-
-	protected void secondaryPress() {
-		this.press();
-		this.execute(this.secondaryAction);
-	}
-
-	protected void tertiaryPress() {
-		this.press();
-		this.execute(this.tertiaryAction);
-	}
-
-	protected void primaryClick() {
-		if (this.focusable()) {
-			this.dragging = true;
-		}
-	}
-
-	protected void secondaryClick() {}
-
-	protected void tertiaryClick() {}
+	protected void primaryClick() {}
 
 	protected boolean scroll(double amount) {
 		if (this.scrollAction == null) {
@@ -1455,12 +1384,6 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 
 		this.scrollAction.scroll((T) this, amount);
 		return true;
-	}
-
-	protected void execute(PressCallback<T> callback) {
-		if (callback != null) {
-			callback.onPress((T) this);
-		}
 	}
 
 	/**
@@ -1503,36 +1426,24 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 {@inheritDoc}
 	 */
 	@Override public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (this.isPresent()) {
-			if (this.isPresent() && this.childrenReverse().anyMatch(child -> child.mouseClicked(mouseX, mouseY, button))) {
+		if (button <= 2 && this.isPresent()) {
+			if (this.childrenReverse().anyMatch(child -> child.mouseClicked(mouseX, mouseY, button))) {
 				return true;
 			}
 
 			if (this.clicked()) {
-				switch (button) {
-					case 0 -> {
-						if (this.primaryAction != null) {
-							this.primaryPress();
-						} else if (!this.movable) {
-							return false;
-						}
+				var c = switch (button) {
+					case 0 -> this.primaryAction;
+					case 1 -> this.secondaryAction;
+					default -> this.tertiaryAction;
+				};
 
+				if (c != null) {
+					c.onPress((T) this);
+					this.playSound();
+
+					if (button == 0) {
 						this.primaryClick();
-					}
-					case 1 -> {
-						if (this.secondaryAction != null) {
-							this.secondaryPress();
-							this.secondaryClick();
-						}
-					}
-					case 2 -> {
-						if (this.tertiaryAction != null) {
-							this.tertiaryPress();
-							this.tertiaryClick();
-						}
-					}
-					default -> {
-						return false;
 					}
 				}
 
@@ -1548,14 +1459,12 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 */
 	@Override public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		if (this.isPresent()) {
-			if (this.isPresent() && this.childrenReverse().anyMatch(child -> child.mouseReleased(mouseX, mouseY, button))) {
+			if (this.childrenReverse().anyMatch(child -> child.mouseReleased(mouseX, mouseY, button))) {
 				return true;
 			}
 
 			if (this.dragging) {
 				this.dragging = false;
-				this.drop();
-
 				return true;
 			}
 		}
@@ -1568,7 +1477,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 */
 	@Override public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (this.isPresent()) {
-			if (this.isPresent() && this.childrenReverse().anyMatch(child -> child.mouseDragged(mouseX, mouseY, button, deltaX, deltaY))) {
+			if (this.childrenReverse().anyMatch(child -> child.mouseDragged(mouseX, mouseY, button, deltaX, deltaY))) {
 				return true;
 			}
 
@@ -1583,7 +1492,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 */
 	@Override public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (this.isPresent()) {
-			if (this.isPresent() && this.childrenReverse().anyMatch(widget -> widget.mouseScrolled(mouseX, mouseY, amount))) {
+			if (this.childrenReverse().anyMatch(widget -> widget.mouseScrolled(mouseX, mouseY, amount))) {
 				return true;
 			}
 
@@ -1598,22 +1507,21 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 */
 	@Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (this.isPresent()) {
-			if (keyCode == GLFW.GLFW_KEY_TAB && this.changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0) || this.isPresent() && this.childrenReverse().anyMatch(child -> child.keyPressed(keyCode, scanCode, modifiers))) {
+			if (keyCode == GLFW_KEY_TAB && this.changeFocus(Flags.none(modifiers, GLFW_MOD_SHIFT)) || this.isPresent() && this.childrenReverse().anyMatch(child -> child.keyPressed(keyCode, scanCode, modifiers))) {
 				return true;
 			}
 
-			if (this.isSelected()) {
-				if (this.isValidPrimaryKey(keyCode, scanCode, modifiers)) {
-					this.primaryPress();
-				} else if (this.isValidSecondaryKey(keyCode, scanCode, modifiers)) {
-					this.secondaryPress();
-				} else if (this.isValidTertiaryKey(keyCode, scanCode, modifiers)) {
-					this.tertiaryPress();
-				} else {
-					return false;
-				}
+			if (this.isSelected() && (keyCode == GLFW_KEY_SPACE || keyCode == GLFW_KEY_ENTER)) {
+				var c = Flags.all(modifiers, GLFW_MOD_SHIFT) ? this.secondaryAction
+					: Flags.all(modifiers, GLFW_MOD_CONTROL) ? this.tertiaryAction
+					: this.primaryAction;
 
-				return true;
+				if (c != null) {
+					c.onPress((T) this);
+					this.playSound();
+
+					return true;
+				}
 			}
 		}
 
