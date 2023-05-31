@@ -86,27 +86,29 @@ publishing {
 	}
 }
 
-afterEvaluate {
-	tasks.withType(genSourcesWithCfr.class) {
-		final marker = new File(outputJar.asFile.get().parentFile, project.name + "-marker")
-		onlyIf {!marker.exists()}
-
-		doLast {
-			marker.createNewFile()
-		}
-	}
-
-	unpickJar {
-		onlyIf {!outputJar.asFile.get().exists()}
-	}
-
-	genSources {
-		dependsOn = [genSourcesWithFernFlower]
-	}
-}
-
 tasks.findByName("ideaSyncTask")?.tap {
 	dependsOn("genSources")
+}
+
+afterEvaluate {
+	if (tasks.findByName("genSourcesWithCfr")) {
+		tasks.withType(genSourcesWithCfr.class) {
+			final marker = new File(outputJar.asFile.get().parentFile, project.name + "-marker")
+			onlyIf {!marker.exists()}
+
+			doLast {
+				marker.createNewFile()
+			}
+		}
+
+		unpickJar {
+			onlyIf {!outputJar.asFile.get().exists()}
+		}
+
+		genSources {
+			dependsOn = [genSourcesWithFernFlower]
+		}
+	}
 }
 
 loom {
@@ -133,7 +135,7 @@ loom {
 			all {run ->
 				run.vmArgs.addAll(["-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition", "-Dmixin.hotSwap=true"])
 
-				net.auoeke.reflect.Accessor.putReference(run, "envVariables", new HashMap<String, String>() {
+				net.auoeke.reflect.Accessor.putReference(run, "environmentVariables", new HashMap<String, String>() {
 					String put(String key, String value) {
 						// Ignore Gradle's output because it interferes even if it is last.
 						return key == "MOD_CLASSES" && this["MOD_CLASSES"] ? null : super.put(key, value)
