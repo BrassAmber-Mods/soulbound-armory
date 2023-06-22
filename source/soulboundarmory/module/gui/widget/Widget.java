@@ -298,17 +298,14 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	}
 
 	public void fill(int x1, int y1, int x2, int y2, float z, int color) {
-		var matrix = this.matrixes.peek().getPositionMatrix();
-		int i;
-
 		if (x1 < x2) {
-			i = x1;
+			var i = x1;
 			x1 = x2;
 			x2 = i;
 		}
 
 		if (y1 < y2) {
-			i = y1;
+			var i = y1;
 			y1 = y2;
 			y2 = i;
 		}
@@ -318,6 +315,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		var g = (color >> 8 & 255) / 255F;
 		var b = (color & 255) / 255F;
 		var bufferBuilder = Tessellator.getInstance().getBuffer();
+		var matrix = this.matrixes.peek().getPositionMatrix();
 
 		setPositionColorShader();
 		RenderSystem.enableBlend();
@@ -1158,14 +1156,12 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 					start = degree - 1;
 				} else {
 					this.select(null);
-
 					return false;
 				}
 			} else if (this.selected.isPresent()) {
 				start = this.selected.get().index();
 			} else if (forward && this.focusable()) {
 				this.select(this);
-
 				return true;
 			} else {
 				start = forward ? 0 : degree - 1;
@@ -1174,28 +1170,24 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 			for (var index = start; (forward || index >= 0) && index < degree; index += direction) {
 				if (this.child(index).changeFocus(forward)) {
 					this.select(this.child(index));
-
 					return true;
 				}
 			}
 
 			if (!forward && this.focusable()) {
 				this.select(this);
-
 				return true;
 			}
 
 			if (this.isRoot()) {
 				if (this.focusable()) {
 					this.select(this);
-
 					return true;
 				}
 
 				for (var index = forward ? 0 : degree - 1; forward ? index < start : index > start && index < degree; index += direction) {
 					if (this.child(index).changeFocus(forward)) {
 						this.select(this.child(index));
-
 						return true;
 					}
 				}
@@ -1203,7 +1195,6 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		}
 
 		this.select(null);
-
 		return false;
 	}
 
