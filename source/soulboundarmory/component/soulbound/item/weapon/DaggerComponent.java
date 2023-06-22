@@ -24,7 +24,7 @@ public class DaggerComponent extends WeaponComponent<DaggerComponent> {
 			.min(2, StatisticType.attackSpeed, StatisticType.attackDamage);
 
 		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
-		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.throwing, Skills.shadowClone, Skills.returne, Skills.sneakReturn);
+		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.shadowClone, Skills.returne, Skills.sneakReturn);
 	}
 
 	@Override public ItemComponentType<DaggerComponent> type() {

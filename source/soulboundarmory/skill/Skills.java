@@ -12,7 +12,6 @@ import soulboundarmory.skill.weapon.common.PrecisionSkill;
 import soulboundarmory.skill.weapon.dagger.ReturnSkill;
 import soulboundarmory.skill.weapon.dagger.ShadowCloneSkill;
 import soulboundarmory.skill.weapon.dagger.SneakReturnSkill;
-import soulboundarmory.skill.weapon.dagger.ThrowingSkill;
 import soulboundarmory.skill.weapon.greatsword.FreezingSkill;
 import soulboundarmory.skill.weapon.greatsword.LeapingSkill;
 import soulboundarmory.skill.weapon.sword.SummonLightningSkill;
@@ -31,7 +30,6 @@ public class Skills {
 	@Register("shadow_clone") public static final Skill shadowClone = new ShadowCloneSkill();
 	@Register("sneak_return") public static final Skill sneakReturn = new SneakReturnSkill();
 	@Register("summon_lightning") public static final Skill summonLightning = new SummonLightningSkill();
-	@Register("throwing") public static final Skill throwing = new ThrowingSkill();
 
 	@Registry("skill") public static native IForgeRegistry<Skill> registry();
 }

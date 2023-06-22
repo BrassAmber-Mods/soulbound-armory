@@ -15,7 +15,6 @@ import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.entity.SoulboundDaggerEntity;
-import soulboundarmory.skill.Skills;
 
 public class SoulboundDaggerItem extends SoulboundMeleeWeapon {
 	private static final int USE_TIME = 1200;
@@ -37,23 +36,13 @@ public class SoulboundDaggerItem extends SoulboundMeleeWeapon {
 	}
 
 	@Override public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-		if (ItemComponentType.dagger.of(user).hasSkill(Skills.throwing)) {
-			user.setCurrentHand(hand);
-
-			return ActionResult.CONSUME;
-		}
-
-		return ActionResult.PASS;
+		user.setCurrentHand(hand);
+		return ActionResult.CONSUME;
 	}
 
 	@Override public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-		if (ItemComponentType.dagger.of(player).hasSkill(Skills.throwing)) {
-			player.setCurrentHand(hand);
-
-			return TypedActionResult.consume(player.getStackInHand(hand));
-		}
-
-		return TypedActionResult.fail(player.getStackInHand(hand));
+		player.setCurrentHand(hand);
+		return TypedActionResult.consume(player.getStackInHand(hand));
 	}
 
 	@Override public void onStoppedUsing(ItemStack itemStack, World world, LivingEntity entity, int timeLeft) {
