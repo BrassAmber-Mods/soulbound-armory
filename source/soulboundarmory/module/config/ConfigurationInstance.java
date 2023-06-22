@@ -1,12 +1,5 @@
 package soulboundarmory.module.config;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileTime;
-import java.time.Instant;
-import java.util.Timer;
-import java.util.TimerTask;
 import net.auoeke.sp.StructuredProperties;
 import net.auoeke.sp.element.SpMap;
 import net.minecraft.client.gui.screen.Screen;
@@ -17,6 +10,14 @@ import soulboundarmory.SoulboundArmory;
 import soulboundarmory.module.config.gui.ConfigurationScreen;
 import soulboundarmory.util.Util2;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public final class ConfigurationInstance extends Parent {
 	private static final Timer deserializationTimer = new Timer(true);
 	private static final StructuredProperties sp = new StructuredProperties();
@@ -24,16 +25,16 @@ public final class ConfigurationInstance extends Parent {
 	public final ModContainer mod;
 	public final Path path;
 	public final Identifier background;
+	public boolean flush;
 
 	private FileTime mtime = FileTime.from(Instant.EPOCH);
-	private boolean desynced;
 
 	public ConfigurationInstance(ModContainer mod, Class<?> type) {
 		super(type, mod.getModId() + Util2.value(type, (Name name) -> ':' + name.value(), ""), Util2.value(type, Category::value, "main"));
 
 		this.mod = mod;
 		this.path = FMLPaths.CONFIGDIR.get().resolve(Util2.value(type, Name::value, mod.getModId()) + ".str");
-		var background = new Identifier(Util2.value(type, Background::value, "block/andesite.png"));
+		var background = new Identifier(Util2.value(type, Background::value, "block/deepslate.png"));
 		this.background = new Identifier(background.getNamespace(), "textures/" + background.getPath());
 
 		if (this.deserialize()) {
@@ -42,8 +43,8 @@ public final class ConfigurationInstance extends Parent {
 
 		deserializationTimer.schedule(new TimerTask() {
 			@Override public void run() {
-				if (ConfigurationInstance.this.desynced) {
-					ConfigurationInstance.this.desynced = false;
+				if (ConfigurationInstance.this.flush) {
+					ConfigurationInstance.this.flush = false;
 					ConfigurationInstance.this.serialize();
 				} else {
 					ConfigurationInstance.this.deserialize();
@@ -75,7 +76,6 @@ public final class ConfigurationInstance extends Parent {
 			return true;
 		} catch (Throwable trouble) {
 			SoulboundArmory.logger.error("Unable to deserialize configuration %s.".formatted(this.name), trouble);
-
 			return false;
 		}
 	}
@@ -89,10 +89,6 @@ public final class ConfigurationInstance extends Parent {
 		} catch (Throwable trouble) {
 			SoulboundArmory.logger.error("Unable to serialize configuration %s.".formatted(this.name), trouble);
 		}
-	}
-
-	void desynced() {
-		this.desynced = true;
 	}
 
 	private void deserialize(Parent parent, SpMap map) {

@@ -1,14 +1,15 @@
 package soulboundarmory.module.gui.util;
 
-public class Rectangle {
-	public final Point start = new Point();
-	public final Point end = new Point();
+public record Rectangle(int x0, int y0, int x1, int y1) {
+	public Rectangle() {
+		this(0, 0, 0, 0);
+	}
 
 	public int width() {
-		return this.end.x - this.start.x;
+		return this.x1 - this.x0;
 	}
 
 	public int height() {
-		return this.end.y - this.start.y;
+		return this.y1 - this.y0;
 	}
 }

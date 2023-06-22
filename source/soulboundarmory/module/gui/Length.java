@@ -9,7 +9,7 @@ public class Length {
 	public IntSupplier value = Util.zeroSupplier;
 	public Type type = Type.PARENT_PROPORTION;
 
-	private DoubleSupplier base = () -> 1;
+	DoubleSupplier base = () -> 1;
 
 	public void base(double value) {
 		this.base(() -> value);

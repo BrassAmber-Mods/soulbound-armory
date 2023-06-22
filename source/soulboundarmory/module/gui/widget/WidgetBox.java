@@ -1,30 +1,20 @@
 package soulboundarmory.module.gui.widget;
 
 public class WidgetBox<T extends WidgetBox<T>> extends Widget<T> {
-	public int xSpacing;
-	public int ySpacing;
 	public boolean horizontal = true;
+	public int margin;
 
-	@Override public int width() {
-		return this.horizontal ? Math.max(this.minWidth, this.children().filter(Widget::isVisible).mapToInt(Widget::width).sum() + this.xSpacing * Math.max(0, this.degree() - 1)) : super.width();
-	}
-
-	@Override public int height() {
-		return this.horizontal ? super.height() : Math.max(this.minHeight, this.children.stream().filter(Widget::isVisible).mapToInt(Widget::height).sum() + this.ySpacing * Math.max(0, this.degree() - 1));
+	public WidgetBox() {
+		this.width(w -> this.descendantWidth(false));
+		this.height(w -> this.descendantHeight(false));
 	}
 
 	@Override public <C extends Widget> C add(int index, C child) {
-		return this.update(super.add(index, child));
-	}
+		super.add(index, child);
 
-	public T xSpacing(int spacing) {
-		this.xSpacing = spacing;
-		return this.horizontal();
-	}
-
-	public T ySpacing(int spacing) {
-		this.ySpacing = spacing;
-		return this.vertical();
+		var previous = this.degree() == 1 ? null : this.child(this.degree() - 2);
+		return this.horizontal ? (C) child.x(previous == null ? c -> 0 : c -> previous.endX() + this.margin)
+			: (C) child.y(previous == null ? c -> 0 : c -> previous.endY() + this.margin);
 	}
 
 	public T horizontal() {
@@ -37,10 +27,16 @@ public class WidgetBox<T extends WidgetBox<T>> extends Widget<T> {
 		return (T) this;
 	}
 
-	protected <C extends Widget<?>> C update(C child) {
-		var previous = this.degree() < 2 ? null : this.children.get(this.degree() - 2);
+	public T margin(int margin) {
+		this.margin = margin;
+		return (T) this;
+	}
 
-		return this.horizontal ? (C) child.x(previous == null ? c -> 0 : c -> previous.endX() + this.xSpacing)
-			: (C) child.y(previous == null ? c -> 0 : c -> previous.endY() + this.ySpacing);
+	public T xMargin(int margin) {
+		return this.horizontal().margin(margin);
+	}
+
+	public T yMargin(int margin) {
+		return this.vertical().margin(margin);
 	}
 }

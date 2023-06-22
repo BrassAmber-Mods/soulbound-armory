@@ -24,20 +24,19 @@ public class SoulboundDaggerEntityRenderer extends EntityRenderer<SoulboundDagge
 	}
 
 	@Override public void render(SoulboundDaggerEntity dagger, float yaw, float tickDelta, MatrixStack matrixes, VertexConsumerProvider vertexConsumers, int light) {
-		matrixes.push();
-		Util.rotate(matrixes, Vec3f.POSITIVE_Y, MathHelper.lerp(tickDelta, dagger.prevYaw, dagger.getYaw()) + 90);
-		Util.rotate(matrixes, Vec3f.POSITIVE_Z, 45 - MathHelper.lerp(tickDelta, dagger.prevPitch, dagger.getPitch()));
+		try (var ms = Widget.push(matrixes)
+			.rotate(Vec3f.POSITIVE_Y, MathHelper.lerp(tickDelta, dagger.prevYaw, dagger.getYaw()) + 90)
+			.rotate(Vec3f.POSITIVE_Z, 45 - MathHelper.lerp(tickDelta, dagger.prevPitch, dagger.getPitch()))
+		) {
+			var shake = dagger.shake - tickDelta;
 
-		var shake = dagger.shake - tickDelta;
+			if (shake > 0) {
+				ms.rotate(Vec3f.POSITIVE_Z, -MathHelper.sin(shake * 3) * shake);
+			}
 
-		if (shake > 0) {
-			Util.rotate(matrixes, Vec3f.POSITIVE_Z, -MathHelper.sin(shake * 3) * shake);
+			ms.scale(0.75F);
+			Widget.itemRenderer.renderItem(dagger.asItemStack(), ModelTransformation.Mode.FIXED, light, 0, matrixes, vertexConsumers, dagger.age);
 		}
-
-		var size = .75F;
-		matrixes.scale(size, size, size);
-		Widget.client.getItemRenderer().renderItem(dagger.asItemStack(), ModelTransformation.Mode.FIXED, light, 0, matrixes, vertexConsumers, dagger.age);
-		matrixes.pop();
 
 		super.render(dagger, yaw, tickDelta, matrixes, vertexConsumers, light);
 	}

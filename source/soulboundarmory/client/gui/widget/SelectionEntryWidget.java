@@ -26,12 +26,10 @@ public class SelectionEntryWidget extends ScalableWidget<SelectionEntryWidget> {
 			this.spikedRectangle(item.isUnlocked() ? 0 : 1)
 				.size(54, 54)
 				.scaleMode(ScaleMode.STRETCH)
-				.centerY()
 				.with(new ItemWidget().size(32).center().x(0.5).y(0.5).item(item.item()).tooltip());
 		} else {
 			this.button()
 				.size(128, 20)
-				.centerX()
 				.text(item.name());
 		}
 	}
@@ -55,7 +53,7 @@ public class SelectionEntryWidget extends ScalableWidget<SelectionEntryWidget> {
 
 		if (!this.isActive()) {
 			y = ItemUtil.inventory(player()).anyMatch(this.item::matches) ? y : (int) (y + this.height() * (1 - this.component.cooldown() / 600F));
-			fill(this.matrixes, x, y, this.absoluteEndX(), this.absoluteEndY(), this.z(), NativeImage.packColor(95, 0, 0, 0));
+			this.fill(x, y, this.absoluteEndX(), this.absoluteEndY(), this.z(), NativeImage.packColor(95, 0, 0, 0));
 		}
 
 		glDisable(GL_STENCIL_TEST);

@@ -1,11 +1,12 @@
 package soulboundarmory.module.config;
 
+import net.auoeke.reflect.Pointer;
+import soulboundarmory.util.Util2;
+
 import java.io.InvalidClassException;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.stream.Stream;
-import net.auoeke.reflect.Pointer;
-import soulboundarmory.util.Util2;
 
 public final class Property<T> extends Node {
 	public final Parent parent;
@@ -54,7 +55,7 @@ public final class Property<T> extends Node {
 
 	public void set(Object value) {
 		this.field.put(value);
-		this.configuration().desynced();
+		this.configuration().flush = true;
 	}
 
 	public void reset() {

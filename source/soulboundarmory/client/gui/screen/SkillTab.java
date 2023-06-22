@@ -1,11 +1,8 @@
 package soulboundarmory.client.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntPredicate;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceLinkedOpenHashMap;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.MathHelper;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.module.gui.widget.ItemWidget;
 import soulboundarmory.module.gui.widget.TextWidget;
@@ -13,6 +10,7 @@ import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.skill.SkillInstance;
 
 import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  The skill tab; design (not code of course) blatantly copied from the advancement screen.
@@ -39,20 +37,18 @@ public class SkillTab extends Tab {
 		this.updateWidgets();
 
 		var points = this.add(new TextWidget())
-			.x(0.5)
+			.x.center()
 			.y(this.button.absoluteEndY())
-			.centerX()
 			.stroke()
 			.text(() -> this.pointText(this.container().item().skillPoints()))
 			.color(0xEEEEEE);
 
-		var width = this.container.descendantWidth();
-
 		this.add(this.container)
+			.width(this.container.descendantWidth())
 			.height(this.container.descendantHeight())
-			.x(MathHelper.clamp((this.width() - width) / 2, 0, this.container().options.absoluteX() - 4 - width))
-			.y(Math.max(points.endY() + 8, this.container().height() / 2))
-			.centerY();
+			.x.middle().x(0.5)
+			.max.x.value(this.container().options.absoluteX() - 4 - this.container.width())
+			.y.middle().y(Math.max(points.endY() + 8, this.container().height() / 2));
 	}
 
 	@Override protected void render() {
@@ -67,24 +63,17 @@ public class SkillTab extends Tab {
 	}
 
 	private void updateWidgets() {
+		var skills = this.container().item().skills();
 		// 0: index of the current skill per tier (used in a loop)
 		// 1: number of skills per tier
-		var tierOrders = new Int2ReferenceLinkedOpenHashMap<int[]>();
-		var skills = this.container().item().skills();
+		var tierOrders = skills.stream().map(SkillInstance::tier).distinct().map(t -> new int[]{0, 0}).toArray(int[][]::new);
+		for (var skill : skills) tierOrders[skill.tier()][1]++;
 
-		for (var skill : skills) {
-			tierOrders.computeIfAbsent(skill.tier(), tier -> new int[]{0, 0})[1]++;
-		}
-
-		IntPredicate truthy = n -> n != 0;
-		var width = 2 + tierOrders.keySet().intStream()
-			.filter(truthy).map(tier -> tierOrders.get(tier)[1])
-			.filter(truthy).map(length -> length - 1)
-			.sum();
+		var width = 2 + IntStream.range(1, tierOrders.length).map(tier -> tierOrders[tier][1] - 1).sum();
 
 		for (var skill : skills) {
 			var tier = skill.tier();
-			var data = tierOrders.computeIfAbsent(tier, t -> new int[]{0, 0});
+			var data = tierOrders[tier];
 			var spacing = skill.hasDependencies() ? 48 : width * 24;
 			var x = data[0] * spacing;
 

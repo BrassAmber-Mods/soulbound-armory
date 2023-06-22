@@ -66,6 +66,6 @@ public class SliderWidget extends ScalableWidget<SliderWidget> {
 
 	protected void updateMessage() {
 		var formattedValue = this.slider.discrete || Math.abs(this.value()) >= 100 ? (long) this.value() : floatFormat.format(this.value());
-		this.text.overwrite(Text.of(this.label == Translations.empty ? String.valueOf(formattedValue) : "%s: %s".formatted(this.label, formattedValue)));
+		this.text.clear().text(Text.of(this.label == Translations.empty ? String.valueOf(formattedValue) : "%s: %s".formatted(this.label, formattedValue)));
 	}
 }

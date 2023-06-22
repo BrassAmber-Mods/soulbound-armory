@@ -7,7 +7,8 @@ import soulboundarmory.module.gui.widget.WidgetBox;
 
 public class CategoryWidget extends WidgetBox<CategoryWidget> {
 	public CategoryWidget(Iterable<Node> nodes, int depth) {
-		this.vertical().width(category -> category.parent.get().absoluteEndX() - category.absoluteX());
+		this.vertical();
+		this.width(1D);
 
 		for (var node : nodes) {
 			if (node instanceof Property<?> property) {

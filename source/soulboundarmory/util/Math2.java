@@ -24,6 +24,10 @@ public class Math2 {
 		return value * value;
 	}
 
+	public static int iround(double a) {
+		return (int) Math.round(a);
+	}
+
 	public static double zenith(LivingEntity entity) {
 		return square(entity.getVelocity().y) / 2 / entity.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
 	}

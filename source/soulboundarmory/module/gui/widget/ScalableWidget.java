@@ -20,9 +20,8 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 	private static final Identifier widgetsID = new Identifier("textures/gui/advancements/widgets.png");
 	private static final Identifier windowID = new Identifier("textures/gui/advancements/window.png");
 
-	public final Rectangle[] middles = Util2.fill(new Rectangle[5], Rectangle::new);
-	public final Rectangle[] corners = Util2.fill(new Rectangle[4], Rectangle::new);
-	public final Rectangle border = new Rectangle();
+	public Rectangle[] middles = Util2.fill(new Rectangle[5], Rectangle::new);
+	public Rectangle[] corners = Util2.fill(new Rectangle[4], Rectangle::new);
 	public AbstractTexture texture;
 	public ScaleMode scaleMode = ScaleMode.SLICE;
 	public int u, v;
@@ -98,28 +97,20 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 	 @return {@code this}
 	 */
 	public T slice(int u0, int u1, int u2, int v0, int v1, int v2) {
-		var topLeft = this.corners[0];
-		var topRight = this.corners[1];
-		var bottomLeft = this.corners[2];
-		var bottomRight = this.corners[3];
-		bottomLeft.end.x = topLeft.end.x = u0;
-		bottomRight.start.x = topRight.start.x = u1;
-		bottomRight.end.x = topRight.end.x = u2;
-		topRight.end.y = topLeft.end.y = v0;
-		bottomRight.start.y = bottomLeft.start.y = v1;
-		bottomRight.end.y = bottomLeft.end.y = v2;
+		this.corners = new Rectangle[]{
+			new Rectangle(0, 0, u0, v0), // top left
+			new Rectangle(u1, 0, u2, v0), // top right
+			new Rectangle(0, v1, u0, v2), // bottom left
+			new Rectangle(u1, v1, u2, v2) // bottom right
+		};
 
-		var top = this.middles[0];
-		var left = this.middles[1];
-		var center = this.middles[2];
-		var right = this.middles[3];
-		var bottom = this.middles[4];
-		bottom.start.x = center.start.x = left.end.x = top.start.x = u0;
-		bottom.end.x = right.start.x = center.end.x = top.end.x = u1;
-		right.end.x = u2;
-		right.start.y = center.start.y = left.start.y = top.end.y = v0;
-		bottom.start.y = right.end.y = center.end.y = left.end.y = v1;
-		bottom.end.y = v2;
+		this.middles = new Rectangle[]{
+			new Rectangle(u0, 0, u1, v0), // top
+			new Rectangle(0, v0, u0, v1), // left
+			new Rectangle(u0, v0, u1, v1), // center
+			new Rectangle(u1, v0, u2, v1), // right
+			new Rectangle(u0, v1, u1, v2) // bottom
+		};
 
 		return (T) this;
 	}
@@ -147,11 +138,15 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 	}
 
 	@Override public int width() {
-		return this.resolve(this.width, this.textureWidth);
+		return super.width();
+		// return this.resolve(this.width, this.parent().map(Widget::width).orElseGet(Widget::windowWidth));
+		// return this.resolve(this.height, this.textureWidth);
 	}
 
 	@Override public int height() {
-		return this.resolve(this.height, this.textureHeight);
+		return super.height();
+		// return this.resolve(this.height, this.parent().map(Widget::height).orElseGet(Widget::windowHeight));
+		// return this.resolve(this.height, this.textureHeight);
 	}
 
 	public T fullView() {
@@ -280,20 +275,72 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 	}
 
 	@Override protected void render() {
-		pushScissor(this.matrixes, this.absoluteX(), this.absoluteY(), this.viewWidth(), this.viewHeight());
-		RenderSystem.enableBlend();
-		shaderTexture(this.texture);
-		this.resetColor();
+		try (var __ = this.pushScissor(this.absoluteX(), this.absoluteY(), this.viewWidth(), this.viewHeight())) {
+			RenderSystem.enableBlend();
+			shaderTexture(this.texture);
+			this.resetColor();
 
-		switch (this.scaleMode) {
-			case SLICE -> {
-				this.renderCorners();
-				this.renderMiddles();
-			}
-			case STRETCH -> {
-				this.matrixes.push();
-				this.matrixes.translate(0, 0, this.z());
-				drawTexture(
+			switch (this.scaleMode) {
+				case SLICE -> {
+					// corners (not scalable)
+
+					for (var index = 0; index < this.corners.length; ++index) {
+						var corner = this.corners[index];
+						var width = corner.width();
+						var height = corner.height();
+
+						drawTexture(
+							this.matrixes,
+							this.absoluteX() + index % 2 * (this.width() - corner.width()),
+							this.absoluteY() + index / 2 * (this.height() - corner.height()),
+							this.z(),
+							this.u + corner.x0(),
+							this.v + corner.y0(),
+							width,
+							height,
+							this.textureWidth(),
+							this.textureHeight()
+						);
+					}
+
+					// middles (scalable parts)
+
+					var tessellator = Tessellator.getInstance();
+					var buffer = tessellator.getBuffer();
+					var matrix = this.matrixes.peek().getPositionMatrix();
+
+					for (var index = 0; index < this.middles.length; ++index) {
+						record Line(int start, int end) {}
+
+						var middle = this.middles[index];
+
+						var x = switch (index) {
+							case 1 -> new Line(this.absoluteX(), this.absoluteX() + middle.width());
+							case 3 -> new Line(this.absoluteEndX() - middle.width(), this.absoluteEndX());
+							default -> new Line(this.absoluteX() + this.middles[1].width(), this.absoluteEndX() - this.middles[3].width());
+						};
+
+						var y = switch (index) {
+							case 0 -> new Line(this.absoluteY(), this.absoluteY() + middle.height());
+							case 4 -> new Line(this.absoluteEndY() - middle.height(), this.absoluteEndY());
+							default -> new Line(this.absoluteY() + this.middles[0].height(), this.absoluteEndY() - this.middles[4].height());
+						};
+
+						var textureWidth = (float) this.textureWidth();
+						var textureHeight = (float) this.textureHeight();
+						var u = (this.u + middle.x0()) / textureWidth;
+						var v = (this.v + middle.y0()) / textureHeight;
+						var endU = u + Math.min(x.end - x.start, middle.width()) / textureWidth;
+						var endV = v + Math.min(y.end - y.start, middle.height()) / textureHeight;
+						buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+						buffer.vertex(matrix, x.start, y.end, this.z()).texture(u, endV).next();
+						buffer.vertex(matrix, x.end, y.end, this.z()).texture(endU, endV).next();
+						buffer.vertex(matrix, x.end, y.start, this.z()).texture(endU, v).next();
+						buffer.vertex(matrix, x.start, y.start, this.z()).texture(u, v).next();
+						tessellator.draw();
+					}
+				}
+				case STRETCH -> this.withZ(() -> drawTexture(
 					this.matrixes,
 					this.absoluteX(),
 					this.absoluteY(),
@@ -301,93 +348,22 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 					this.height(),
 					this.u,
 					this.v,
-					this.corners[3].end.x - this.corners[0].start.x,
-					this.corners[3].end.y - this.corners[0].start.y,
+					this.regionWidth(),
+					this.regionHeight(),
 					this.textureWidth(),
 					this.textureHeight()
-				);
-				this.matrixes.pop();
+				));
+			}
+
+			if (this.isFocused() && this.isActive()) {
+				var endX = this.absoluteEndX() - 1;
+				var endY = this.absoluteEndY();
+				this.drawHorizontalLine(this.absoluteX(), endX, this.absoluteY(), this.z(), -1);
+				this.drawVerticalLine(this.absoluteX(), this.absoluteY(), endY, this.z(), -1);
+				this.drawVerticalLine(endX, this.absoluteY(), endY, this.z(), -1);
+				this.drawHorizontalLine(this.absoluteX(), endX, endY - 1, this.z(), -1);
 			}
 		}
-
-		if (this.isFocused() && this.isActive()) {
-			this.drawBorder();
-		}
-
-		popScissor(this.matrixes);
-	}
-
-	protected void renderCorners() {
-		for (var index = 0; index < this.corners.length; ++index) {
-			var corner = this.corners[index];
-			var width = corner.width();
-			var height = corner.height();
-
-			drawTexture(
-				this.matrixes,
-				this.absoluteX() + index % 2 * (this.width() - corner.width()),
-				this.absoluteY() + index / 2 * (this.height() - corner.height()),
-				this.z(),
-				this.u + corner.start.x,
-				this.v + corner.start.y,
-				width,
-				height,
-				this.textureWidth(),
-				this.textureHeight()
-			);
-		}
-	}
-
-	protected void renderMiddles() {
-		var tessellator = Tessellator.getInstance();
-		var buffer = tessellator.getBuffer();
-		var matrix = this.matrixes.peek().getPositionMatrix();
-
-		for (var index = 0; index < this.middles.length; ++index) {
-			var middle = this.middles[index];
-			var x = switch (index) {
-				case 1 -> this.absoluteX();
-				case 3 -> this.absoluteEndX() - middle.width();
-				default -> this.absoluteX() + this.middles[1].width();
-			};
-			var y = switch (index) {
-				case 0 -> this.absoluteY();
-				case 4 -> this.absoluteEndY() - middle.height();
-				default -> this.absoluteY() + this.middles[0].height();
-			};
-			var endX = switch (index) {
-				case 1 -> this.absoluteX() + middle.width();
-				case 3 -> this.absoluteEndX();
-				default -> this.absoluteEndX() - this.middles[3].width();
-			};
-			var endY = switch (index) {
-				case 0 -> this.absoluteY() + middle.height();
-				case 4 -> this.absoluteEndY();
-				default -> this.absoluteEndY() - this.middles[4].height();
-			};
-
-			var textureWidth = (float) this.textureWidth();
-			var textureHeight = (float) this.textureHeight();
-			var u = (this.u + middle.start.x) / textureWidth;
-			var v = (this.v + middle.start.y) / textureHeight;
-			var endU = u + Math.min(endX - x, middle.width()) / textureWidth;
-			var endV = v + Math.min(endY - y, middle.height()) / textureHeight;
-			buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			buffer.vertex(matrix, x, endY, this.z()).texture(u, endV).next();
-			buffer.vertex(matrix, endX, endY, this.z()).texture(endU, endV).next();
-			buffer.vertex(matrix, endX, y, this.z()).texture(endU, v).next();
-			buffer.vertex(matrix, x, y, this.z()).texture(u, v).next();
-			tessellator.draw();
-		}
-	}
-
-	protected void drawBorder() {
-		var endX = this.absoluteEndX() - 1;
-		var endY = this.absoluteEndY();
-		drawHorizontalLine(this.matrixes, this.absoluteX(), endX, this.absoluteY(), this.z(), -1);
-		drawVerticalLine(this.matrixes, this.absoluteX(), this.absoluteY(), endY, this.z(), -1);
-		drawVerticalLine(this.matrixes, endX, this.absoluteY(), endY, this.z(), -1);
-		drawHorizontalLine(this.matrixes, this.absoluteX(), endX, endY - 1, this.z(), -1);
 	}
 
 	protected void resetColor() {
@@ -397,5 +373,17 @@ public class ScalableWidget<T extends ScalableWidget<T>> extends Widget<T> {
 			var value = 160F / 255;
 			RenderSystem.setShaderColor(this.r * value, this.g * value, this.b * value, this.a);
 		}
+	}
+
+	@Override protected String toLocalString() {
+		return super.toLocalString() + " %s[%s + %s, %s + %s]".formatted(this.texture instanceof ResourceTexture r ? r.location : this.texture, this.u, this.regionWidth(), this.v, this.regionHeight());
+	}
+
+	int regionWidth() {
+		return this.corners[3].x1() - this.corners[0].x0();
+	}
+
+	int regionHeight() {
+		return this.corners[3].y1() - this.corners[0].y0();
 	}
 }

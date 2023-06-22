@@ -1,7 +1,5 @@
 package soulboundarmory.entity;
 
-import java.util.Optional;
-import java.util.Set;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,6 +20,9 @@ import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.module.transform.Register;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.Util;
+
+import java.util.Optional;
+import java.util.Set;
 
 public class SoulboundDaggerEntity extends ExtendedProjectile implements IEntityAdditionalSpawnData {
 	@Register(value = "dagger", registry = "entity_type") public static final EntityType<SoulboundDaggerEntity> type = EntityType.Builder

@@ -21,12 +21,10 @@ public class ItemWidget extends Widget<ItemWidget> {
 	}
 
 	@Override protected void render() {
-		var matrixes = RenderSystem.getModelViewStack();
-		matrixes.push();
-		matrixes.translate(this.absoluteX(), this.absoluteY(), 0);
-		matrixes.scale(this.width() / 16F, this.height() / 16F, 1);
-		this.renderGuiItem(this.item, 0, 0);
-		matrixes.pop();
+		try (var ms = push(RenderSystem.getModelViewStack()).translate(this.absoluteX(), this.absoluteY(), 0).scale(this.width() / 16F, this.height() / 16F, 1)) {
+			this.renderGuiItem(this.item, 0, 0);
+		}
+
 		RenderSystem.applyModelViewMatrix();
 	}
 }

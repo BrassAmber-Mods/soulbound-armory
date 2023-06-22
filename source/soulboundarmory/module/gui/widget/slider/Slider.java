@@ -6,7 +6,6 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 import soulboundarmory.SoulboundArmory;
 import soulboundarmory.module.gui.widget.ScalableWidget;
-import soulboundarmory.module.gui.widget.Widget;
 
 public class Slider extends ScalableWidget<Slider> {
 	public SlideCallback onSlide;
@@ -107,11 +106,11 @@ public class Slider extends ScalableWidget<Slider> {
 	}
 
 	@Override public boolean isFocused() {
-		return super.isFocused() || this.owner().isHovered();
+		return super.isFocused() || this.parent.isHovered();
 	}
 
 	@Override public boolean drag(double x, double y) {
-		this.progress(MathHelper.clamp(mouseX() - this.owner().absoluteX(), 0D, this.maxX()) / this.maxX());
+		this.progress(MathHelper.clamp(mouseX() - this.parent.absoluteX(), 0D, this.maxX()) / this.maxX());
 		SoulboundArmory.logger.info("{} {}", x, y);
 		return true;
 	}
@@ -156,14 +155,10 @@ public class Slider extends ScalableWidget<Slider> {
 	}
 
 	@Override protected boolean clicked() {
-		return this.owner().isHovered() || this.isHovered();
-	}
-
-	protected Widget<?> owner() {
-		return this.parent.get();
+		return this.parent.isHovered() || this.isHovered();
 	}
 
 	protected int maxX() {
-		return this.owner().width() - this.width();
+		return this.parent.width() - this.width();
 	}
 }

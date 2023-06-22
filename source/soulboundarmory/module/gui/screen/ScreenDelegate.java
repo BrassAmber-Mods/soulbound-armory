@@ -107,7 +107,7 @@ public final class ScreenDelegate extends Screen {
 	}
 
 	@Override protected void init() {
-		this.screen.width(this.width).height(this.height).preinitialize();
+		this.screen.width(this.width).height(this.height).reinitialize();
 	}
 
 	@Override public void tick() {

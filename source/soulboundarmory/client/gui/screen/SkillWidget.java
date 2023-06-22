@@ -17,7 +17,7 @@ public class SkillWidget extends Widget<SkillWidget> {
 	public SkillWidget(SkillTab tab, SkillInstance skill) {
 		this.tab = tab;
 		this.skill = skill;
-		this.frame.add(new GraphicWidget(widget -> skill.render(widget, this.matrixes)).center().x(0.5).y(0.5).size(16));
+		this.frame.add(new GraphicWidget(w -> skill.render(w, this.matrixes)).center().x(0.5).y(0.5).size(16));
 		this.primaryAction(() -> tab.container().item().upgrade(skill));
 	}
 
@@ -57,7 +57,8 @@ public class SkillWidget extends Widget<SkillWidget> {
 					.grayRectangle()
 					.width(tooltipWidth)
 					.height(height)
-					.present(this::isFocused).with(new TextWidget().alignStart().x(5).y(textY).color(0x999999).with(t -> section.forEach(t::text)));
+					.present(this::isFocused)
+					.with(new TextWidget().x(5).y(textY).color(0x999999).with(t -> section.forEach(t::text)));
 
 				textY = 6;
 				height = 20;
@@ -66,8 +67,7 @@ public class SkillWidget extends Widget<SkillWidget> {
 			this.tooltip(new ScalableWidget<>()
 				.blueRectangle()
 				.x(-4)
-				.y(0.5)
-				.centerY()
+				.y.center()
 				.width(tooltipWidth)
 				.height(20)
 				.present(this::isFocused)

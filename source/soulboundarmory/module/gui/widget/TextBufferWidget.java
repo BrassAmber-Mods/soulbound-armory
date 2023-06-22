@@ -142,7 +142,7 @@ public abstract class TextBufferWidget<T extends TextBufferWidget<T>> extends Wi
 	}
 
 	protected void update() {
-		this.text.overwrite(this.lines().map(Text::of).toList());
+		this.text.clear().text(this.lines().map(Text::of).toList());
 
 		var column = 0;
 		var row = 0;
@@ -167,7 +167,7 @@ public abstract class TextBufferWidget<T extends TextBufferWidget<T>> extends Wi
 		this.caret.y(2 + row * fontHeight());
 	}
 
-	protected boolean isEmpty() {
+	protected boolean blank() {
 		return this.lines.stream().allMatch(CharSequence::isEmpty);
 	}
 

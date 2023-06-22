@@ -8,7 +8,12 @@ public class GroupWidget extends WidgetBox<GroupWidget> {
 	private boolean expanded;
 
 	public GroupWidget(Group group, int depth) {
-		this.vertical().add(new EntryWidget<>(group.comment).height(32).with(new TextWidget().text("> " + group.name).centerY().x(8).y(.5)).primaryAction(() -> this.expanded ^= true));
-		this.add(new CategoryWidget(group.children().toList(), depth).y(32).with(c -> c.present(() -> this.expanded)));
+		this.width(w -> windowWidth() - w.absoluteX());
+		this.vertical().add(new EntryWidget<>(group.comment)
+			.height(32)
+			.primaryAction(() -> this.expanded ^= true)
+			.with(new TextWidget().text(() -> (this.expanded ? "∨ " : "› ") + group.name).x(8).y.center())
+		);
+		this.add(new CategoryWidget(group.children().toList(), depth).y(32).present(() -> this.expanded));
 	}
 }

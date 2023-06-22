@@ -13,7 +13,7 @@ public class ThrowingSkill extends Skill {
 		return 2;
 	}
 
-	@Override public void render(Widget<?> tab, int level) {
-		tab.renderGuiItem(Items.TRIDENT, tab.absoluteX(), tab.absoluteY());
+	@Override public void render(Widget<?> widget, int level) {
+		widget.renderGuiItem(Items.TRIDENT, widget.absoluteX(), widget.absoluteY());
 	}
 }

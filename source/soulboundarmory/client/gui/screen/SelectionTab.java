@@ -26,12 +26,11 @@ public class SelectionTab extends Tab {
 	@Override public void initialize() {
 		var parent = this.container();
 		var component = parent.component;
-		var box = this.add(new WidgetBox<>().center());
+		var box = this.add(new WidgetBox<>().center().x(0.5).y(0.5));
 
-		if (Configuration.Client.selectionEntryType == SelectionEntryWidget.Type.ICON) {
-			box.xSpacing(12).x(0.5).y(1D);
-		} else {
-			box.ySpacing(8).x(1D).y(0.5);
+		switch (Configuration.Client.selectionEntryType) {
+			case ICON -> box.xMargin(12);
+			case TEXT -> box.yMargin(8);
 		}
 
 		component.items.values().stream()

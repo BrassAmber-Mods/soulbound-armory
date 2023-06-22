@@ -13,7 +13,7 @@ public final class NourishmentSkill extends Skill {
 		return level == 1 ? 3 : level;
 	}
 
-	@Override public void render(Widget<?> tab, int level) {
-		tab.renderGuiItem(Items.COOKED_BEEF, tab.absoluteX(), tab.absoluteY());
+	@Override public void render(Widget<?> widget, int level) {
+		widget.renderGuiItem(Items.COOKED_BEEF, widget.absoluteX(), widget.absoluteY());
 	}
 }

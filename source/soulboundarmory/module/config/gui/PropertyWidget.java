@@ -13,7 +13,7 @@ public class PropertyWidget extends EntryWidget<PropertyWidget> {
 		super(property.comment);
 
 		this.property = property;
-		this.text(text -> text.text(this.property.name).centerY().x(8 + 24 * depth).y(.5));
+		this.text(text -> text.text(this.property.name).y.center().x(8 + 24 * depth));
 
 		if (Types.equals(property.type, int.class)) {
 			if (property.interval == null) {
@@ -26,12 +26,12 @@ public class PropertyWidget extends EntryWidget<PropertyWidget> {
 		} else if (Types.equals(property.type, boolean.class)) {
 			this.value = new BooleanPropertyWidget((Property<Boolean>) property).width(100).height(20);
 		} else if (property.type.isEnum()) {
-			this.value = new EnumPropertyWidget((Property<Enum<?>>) property).width(p -> Math.max(100, p.descendantWidth() + 10)).height(20);
+			this.value = new EnumPropertyWidget((Property<Enum<?>>) property).width(p -> Math.max(100, p.descendantWidth(false) + 10)).height(20);
 		} else {
 			this.value = null;
 			return;
 		}
 
-		this.add(this.value.x(1, -8).y(.5).alignRight().centerY());
+		this.add(this.value.x(1, -8).x.end().y.center());
 	}
 }

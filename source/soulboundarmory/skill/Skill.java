@@ -1,8 +1,5 @@
 package soulboundarmory.skill;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
@@ -18,6 +15,10 @@ import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.registry.Identifiable;
 import soulboundarmory.util.Util;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  An active or passive ability; locked by default and possibly having multiple levels and dependencies.
@@ -85,9 +86,9 @@ public abstract class Skill extends Identifiable {
 	 Render an icon of this skill.
 	 */
 	@OnlyIn(Dist.CLIENT)
-	public void render(Widget<?> tab, int level) {
+	public void render(Widget<?> widget, int level) {
 		Widget.shaderTexture(this.texture);
-		DrawableHelper.drawTexture(tab.matrixes, tab.absoluteX(), tab.absoluteY(), tab.z(), 0, 0, 16, 16, 16, 16);
+		DrawableHelper.drawTexture(widget.matrixes, widget.absoluteX(), widget.absoluteY(), widget.z(), 0, 0, 16, 16, 16, 16);
 	}
 
 	/**

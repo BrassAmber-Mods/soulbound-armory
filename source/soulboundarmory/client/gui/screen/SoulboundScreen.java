@@ -42,7 +42,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 	protected final WidgetBox<?> options = new WidgetBox<>()
 		.x(box -> Math.round(this.width() * 23 / 24F) - 100)
 		.y(box -> this.optionY(0))
-		.ySpacing(4)
+		.yMargin(4)
 		.present(() -> Configuration.Client.displayOptions && this.displayTabs())
 		.add(
 			this.colorSlider(Translations.red, 0),
@@ -101,7 +101,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 			this.tabs.add(this.tab = this.component.selectionTab());
 		}
 
-		var tabBox = this.add(new WidgetBox<>()).x(0.5).y(1D / 16).centerX().xSpacing(12);
+		var tabBox = this.add(new WidgetBox<>()).x.center().y(1D / 16).xMargin(12);
 
 		Util.enumerate(this.tabs, (tab, index) -> {
 			tab.index = index;
@@ -112,10 +112,10 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 
 		this.add(new ScalableWidget<>())
 			.button()
-			.x(this.options)
+			.alignEnd()
+			.x(w -> this.options.x() + 100)
 			.y(15D / 16)
-			.alignDown()
-			.width(button -> this.options.descendantWidth())
+			.width(button -> this.tab instanceof AttributeTab || this.tab instanceof EnchantmentTab ? 80 : 100)
 			.height(20)
 			.text(() -> this.bound() ? Translations.guiButtonUnbind : Translations.guiButtonBind)
 			.present(this::displayTabs)
@@ -134,7 +134,6 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 
 			if (tab != this.tab) {
 				this.tab(tab);
-
 				return true;
 			}
 		}
@@ -155,8 +154,8 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 	}
 
 	public void refresh() {
-		this.preinitialize();
-		this.tab.preinitialize();
+		this.reinitialize();
+		this.tab.reinitialize();
 	}
 
 	private void baseTick() {
@@ -191,7 +190,10 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 			.discrete()
 			.value(Configuration.Client.Bar.get(id))
 			.text(text)
-			.onSlide(slider -> Configuration.Client.Bar.set(id, (int) slider.value()));
+			.onSlide(slider -> {
+				Configuration.Client.Bar.set(id, (int) slider.value());
+				ConfigurationManager.instance(Configuration.class).flush = true;
+			});
 	}
 
 	private Widget<?> button(Tab tab) {
@@ -208,12 +210,12 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 			.tooltip(new TooltipWidget().text(tab.title))
 			.primaryAction(() -> this.tab(tab))
 			.present(this::displayTabs)
-			.active(() -> tab != this.tab);
+			.active(w -> tab != this.tab);
 	}
 
 	private void tab(Tab tab) {
 		this.renew(this.tab, this.tab = tab);
-		tab.preinitialize();
+		tab.reinitialize();
 		this.component.tab(tab.index);
 	}
 

@@ -22,7 +22,6 @@ public abstract class ScreenWidget<T extends ScreenWidget<T>> extends Widget<T> 
 
 	public T title(Text title) {
 		this.title = title;
-
 		return (T) this;
 	}
 
@@ -53,7 +52,6 @@ public abstract class ScreenWidget<T extends ScreenWidget<T>> extends Widget<T> 
 
 		if (this.shouldClose(keyCode, scanCode, modifiers)) {
 			this.close();
-
 			return true;
 		}
 
@@ -61,6 +59,6 @@ public abstract class ScreenWidget<T extends ScreenWidget<T>> extends Widget<T> 
 	}
 
 	@Override protected void render() {
-		this.renderBackground(this.matrixes);
+		this.renderBackground();
 	}
 }

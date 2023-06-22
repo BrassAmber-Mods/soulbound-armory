@@ -28,14 +28,6 @@ public abstract class Tab extends Widget<Tab> {
 
 	public abstract Widget<?> icon();
 
-	@Override public Tab parent(Widget<?> parent) {
-		if (parent != null) {
-			this.width(parent.width()).height(parent.height());
-		}
-
-		return super.parent(parent);
-	}
-
 	public Widget<?> squareButton(String text, Runnable action) {
 		return new ScalableWidget<>()
 			.button()
@@ -51,20 +43,20 @@ public abstract class Tab extends Widget<Tab> {
 			.with(new ScalableWidget<>()
 				.x(0.5)
 				.y(0.5)
-				.texture("soulboundarmory:textures/gui/counterclockwise_arrow.png")
-				.slice(0, 16, 16, 0, 16, 16)
-				.textureSize(16, 16)
 				.center()
+				.texture("soulboundarmory:textures/gui/counterclockwise_arrow.png")
+				.textureSize(16, 16)
+				.slice(0, 16, 16, 0, 16, 16)
 			)
-			.alignEnd()
 			.x(this.container().options)
+			.y.end()
 			.y(15D / 16)
 			.size(20)
 			.primaryAction(() -> this.reset(category));
 	}
 
 	public SoulboundScreen container() {
-		return (SoulboundScreen) super.parent.get();
+		return (SoulboundScreen) super.parent;
 	}
 
 	protected void reset(Category category) {
@@ -72,7 +64,7 @@ public abstract class Tab extends Widget<Tab> {
 	}
 
 	protected void displayPoints(IntSupplier points) {
-		this.centeredText(widget -> widget.text(() -> this.pointText(points.getAsInt())).y(0, 4).alignUp());
+		this.centeredText(widget -> widget.text(() -> this.pointText(points.getAsInt())).y(0, 4));
 	}
 
 	protected Text pointText(int points) {

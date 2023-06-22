@@ -13,7 +13,7 @@ public class LeapingSkill extends Skill {
 		return 3;
 	}
 
-	@Override public void render(Widget<?> tab, int level) {
-		tab.renderGuiItem(Items.RABBIT_FOOT, tab.absoluteX(), tab.absoluteY());
+	@Override public void render(Widget<?> widget, int level) {
+		widget.renderGuiItem(Items.RABBIT_FOOT, widget.absoluteX(), widget.absoluteY());
 	}
 }

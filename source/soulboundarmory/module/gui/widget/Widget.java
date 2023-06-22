@@ -1,5 +1,6 @@
 package soulboundarmory.module.gui.widget;
 
+import com.google.common.base.Predicates;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
@@ -35,25 +36,24 @@ import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL46C;
+import soulboundarmory.module.gui.LazyProperty;
 import soulboundarmory.module.gui.Length;
+import soulboundarmory.module.gui.MatrixTransformation;
 import soulboundarmory.module.gui.Scissor;
-import soulboundarmory.module.gui.coordinate.Coordinate;
-import soulboundarmory.module.gui.coordinate.Offset;
+import soulboundarmory.module.gui.box.Side;
+import soulboundarmory.module.gui.box.Box;
 import soulboundarmory.module.gui.screen.ScreenDelegate;
 import soulboundarmory.module.gui.screen.ScreenWidget;
 import soulboundarmory.module.gui.util.function.BiFloatIntConsumer;
-import soulboundarmory.module.gui.util.function.NulliPredicate;
 import soulboundarmory.module.gui.util.function.ObjectSupplier;
 import soulboundarmory.module.gui.widget.callback.PressCallback;
 import soulboundarmory.module.gui.widget.scroll.ContextScrollAction;
 import soulboundarmory.module.gui.widget.scroll.ScrollAction;
-import soulboundarmory.module.gui.widget.slider.Slider;
 import soulboundarmory.util.Iteratable;
-import soulboundarmory.util.Util;
 import soulboundarmory.util.Util2;
 
 import java.util.List;
@@ -89,32 +89,26 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 
 	protected static ReferenceArrayList<Scissor> scissors = ReferenceArrayList.of();
 
-	public Optional<Widget<?>> parent = Optional.empty();
+	public Widget<?> parent;
 	public ReferenceArrayList<Widget<?>> children = ReferenceArrayList.of();
 	public ReferenceArrayList<Widget<?>> tooltips = ReferenceArrayList.of();
 
-	/**
-	 The element selected by the keyboard; may be {@code null}, {@code this} or a child.
-	 */
+	/** The element selected by the keyboard; may be {@code null}, {@code this} or a child. */
 	public Optional<Widget<?>> selected = Optional.empty();
 	public PressCallback<T> primaryAction;
 	public PressCallback<T> secondaryAction;
 	public PressCallback<T> tertiaryAction;
 	public ContextScrollAction<T> scrollAction;
 
-	public NulliPredicate present = () -> !this.isTooltip() || this.isPresentTooltip();
-	public NulliPredicate visible = NulliPredicate.ofTrue();
-	public NulliPredicate active = NulliPredicate.ofTrue();
+	public Predicate<T> present = w -> !w.isTooltip() || w.isPresentTooltip();
+	public Predicate<T> visible = Predicates.alwaysTrue();
+	public Predicate<T> active = Predicates.alwaysTrue();
 
-	/**
-	 Is the deepest element that is hovered by the mouse.
-	 */
+	/** Is the deepest element that is hovered by the mouse. */
 	public boolean mouseFocused;
 	public boolean dragging;
 
-	/**
-	 Stored by {@link #render(MatrixStack)} in order to avoid passing it around everywhere.
-	 */
+	/** Stored by {@link #render(MatrixStack)} in order to avoid passing it around everywhere. */
 	public MatrixStack matrixes;
 
 	protected double dragX;
@@ -122,13 +116,32 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 
 	private final Set<Widget<?>> renderDeferred = ReferenceLinkedOpenHashSet.of();
 
-	public int minWidth;
-	public int minHeight;
+	public final List<LazyProperty<?>> allProperties = ReferenceArrayList.of();
+	public final List<LazyProperty<?>> frameProperties = ReferenceArrayList.of();
 
-	protected Coordinate x = new Coordinate();
-	protected Coordinate y = new Coordinate();
-	protected Length width = new Length();
-	protected Length height = new Length();
+	public final Box<T> box = new Box<>((T) this, null);
+	public final Box<T> min = new Box<>((T) this, this.box);
+	public final Box<T> max = new Box<>((T) this, this.box);
+	public final Side<T> x = this.box.x;
+	public final Side<T> y = this.box.y;
+
+	protected final Length width = this.x.length;
+	protected final Length height = this.y.length;
+
+	public Widget() {
+		var max = Integer.MAX_VALUE >> 16;
+		var min = Integer.MIN_VALUE >> 16;
+
+		this.min.x.value(min)
+			.min.y.value(min)
+			.max.x.value(max)
+			.max.y.value(max);
+
+		this.min.width.base(0);
+		this.min.height.base(0);
+		this.max.width.base(max >> 1);
+		this.max.height.base(max >> 1);
+	}
 
 	public static Screen screen() {
 		return client.currentScreen;
@@ -198,11 +211,14 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return width(Util2.stream(text));
 	}
 
-	/**
-	 @return whether an area starting at (`startX`, `startY`) with dimensions (`width`, `height`) contains the point (`x`, `y`)
-	 */
+	/** @return whether an area starting at (`startX`, `startY`) with dimensions (`width`, `height`) contains the point (`x`, `y`) */
 	public static boolean contains(double x, double y, double startX, double startY, double width, double height) {
-		return x >= startX && x <= startX + width && y >= startY && y <= startY + height;
+		return Util2.contains(x, startX, startX + width) && Util2.contains(y, startY, startY + height);
+	}
+
+	public static boolean intersect(double ax0, double ax1, double ay0, double ay1, double bx0, double bx1, double by0, double by1) {
+		return (Util2.contains(bx0, ax0, ax1) || Util2.contains(bx1, ax0, ax1))
+			&& (Util2.contains(by0, ay0, ay1) || Util2.contains(by1, ay0, ay1));
 	}
 
 	public static boolean isPressed(int keyCode) {
@@ -233,27 +249,56 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		RenderSystem.setShaderColor(brightness, brightness, brightness, -1);
 	}
 
-	public static void pushScissor(MatrixStack matrixes, int x, int y, int width, int height) {
-		var scissor = new Scissor(x, y, width, height);
-		scissors.push(scissor);
-		scissor.apply(matrixes);
+	public static void stroke(float x, float y, int color, int strokeColor, BiFloatIntConsumer draw) {
+		draw.accept(x + 1, y, strokeColor);
+		draw.accept(x - 1, y, strokeColor);
+		draw.accept(x, y + 1, strokeColor);
+		draw.accept(x, y - 1, strokeColor);
+		draw.accept(x, y, color);
 	}
 
-	public static void popScissor(MatrixStack matrixes) {
-		scissors.pop();
+	public static void stroke(float x, float y, int color, BiFloatIntConsumer draw) {
+		stroke(x, y, color, 0, draw);
+	}
 
-		if (scissors.isEmpty()) {
-			disableScissor();
-		} else {
-			scissors.top().apply(matrixes);
+	public static List<StringVisitable> wrap(List<? extends StringVisitable> lines, int width) {
+		return lines.stream().map(line -> textHandler.wrapLines(line, width, Style.EMPTY)).flatMap(List::stream).toList();
+	}
+
+	public static <T extends Widget<?>> Stream<T> present(Stream<T> widgets) {
+		return widgets.filter(T::isPresent);
+	}
+
+	public static MatrixTransformation push(MatrixStack matrixes) {
+		return new MatrixTransformation(matrixes);
+	}
+
+	public AutoCloseable pushScissor(int x, int y, int width, int height) {
+		var x1 = x + width;
+		var y1 = y + height;
+
+		if (!scissors.isEmpty()) {
+			var top = scissors.top();
+			x = Math.max(x, top.x0());
+			y = Math.max(y, top.y0());
+			x1 = Math.min(x1, top.x1());
+			y1 = Math.min(y1, top.y1());
 		}
+
+		var scissor = new Scissor(x, y, x1, y1);
+		scissors.push(scissor);
+		scissor.apply(this.matrixes);
+
+		return () -> {
+			scissors.pop();
+
+			if (scissors.isEmpty()) disableScissor();
+			else scissors.top().apply(this.matrixes);
+		};
 	}
 
-	public static void fill(MatrixStack matrices, int x1, int y1, int x2, int y2, float z, int color) {
-		fill(matrices.peek().getPositionMatrix(), x1, y1, x2, y2, z, color);
-	}
-
-	public static void fill(Matrix4f matrix, int x1, int y1, int x2, int y2, float z, int color) {
+	public void fill(int x1, int y1, int x2, int y2, float z, int color) {
+		var matrix = this.matrixes.peek().getPositionMatrix();
 		int i;
 
 		if (x1 < x2) {
@@ -290,104 +335,76 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		RenderSystem.disableBlend();
 	}
 
-	public static void drawHorizontalLine(MatrixStack matrices, int x1, int x2, int y, int z, int color) {
+	public void drawHorizontalLine(int x1, int x2, int y, int z, int color) {
 		if (x2 < x1) {
 			var i = x1;
-
 			x1 = x2;
 			x2 = i;
 		}
 
-		fill(matrices, x1, y, x2 + 1, y + 1, z, color);
+		this.fill(x1, y, x2 + 1, y + 1, z, color);
 	}
 
-	public static void drawVerticalLine(MatrixStack matrices, int x, int y1, int y2, int z, int color) {
+	public void drawVerticalLine(int x, int y1, int y2, int z, int color) {
 		if (y2 < y1) {
 			var i = y1;
-
 			y1 = y2;
 			y2 = i;
 		}
 
-		fill(matrices, x, y1 + 1, x + 1, y2, z, color);
-	}
-
-	public static void stroke(float x, float y, int color, int strokeColor, BiFloatIntConsumer draw) {
-		draw.accept(x + 1, y, strokeColor);
-		draw.accept(x - 1, y, strokeColor);
-		draw.accept(x, y + 1, strokeColor);
-		draw.accept(x, y - 1, strokeColor);
-		draw.accept(x, y, color);
-	}
-
-	public static void stroke(float x, float y, int color, BiFloatIntConsumer draw) {
-		stroke(x, y, color, 0, draw);
+		this.fill(x, y1 + 1, x + 1, y2, z, color);
 	}
 
 	/**
 	 Draw text with stroke.
 
-	 @param text the text
-	 @param x the x at which to start
-	 @param y the y at which to start
-	 @param color the color of the text
-	 @param strokeColor the color of the stroke
+	 @param x initial x
+	 @param y initial y
 	 */
-	public static void drawStrokedText(MatrixStack matrixes, Text text, float x, float y, int color, int strokeColor) {
-		stroke(x, y, color, strokeColor, (i, j, color1) -> textRenderer.draw(matrixes, text, i, j, color1));
+	public void drawStrokedText(Text text, float x, float y, int color, int strokeColor) {
+		stroke(x, y, color, strokeColor, (i, j, color1) -> textRenderer.draw(this.matrixes, text, i, j, color1));
 	}
 
 	/**
 	 Draw text with stroke.
 
-	 @param text the text
-	 @param x the x at which to start
-	 @param y the y at which to start
-	 @param color the color of the text
-	 @param strokeColor the color of the stroke
+	 @param x initial x
+	 @param y initial y
 	 */
-	public static void drawStrokedText(MatrixStack matrixes, String string, float x, float y, int color, int strokeColor) {
-		stroke(x, y, color, strokeColor, (i, j, color1) -> textRenderer.draw(matrixes, string, i, j, color1));
+	public void drawStrokedText(String string, float x, float y, int color, int strokeColor) {
+		stroke(x, y, color, strokeColor, (i, j, color1) -> textRenderer.draw(this.matrixes, string, i, j, color1));
 	}
 
 	/**
 	 Draw text with stroke.
 
-	 @param text the text
-	 @param x the x at which to start
-	 @param y the y at which to start
-	 @param color the color of the text
+	 @param x initial x
+	 @param y initial y
 	 */
-	public static void drawStrokedText(MatrixStack matrixes, Text text, float x, float y, int color) {
-		drawStrokedText(matrixes, text, x, y, color, 0);
+	public void drawStrokedText(Text text, float x, float y, int color) {
+		this.drawStrokedText(text, x, y, color, 0);
 	}
 
 	/**
 	 Draw text with stroke.
 
-	 @param text the text
-	 @param x the x at which to start
-	 @param y the y at which to start
-	 @param color the color of the text
+	 @param x initial x
+	 @param y initial y
 	 */
-	public static void drawStrokedText(MatrixStack matrixes, String text, float x, float y, int color) {
-		drawStrokedText(matrixes, text, x, y, color, 0);
+	public void drawStrokedText(String text, float x, float y, int color) {
+		this.drawStrokedText(text, x, y, color, 0);
 	}
 
-	public static void renderTooltip(MatrixStack matrixes, List<? extends StringVisitable> lines, double x, double y) {
-		screen().renderComponentTooltip(matrixes, lines, (int) x, (int) y, textRenderer, ItemStack.EMPTY);
+	public void renderTooltip(List<? extends StringVisitable> lines, double x, double y) {
+		screen().renderComponentTooltip(this.matrixes, lines, (int) x, (int) y, textRenderer, ItemStack.EMPTY);
 	}
 
-	public static void renderTooltip(MatrixStack matrixes, StringVisitable text, double x, double y) {
-		renderTooltip(matrixes, List.of(text), (int) x, (int) y);
+	public void renderTooltip(StringVisitable text, double x, double y) {
+		this.renderTooltip(List.of(text), (int) x, (int) y);
 	}
 
-	public static void renderTooltipFromComponents(MatrixStack matrixes, List<? extends TooltipComponent> components, double x, double y) {
-		screen().renderTooltipFromComponents(matrixes, (List<TooltipComponent>) components, (int) x, (int) y);
-	}
-
-	public static List<StringVisitable> wrap(List<? extends StringVisitable> lines, int width) {
-		return lines.stream().map(line -> textHandler.wrapLines(line, width, Style.EMPTY)).flatMap(List::stream).toList();
+	public void renderTooltipFromComponents(List<? extends TooltipComponent> components, double x, double y) {
+		screen().renderTooltipFromComponents(this.matrixes, (List<TooltipComponent>) components, (int) x, (int) y);
 	}
 
 	@Override public T clone() {
@@ -395,11 +412,12 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	}
 
 	public int x() {
-		return (int) this.dragX + this.x.resolve(this::width, Util.zeroSupplier, () -> this.parent.map(Widget::width).orElseGet(Widget::windowWidth));
+		return MathHelper.clamp((int) this.dragX + this.x.p.value(), this.min.x.p.value(), this.max.x.p.value());
 	}
 
 	public int y() {
-		return (int) this.dragY + this.y.resolve(this::height, Util.zeroSupplier, () -> this.parent.map(Widget::height).orElseGet(Widget::windowHeight));
+		return MathHelper.clamp((int) this.dragY + this.y.p.value(), this.min.y.p.value(), this.max.y.p.value())
+			- (this.y.type != Side.Type.RELATIVE_FIXED && this.parent instanceof ScrollWidget scroll ? scroll.scroll : 0);
 	}
 
 	public int middleX() {
@@ -422,7 +440,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 @return this node's current x coordinate
 	 */
 	public int absoluteX() {
-		return (int) this.dragX + this.x.resolve(this::width, () -> this.parent.map(Widget::absoluteX).orElse(0), () -> this.parent.map(Widget::width).orElseGet(Widget::windowWidth));
+		return MathHelper.clamp((int) this.dragX + this.x.pAbsolute.value(), this.min.x.pAbsolute.value(), this.max.x.pAbsolute.value());
 	}
 
 	public void initialize() {}
@@ -438,16 +456,8 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return false;
 	}
 
-	public T x(Offset.Type offset) {
-		this.x.offset.type = offset;
-
-		return (T) this;
-	}
-
-	public T x(Coordinate.Position position) {
-		this.x.position = position;
-
-		return (T) this;
+	public T x(Side.Type type) {
+		return this.x.type(type);
 	}
 
 	/**
@@ -457,29 +467,19 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 @return this
 	 */
 	public T x(double value) {
-		this.x.offset.value = value;
-
-		return this.x(Offset.Type.RELATIVE);
+		return this.x.offset(value);
 	}
 
 	public T x(double offset, int x) {
-		return this.x(offset).x(x).x(Offset.Type.RELATIVE);
+		return this.x.value(offset, x);
 	}
 
 	public T x(Widget<?> node) {
-		return this.x(__ -> node.absoluteX());
+		return this.x(w -> node.absoluteX());
 	}
 
-	public T y(Offset.Type offset) {
-		this.y.offset.type = offset;
-
-		return (T) this;
-	}
-
-	public T y(Coordinate.Position position) {
-		this.y.position = position;
-
-		return (T) this;
+	public T y(Side.Type type) {
+		return this.y.type(type);
 	}
 
 	/**
@@ -489,87 +489,54 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 @return this
 	 */
 	public T y(double y) {
-		this.y.offset.value = y;
-
-		return this.y(Offset.Type.RELATIVE);
+		return this.y.offset(y);
 	}
 
 	public T y(double offset, int y) {
-		return this.y(offset).y(y).y(Offset.Type.RELATIVE);
+		return this.y.value(offset, y);
 	}
 
 	public T y(Widget<?> node) {
-		return this.y(__ -> node.absoluteY());
+		return this.y(w -> node.absoluteY());
 	}
 
-	public T offset(Offset.Type offset) {
-		return this.x(offset).y(offset);
-	}
-
-	public T position(Coordinate.Position position) {
-		return this.x(position).y(position);
-	}
-
-	public T centerX() {
-		return this.x(Coordinate.Position.CENTER);
-	}
-
-	public T centerY() {
-		return this.y(Coordinate.Position.CENTER);
+	public T offset(Side.Type type) {
+		return this.x(type).y(type);
 	}
 
 	public T center() {
-		return this.position(Coordinate.Position.CENTER);
-	}
-
-	public T alignLeft() {
-		return this.x(Coordinate.Position.START);
-	}
-
-	public T alignRight() {
-		return this.x(Coordinate.Position.END);
-	}
-
-	public T alignUp() {
-		return this.y(Coordinate.Position.START);
-	}
-
-	public T alignDown() {
-		return this.y(Coordinate.Position.END);
-	}
-
-	public T alignEnd() {
-		return this.alignRight().alignDown();
+		return this.x.middle().y.middle();
 	}
 
 	public T alignStart() {
-		return this.alignLeft().alignUp();
+		return this.box.start();
 	}
 
-	public T present(NulliPredicate predicate) {
+	public T alignEnd() {
+		return this.box.end();
+	}
+
+	public T present(Predicate<T> predicate) {
 		this.present = predicate;
-
 		return (T) this;
 	}
 
-	public T present(boolean present) {
-		return this.present(NulliPredicate.of(present));
+	public T present(BooleanSupplier predicate) {
+		return this.present(w -> predicate.getAsBoolean());
 	}
 
-	public T visible(NulliPredicate predicate) {
+	public T visible(Predicate<T> predicate) {
 		this.visible = predicate;
-
 		return (T) this;
 	}
 
-	public T active(NulliPredicate active) {
+	public T active(Predicate<T> active) {
 		this.active = active;
-
 		return (T) this;
 	}
 
-	public T active(boolean active) {
-		return this.active(NulliPredicate.of(active));
+	public T active(BooleanSupplier predicate) {
+		return this.active(w -> predicate.getAsBoolean());
 	}
 
 	public T movable() {
@@ -610,7 +577,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	}
 
 	public T parent(Widget<?> parent) {
-		this.parent = Optional.ofNullable(parent);
+		this.parent = parent;
 		return (T) this;
 	}
 
@@ -665,7 +632,6 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	public T select(Widget<?> widget) {
 		if (widget == this) {
 			this.selected = Optional.of(this);
-			this.select();
 		} else if (widget == null || this.contains(widget)) {
 			this.selected = Optional.ofNullable(widget);
 		} else {
@@ -738,9 +704,11 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return this.remove(List.of(children));
 	}
 
-	public void clear() {
+	public T clear() {
 		this.children.clear();
 		this.tooltips.clear();
+
+		return (T) this;
 	}
 
 	public void clearTooltips() {
@@ -771,15 +739,11 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	}
 
 	public T x(int x) {
-		this.x.set(x);
-
-		return (T) this;
+		return this.x.value(x);
 	}
 
 	public T x(ToIntFunction<T> x) {
-		this.x.set(() -> x.applyAsInt((T) this));
-
-		return (T) this;
+		return this.x.value(() -> x.applyAsInt((T) this));
 	}
 
 	/**
@@ -800,19 +764,16 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 @return this node's current y coordinate
 	 */
 	public int absoluteY() {
-		return (int) this.dragY + this.y.resolve(this::height, () -> this.parent.map(Widget::absoluteY).orElse(0), () -> this.parent.map(Widget::height).orElseGet(Widget::windowHeight));
+		return MathHelper.clamp((int) this.dragY + this.y.pAbsolute.value(), this.min.y.pAbsolute.value(), this.max.y.pAbsolute.value())
+			- (this.y.type != Side.Type.RELATIVE_FIXED && this.parent instanceof ScrollWidget scroll ? scroll.scroll : 0);
 	}
 
 	public T y(int y) {
-		this.y.set(y);
-
-		return (T) this;
+		return this.y.value(y);
 	}
 
 	public T y(ToIntFunction<T> y) {
-		this.y.set(() -> y.applyAsInt((T) this));
-
-		return (T) this;
+		return this.y.value(() -> y.applyAsInt((T) this));
 	}
 
 	/**
@@ -830,12 +791,11 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	}
 
 	public int z() {
-		return this.getZOffset() + this.parent.map(Widget::z).orElse(0);
+		return this.getZOffset() + this.parent().map(Widget::z).orElse(0);
 	}
 
 	public T z(int z) {
 		this.setZOffset(z);
-
 		return (T) this;
 	}
 
@@ -843,98 +803,71 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return this.z(this.z() + z);
 	}
 
-	/**
-	 Push a matrix, translate by {@link #z()}, run {@code render} and pop.
-	 */
+	/** Push a matrix, translate by {@link #z()}, run {@code render} and pop. */
 	public void withZ(Runnable render) {
-		this.matrixes.push();
-		this.matrixes.translate(0, 0, this.z());
-		var previousZ = itemRenderer.zOffset;
-		itemRenderer.zOffset = this.z();
-		render.run();
-		itemRenderer.zOffset = previousZ;
-		this.matrixes.pop();
+		try (var ms = this.push().translate(0, 0, this.z())) {
+			var previousZ = itemRenderer.zOffset;
+			itemRenderer.zOffset = this.z();
+			render.run();
+			itemRenderer.zOffset = previousZ;
+		}
 	}
 
-	/**
-	 @return this node's current width
-	 */
 	public int width() {
-		return Math.max(this.minWidth, this.width.value.getAsInt() + (int) switch (this.width.type) {
-			case EXACT -> this.width.base().getAsDouble();
-			case PARENT_PROPORTION -> this.width.base().getAsDouble() * this.parent().map(Widget::width).orElse(1);
-			case CHILD_RANGE -> this.descendantWidth();
-		});
+		return this.x.pLength.value();
 	}
 
 	public T width(int width) {
 		this.width.base(width);
-
 		return (T) this;
 	}
 
 	public T width(double width) {
 		this.width.base(width);
-
 		return (T) this;
 	}
 
 	public T width(ToIntFunction<T> width) {
 		this.width.base(() -> width.applyAsInt((T) this));
-
 		return (T) this;
 	}
 
 	public T widthProportion(ToDoubleFunction<T> width) {
 		this.width.base(() -> width.applyAsDouble((T) this));
-
 		return (T) this;
 	}
 
 	public T minWidth(int width) {
-		this.minWidth = width;
-
+		this.min.x.length.base(width);
 		return (T) this;
 	}
 
-	/**
-	 @return this node's current height
-	 */
 	public int height() {
-		return Math.max(this.minHeight, this.height.value.getAsInt() + (int) switch (this.height.type) {
-			case EXACT -> this.height.base().getAsDouble();
-			case PARENT_PROPORTION -> this.height.base().getAsDouble() * this.parent().map(Widget::height).orElse(1);
-			case CHILD_RANGE -> this.descendantHeight();
-		});
+		return this.y.pLength.value();
 	}
 
 	public T height(int height) {
 		this.height.base(height);
-
 		return (T) this;
 	}
 
 	public T height(double height) {
 		this.height.base(height);
-
 		return (T) this;
 	}
 
 	public T height(ToIntFunction<T> height) {
 		this.height.base(() -> height.applyAsInt((T) this));
-
 		return (T) this;
 	}
 
 	public T heightProportion(ToDoubleFunction<T> height) {
 		this.height.base(() -> height.applyAsDouble((T) this));
-
 		return (T) this;
 	}
 
 	public T minHeight(int height) {
-		this.minHeight = height;
-
+		this.min.y.length.base(height);
 		return (T) this;
 	}
 
@@ -954,55 +887,61 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		this.withZ(() -> itemRenderer.renderGuiItemIcon(item, x, y));
 	}
 
-	/**
-	 @return the total width of the smallest area that contains this node's descendants
-	 */
+	/** @return the width of the smallest area that subsumes this node's descendants */
+	public int descendantWidth(boolean includeTooltips) {
+		return switch (this.degree()) {
+			case 0 -> 0;
+			case 1 -> {
+				var c = this.child(0);
+				yield c.isPresent() && (includeTooltips || !c.isTooltip()) ? c.width() : 0;
+			}
+			default -> {
+				var descendants = present(this.descendants(includeTooltips ? Predicates.alwaysTrue() : w -> !w.isTooltip())).toList();
+				yield descendants.isEmpty() ? 0 : descendants.stream().mapToInt(Widget::absoluteEndX).max().getAsInt() - descendants.stream().mapToInt(Widget::absoluteX).min().getAsInt();
+			}
+		};
+	}
+
 	public int descendantWidth() {
+		return this.descendantWidth(true);
+	}
+
+	/** @return the height of the smallest area that subsumes this node's descendants */
+	public int descendantHeight(boolean includeTooltips) {
 		return switch (this.degree()) {
 			case 0 -> 0;
-			case 1 -> this.child(0).width();
+			case 1 -> {
+				var c = this.child(0);
+				yield c.isPresent() && (includeTooltips || !c.isTooltip()) ? c.height() : 0;
+			}
 			default -> {
-				var filter = this.width.type == Length.Type.CHILD_RANGE;
-				yield (filter ? this.descendants().filter(node -> node.width.type != Length.Type.PARENT_PROPORTION) : this.descendants()).mapToInt(Widget::absoluteEndX).max().orElse(0)
-					- (filter ? this.descendants().filter(node -> node.width.type != Length.Type.PARENT_PROPORTION) : this.descendants()).mapToInt(Widget::absoluteX).min().orElse(0);
+				var descendants = present(this.descendants(includeTooltips ? Predicates.alwaysTrue() : w -> !w.isTooltip())).toList();
+				yield descendants.isEmpty() ? 0 : descendants.stream().mapToInt(Widget::absoluteEndY).max().getAsInt() - descendants.stream().mapToInt(Widget::absoluteY).min().getAsInt();
 			}
 		};
 	}
 
-	/**
-	 @return the total height of the smallest area that contains this node's descendants
-	 */
 	public int descendantHeight() {
-		return switch (this.degree()) {
-			case 0 -> 0;
-			case 1 -> this.child(0).height();
-			default -> {
-				var filter = this.height.type == Length.Type.CHILD_RANGE;
-				yield (filter ? this.descendants().filter(node -> node.height.type != Length.Type.PARENT_PROPORTION) : this.descendants()).mapToInt(Widget::absoluteEndY).max().orElse(0)
-					- (filter ? this.descendants().filter(node -> node.height.type != Length.Type.PARENT_PROPORTION) : this.descendants()).mapToInt(Widget::absoluteY).min().orElse(0);
-			}
-		};
+		return this.descendantHeight(true);
 	}
 
-	/**
-	 @return the number of children that this node has
-	 */
+	/** @return the number of children that this node has */
 	public int degree() {
-		return this.listChildren().size();
+		return this.children.size();
 	}
 
-	/**
-	 @return this node's index in the parent element's node list; -1 if this node is the root
-	 */
+	public boolean empty() {
+		return this.degree() == 0;
+	}
+
+	/** @return this node's index in the parent element's node list; -1 if this node is the root */
 	public int index() {
-		return this.parent().map(parent -> parent.listChildren().indexOf(this)).orElse(-1);
+		return this.parent().map(parent -> parent.children.indexOf(this)).orElse(-1);
 	}
 
-	/**
-	 @return whether this node is the root
-	 */
+	/** @return whether this node is the root */
 	public boolean isRoot() {
-		return this.parent().isEmpty();
+		return this.parent == null;
 	}
 
 	/**
@@ -1013,7 +952,6 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 */
 	public T with(Consumer<? super T> consumer) {
 		consumer.accept((T) this);
-
 		return (T) this;
 	}
 
@@ -1028,41 +966,46 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return transform.apply((T) this);
 	}
 
-	/**
-	 @return this node's parent
-	 */
+	/** @return this node's parent */
 	public Optional<? extends Widget<?>> parent() {
-		return this.parent;
+		return Optional.ofNullable(this.parent);
 	}
 
-	/**
-	 @return a list of this node's children
-	 */
-	public List<? extends Widget<?>> listChildren() {
-		return this.children;
+	public Optional<? extends Widget<?>> previous() {
+		return this.parent().flatMap(parent -> parent.findChild(this.index() - 1));
 	}
 
-	/**
-	 @return a stream of this node's children
-	 */
+	public Optional<? extends Widget<?>> next() {
+		return this.parent().flatMap(parent -> parent.findChild(this.index() + 1));
+	}
+
+	public Optional<? extends Widget<?>> first() {
+		return this.findChild(0);
+	}
+
+	public Optional<? extends Widget<?>> last() {
+		return this.findChild(this.degree() - 1);
+	}
+
+	/** @return a stream of this node's children */
 	public Stream<? extends Widget<?>> children() {
-		return this.listChildren().stream();
+		return this.children.stream();
 	}
 
-	/**
-	 @return a stream of this node's children in reverse order
-	 */
+	/** @return a stream of this node's children in reverse order */
 	public Stream<? extends Widget<?>> childrenReverse() {
-		return Stream.of(this.listChildren().listIterator(this.degree())).mapMulti((iterator, buffer) -> {
-			while (iterator.hasPrevious()) {
-				buffer.accept(iterator.previous());
-			}
-		});
+		return Util2.reverseStream(this.children);
 	}
 
-	/**
-	 @return a stream of this node's ancestors
-	 */
+	public Stream<? extends Widget<?>> presentChildren() {
+		return present(this.children());
+	}
+
+	public Stream<? extends Widget<?>> presentChildrenReverse() {
+		return present(this.childrenReverse());
+	}
+
+	/** @return a stream of this node's ancestors */
 	public Stream<? extends Widget<?>> ancestors() {
 		return this.parent().stream().mapMulti((parent, buffer) -> {
 			buffer.accept(parent);
@@ -1070,23 +1013,24 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		});
 	}
 
-	/**
-	 @return a stream of this node's posterity
-	 */
+	/** @return a stream of this node's posterity */
 	public Stream<? extends Widget<?>> descendants() {
-		return Stream.concat(this.children(), this.children().flatMap(Widget::descendants));
+		return this.descendants(Predicates.alwaysTrue());
 	}
 
-	/**
-	 @return a stream of this node's {@linkplain #isHovered hovered} children
-	 */
+	public Stream<? extends Widget<?>> descendants(Predicate<Widget<?>> filter) {
+		return this.children().filter(filter).mapMulti((w, add) -> {
+			add.accept(w);
+			w.descendants(filter).forEach(add);
+		});
+	}
+
+	/** @return a stream of this node's {@linkplain #isHovered hovered} children */
 	public Stream<? extends Widget<?>> hoveredChildren() {
 		return this.childrenReverse().filter(Widget::isHovered);
 	}
 
-	/**
-	 @return the currently hovered descendant rooted at this node
-	 */
+	/** @return the currently hovered descendant rooted at this node */
 	public Optional<? extends Widget<?>> hoveredDescendant() {
 		return this.childrenReverse()
 			.map(Widget::hovered)
@@ -1095,23 +1039,17 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 			.map(Optional::get);
 	}
 
-	/**
-	 @return the currently hovered node starting at this node as the root
-	 */
+	/** @return the currently hovered node starting at this node as the root */
 	public Optional<? extends Widget<?>> hovered() {
 		return this.hoveredDescendant().or(() -> Optional.ofNullable(this.isHovered() ? Util2.cast(this) : null));
 	}
 
-	/**
-	 @return a stream of this node's {@linkplain #isFocused focused} children
-	 */
+	/** @return a stream of this node's {@linkplain #isFocused focused} children */
 	public Stream<? extends Widget<?>> focusedChildren() {
 		return this.childrenReverse().filter(Widget::isFocused);
 	}
 
-	/**
-	 @return the currently focused descendant rooted at this node
-	 */
+	/** @return the currently focused descendant rooted at this node */
 	public Optional<? extends Widget<?>> focusedDescendant() {
 		return this.childrenReverse()
 			.map(Widget::focused)
@@ -1119,9 +1057,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 			.findFirst();
 	}
 
-	/**
-	 @return the currently focused node starting at this node as the root
-	 */
+	/** @return the currently focused node starting at this node as the root */
 	public Optional<? extends Widget<?>> focused() {
 		return this.focusedDescendant().or(() -> Optional.ofNullable(this.isFocused() ? Util2.cast(this) : null));
 	}
@@ -1133,45 +1069,36 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	 @return whether {@code node} is this node's child
 	 */
 	public boolean contains(Widget<?> node) {
-		return this.listChildren().contains(node);
+		return this.children.contains(node);
 	}
 
-	/**
-	 Get the child node at an index.
-
-	 @param index the index of the child node
-	 @return the child node
-	 */
-	public Widget child(int index) {
-		return this.listChildren().get(index);
+	/** @return the child node at an index in the list of children. */
+	public Widget<?> child(int index) {
+		return this.children.get(index);
 	}
 
-	/**
-	 @return the root node in this node's hierarchy
-	 */
+	public Optional<? extends Widget<?>> findChild(int index) {
+		return index < 0 || index >= this.degree() ? Optional.empty() : Optional.of(this.child(index));
+	}
+
+	/** @return the root node in this node's hierarchy */
 	public Widget root() {
 		return this.parent().map(Widget::root).orElse(this);
 	}
 
-	/**
-	 @return whether this node should be treated as existent
-	 */
+	/** @return whether this node should be treated as existent */
 	public boolean isPresent() {
-		return this.present.getAsBoolean() && this.parent().filter(parent -> !parent.isPresent()).isEmpty();
+		return this.present.test((T) this) && (this.parent == null || this.parent.isPresent());
 	}
 
-	/**
-	 @return whether this node should be rendered
-	 */
+	/** @return whether this node should be rendered */
 	public boolean isVisible() {
-		return this.visible.getAsBoolean() && this.isPresent() && this.parent().filter(parent -> !parent.isVisible()).isEmpty();
+		return this.visible.test((T) this) && this.isPresent() && (this.parent == null || this.parent.isVisible());
 	}
 
-	/**
-	 @return whether this node is active
-	 */
+	/** @return whether this node is active */
 	public boolean isActive() {
-		return this.active.getAsBoolean() && this.isPresent() && this.parent().filter(parent -> !parent.isActive()).isEmpty();
+		return this.active.test((T) this) && this.isPresent() && this.parent().filter(parent -> !parent.isActive()).isEmpty();
 	}
 
 	public boolean isSelected() {
@@ -1191,14 +1118,14 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 	}
 
 	public boolean isTooltip() {
-		return this.parent.filter(parent -> parent.tooltips.contains(this)).isPresent();
+		return this.parent != null && this.parent.tooltips.contains(this);
 	}
 
 	public boolean isPresentTooltip() {
-		return this.isTooltip() && this.parent.get().mouseFocused || this.parent.get().isSelected() && isControlDown() || this.isFocused();
+		return this.isTooltip() && this.parent.mouseFocused || this.parent.isSelected() && isControlDown() || this.isFocused();
 	}
 
-	public void preinitialize() {
+	public void reinitialize() {
 		this.select(null);
 		this.clear();
 		keyboard.setRepeatEvents(true);
@@ -1280,49 +1207,52 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return false;
 	}
 
-	public void select() {}
-
 	public void render(MatrixStack matrixes) {
+		this.frameProperties.forEach(p -> p.set = false);
+
 		if (this.isPresent()) {
 			this.renderDeferred.clear();
 			this.matrixes = matrixes;
 			this.mouseFocused = false;
-
-			if (this.isHovered()) {
-				mouseFocused:
-				if (this.focusable()) {
-					for (var ancestor : Iteratable.of(this.ancestors())) {
-						if (ancestor.z() > this.z() && ancestor.mouseFocused) {
-							break mouseFocused;
-						}
-
-						ancestor.mouseFocused = false;
-					}
-
-					this.mouseFocused = true;
-				}
-			}
-
-			if (this.isVisible()) {
-				this.render();
-
-				this.children()
-					.filter(child -> !child.isTooltip())
-					.forEach(child -> child.render(matrixes));
-
-				if (this.isRoot()) {
-					Stream.concat(this.descendants().filter(Widget::isTooltip), this.renderDeferred.stream())
-						.forEach(widget -> {
-							RenderSystem.clear(GL46C.GL_DEPTH_BUFFER_BIT, false);
-							widget.render(matrixes);
-						});
-				}
-			}
+			this.render1();
 		}
 	}
 
 	@Override public void render(MatrixStack matrixes, int mouseX, int mouseY, float delta) {
 		this.render(matrixes);
+	}
+
+	protected void render1() {
+		if (this.isHovered()) {
+			mouseFocused:
+			if (this.focusable()) {
+				for (var ancestor : Iteratable.of(this.ancestors())) {
+					if (ancestor.z() > this.z() && ancestor.mouseFocused) {
+						break mouseFocused;
+					}
+
+					ancestor.mouseFocused = false;
+				}
+
+				this.mouseFocused = true;
+			}
+		}
+
+		if (this.isVisible()) {
+			this.render();
+
+			this.children()
+				.filter(child -> !child.isTooltip())
+				.forEach(child -> child.render(this.matrixes));
+
+			if (this.isRoot()) {
+				Stream.concat(this.descendants().filter(Widget::isTooltip), this.renderDeferred.stream())
+					.forEach(w -> {
+						RenderSystem.clear(GL46C.GL_DEPTH_BUFFER_BIT, false);
+						w.render(this.matrixes);
+					});
+			}
+		}
 	}
 
 	protected void render() {}
@@ -1331,28 +1261,24 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		this.root().renderDeferred.add(this);
 	}
 
-	public void renderBackground() {
-		this.renderBackground(this.matrixes);
-	}
-
 	public void renderBackground(Identifier background) {
 		this.renderBackground(background, 0, 0, windowWidth(), windowHeight());
 	}
 
 	public void renderTooltip(List<? extends StringVisitable> lines) {
-		renderTooltip(this.matrixes, lines, mouseX(), mouseY());
+		this.renderTooltip(lines, mouseX(), mouseY());
 	}
 
 	public void renderTooltip(StringVisitable text) {
-		renderTooltip(this.matrixes, text, mouseX(), mouseY());
+		this.renderTooltip(text, mouseX(), mouseY());
 	}
 
 	public void renderTooltip(double x, double y, List<? extends StringVisitable> lines) {
-		renderTooltip(this.matrixes, lines, x, y);
+		this.renderTooltip(lines, x, y);
 	}
 
 	public void renderTooltip(double x, double y, StringVisitable text) {
-		renderTooltip(this.matrixes, text, x, y);
+		this.renderTooltip(text, x, y);
 	}
 
 	@Override public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrixes, ItemRenderer itemRenderer, int z) {
@@ -1365,6 +1291,10 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 
 	@Override public int getWidth(TextRenderer textRenderer) {
 		return this.width();
+	}
+
+	protected MatrixTransformation push() {
+		return push(this.matrixes);
 	}
 
 	protected boolean clicked() {
@@ -1407,24 +1337,20 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return contains(x, y, this.absoluteX(), this.absoluteY(), this.width(), this.height());
 	}
 
-	/**
-	 Invoked every tick.
-	 */
+	/** Invoked every tick. */
 	public void tick() {
 		if (this.isPresent()) {
-			this.listChildren().forEach(Widget::tick);
+			this.children.forEach(Widget::tick);
 		}
 	}
 
 	@Override public void mouseMoved(double mouseX, double mouseY) {
 		if (this.isPresent()) {
-			this.listChildren().forEach(child -> child.mouseMoved(mouseX, mouseY));
+			this.children.forEach(child -> child.mouseMoved(mouseX, mouseY));
 		}
 	}
 
-	/**
-	 {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button <= 2 && this.isPresent()) {
 			if (this.childrenReverse().anyMatch(child -> child.mouseClicked(mouseX, mouseY, button))) {
@@ -1454,9 +1380,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return false;
 	}
 
-	/**
-	 {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		if (this.isPresent()) {
 			if (this.childrenReverse().anyMatch(child -> child.mouseReleased(mouseX, mouseY, button))) {
@@ -1472,9 +1396,7 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return false;
 	}
 
-	/**
-	 {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (this.isPresent()) {
 			if (this.childrenReverse().anyMatch(child -> child.mouseDragged(mouseX, mouseY, button, deltaX, deltaY))) {
@@ -1487,24 +1409,20 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return false;
 	}
 
-	/**
-	 {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (this.isPresent()) {
 			if (this.childrenReverse().anyMatch(widget -> widget.mouseScrolled(mouseX, mouseY, amount))) {
 				return true;
 			}
 
-			return this.mouseFocused && this.scroll(amount);
+			return this.isHovered() && this.scroll(amount);
 		}
 
 		return false;
 	}
 
-	/**
-	 {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (this.isPresent()) {
 			if (keyCode == GLFW_KEY_TAB && this.changeFocus(Flags.none(modifiers, GLFW_MOD_SHIFT)) || this.isPresent() && this.childrenReverse().anyMatch(child -> child.keyPressed(keyCode, scanCode, modifiers))) {
@@ -1528,23 +1446,17 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		return false;
 	}
 
-	/**
-	 {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 		return this.isPresent() && this.childrenReverse().anyMatch(child -> child.keyReleased(keyCode, scanCode, modifiers));
 	}
 
-	/**
-	 {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override public boolean charTyped(char character, int modifiers) {
 		return this.isPresent() && this.childrenReverse().anyMatch(child -> child.charTyped(character, modifiers));
 	}
 
-	/**
-	 {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override public boolean isMouseOver(double mouseX, double mouseY) {
 		return this.isPresent() && this.contains(mouseX, mouseY);
 	}
@@ -1576,8 +1488,27 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 		this.renderBackground(identifier, x, y, width, height, 64, 0);
 	}
 
-	public void renderBackground(MatrixStack matrixes) {
-		screen().renderBackground(matrixes);
+	public void renderBackground() {
+		screen().renderBackground(this.matrixes);
+	}
+
+	public <P> LazyProperty<P> property(LazyProperty<P> property) {
+		this.allProperties.add(property);
+		if (property.period == LazyProperty.Period.FRAME) this.frameProperties.add(property);
+
+		return property;
+	}
+
+	public <P> LazyProperty<P> property(LazyProperty.Period period, Function<LazyProperty<P>, ? extends P> initializer) {
+		return this.property(LazyProperty.of(period, initializer));
+	}
+
+	public <P> LazyProperty<P> property(Function<LazyProperty<P>, ? extends P> initializer) {
+		return this.property(LazyProperty.Period.FRAME, initializer);
+	}
+
+	@Override public String toString() {
+		return this.parent == null ? this.toLocalString() : "%s : %s".formatted(this.toLocalString(), this.parent.toLocalString());
 	}
 
 	protected int resolve(Length length, int parent) {
@@ -1586,5 +1517,9 @@ public class Widget<T extends Widget<T>> extends DrawableHelper implements Drawa
 			case PARENT_PROPORTION -> length.base().getAsDouble() * parent;
 			default -> throw new IllegalArgumentException();
 		};
+	}
+
+	 protected String toLocalString() {
+		return "%s (%s (%s) + %s, %s (%s) + %s)".formatted(this.getClass().getSimpleName().replaceFirst("(?<=.)Widget|Widget(?=.)", ""), this.x(), this.absoluteX(), this.width(), this.y(), this.absoluteY(), this.height());
 	}
 }

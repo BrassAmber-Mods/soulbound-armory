@@ -123,7 +123,7 @@ loom {
 			}
 
 			all {run ->
-				run.vmArgs.addAll(["-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition", "-Dmixin.hotSwap=true"])
+				run.vmArgs.addAll(["-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition", "-Xss288K", "-Dmixin.hotSwap=true"])
 
 				net.auoeke.reflect.Accessor.putReference(run, "environmentVariables", new HashMap<String, String>() {
 					String put(String key, String value) {

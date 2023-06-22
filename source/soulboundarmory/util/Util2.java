@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -52,7 +53,6 @@ public class Util2 {
 	public static <T> boolean ifPresent(Optional<T> optional, Consumer<? super T> action) {
 		if (optional.isPresent()) {
 			action.accept(optional.get());
-
 			return true;
 		}
 
@@ -107,12 +107,20 @@ public class Util2 {
 		return map;
 	}
 
+	public static <T> Stream<T> reverseStream(List<T> l) {
+		return IntStream.iterate(l.size() - 1, i -> i >= 0, i -> i - 1).mapToObj(l::get);
+	}
+
 	public static boolean containsIgnoreCase(String string, String substring) {
 		return Pattern.compile(substring, Pattern.CASE_INSENSITIVE | Pattern.LITERAL | Pattern.UNICODE_CASE).matcher(string).find();
 	}
 
 	public static boolean contains(Object target, Object... items) {
 		return Arrays.asList(items).contains(target);
+	}
+
+	public static boolean contains(double x, double min, double max) {
+		return x >= min && x <= max;
 	}
 
 	public static <T> Stream<T> stream(Iterable<T> iterable) {

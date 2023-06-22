@@ -1,7 +1,5 @@
 package soulboundarmory.skill;
 
-import java.util.List;
-import java.util.Set;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
@@ -10,6 +8,9 @@ import net.minecraft.text.Text;
 import soulboundarmory.component.statistics.SkillMap;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.serial.Serializable;
+
+import java.util.List;
+import java.util.Set;
 
 public final class SkillInstance implements Comparable<SkillInstance>, Serializable {
 	public final Set<SkillInstance> dependencies = new ReferenceOpenHashSet<>();
@@ -88,8 +89,8 @@ public final class SkillInstance implements Comparable<SkillInstance>, Serializa
 		return this.skill.tooltip();
 	}
 
-	public void render(Widget<?> tab, MatrixStack matrixes) {
-		this.skill.render(tab, this.level);
+	public void render(Widget<?> widget, MatrixStack matrixes) {
+		this.skill.render(widget, this.level);
 	}
 
 	public void reset() {
@@ -102,5 +103,12 @@ public final class SkillInstance implements Comparable<SkillInstance>, Serializa
 
 	@Override public void deserialize(NbtCompound tag) {
 		this.level = tag.getInt("level");
+	}
+
+	@Override public String toString() {
+		var s = "%s level %s".formatted(this.name().getString(), this.level);
+		if (this.skill.maxLevel != -1) s += "/" + this.skill.maxLevel;
+
+		return s;
 	}
 }

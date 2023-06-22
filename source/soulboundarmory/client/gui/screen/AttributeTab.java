@@ -27,10 +27,10 @@ public class AttributeTab extends Tab {
 		this.add(this.resetButton(Category.attribute)).active(() -> component.statistics.get(Category.attribute).values().stream().anyMatch(Statistic::aboveMin));
 		this.displayPoints(component::attributePoints);
 
-		var box = this.add(new WidgetBox<>().ySpacing(4).center().x(.5).y(.5).width(length));
+		var box = this.add(new WidgetBox<>().yMargin(4).center().x(.5).y(.5).width(length));
 		attributes.forEach(statistic -> box.add(new Widget<>().width(length).height(20).with(row -> {
-			row.add(this.squareButton("-", () -> this.removePoint(statistic)).alignRight().x(1, -20).active(statistic::aboveMin));
-			row.add(this.squareButton("+", () -> this.addPointAction(statistic)).alignRight().x(1D).active(() -> component.attributePoints() > 0 && statistic.belowMax()));
+			row.add(this.squareButton("-", () -> this.removePoint(statistic)).x.end().x(1, -20).active(statistic::aboveMin));
+			row.add(this.squareButton("+", () -> this.addPointAction(statistic)).x.end().x(1D).active(() -> component.attributePoints() > 0 && statistic.belowMax()));
 			row.text(widget -> widget.shadow().text(() -> component.format(statistic.type)));
 		})));
 	}

@@ -14,15 +14,13 @@ public class ExperienceBar extends ScalableWidget<ExperienceBar> {
 	private static final ExperienceBar overlayBar = new ExperienceBar().center().x(.5).y(1D, -27);
 
 	protected final TextWidget level = this.add(new TextWidget())
-		.x(.5)
-		.y(5)
-		.centerX()
-		.alignDown()
+		.x.center()
+		.y(5).y.end()
 		.color(Configuration.Client.Bar::argb)
 		.stroke()
 		.text(() -> this.component.level())
-		.visible(() -> this.component.level() > 0)
-		.tooltip(tooltip -> tooltip.alignDown().text(() -> Translations.barLevel.text(this.component.level(), this.component.maxLevel() < 0 ? "∞" : this.component.maxLevel())));
+		.visible(w -> this.component.level() > 0)
+		.tooltip(tooltip -> tooltip.y.end().text(() -> Translations.barLevel.text(this.component.level(), this.component.maxLevel() < 0 ? "∞" : this.component.maxLevel())));
 
 	protected ItemComponent<?> component;
 
