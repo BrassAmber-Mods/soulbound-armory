@@ -29,6 +29,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import soulboundarmory.client.gui.screen.*;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.Components;
+import soulboundarmory.component.soulbound.item.weapon.DaggerComponent;
 import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.*;
@@ -282,7 +283,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 @return whether this item is enabled
 	 */
 	public final boolean isEnabled() {
-		return Configuration.Items.enabled.getBoolean(this.type().id().getPath());
+		return Configuration.Items.enabled.get(this.type().id().getPath());
 	}
 
 	/**

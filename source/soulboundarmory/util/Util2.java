@@ -23,6 +23,10 @@ public class Util2 {
 		throw new IllegalArgumentException(message.formatted(arguments));
 	}
 
+	public static <T> T hurl(Throwable trouble) {
+		throw trouble;
+	}
+
 	public static <A extends Annotation, T> T value(AnnotatedElement element, Function<? super A, ? extends T> getter, T fallback) {
 		var annotation = element.getAnnotation((Class<A>) TypeResolver.resolveRawArguments(Function.class, getter.getClass())[0]);
 		return annotation == null ? fallback : getter.apply(annotation);

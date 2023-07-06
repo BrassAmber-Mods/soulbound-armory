@@ -1,5 +1,6 @@
 package soulboundarmory.module.config;
 
+import net.auoeke.reflect.Classes;
 import net.auoeke.sp.StructuredProperties;
 import net.auoeke.sp.element.SpMap;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,6 +23,7 @@ public final class ConfigurationInstance extends Parent {
 	private static final Timer deserializationTimer = new Timer(true);
 	private static final StructuredProperties sp = new StructuredProperties();
 
+	public final Class<?> type;
 	public final ModContainer mod;
 	public final Path path;
 	public final Identifier background;
@@ -32,6 +34,7 @@ public final class ConfigurationInstance extends Parent {
 	public ConfigurationInstance(ModContainer mod, Class<?> type) {
 		super(type, mod.getModId() + Util2.value(type, (Name name) -> ':' + name.value(), ""), Util2.value(type, Category::value, "main"));
 
+		this.type = Classes.initialize(type);
 		this.mod = mod;
 		this.path = FMLPaths.CONFIGDIR.get().resolve(Util2.value(type, Name::value, mod.getModId()) + ".str");
 		var background = new Identifier(Util2.value(type, Background::value, "block/deepslate.png"));

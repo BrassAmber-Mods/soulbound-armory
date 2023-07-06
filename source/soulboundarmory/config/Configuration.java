@@ -11,6 +11,7 @@ import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.module.config.*;
 import soulboundarmory.util.Math2;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ConfigurationFile
@@ -49,7 +50,7 @@ public final class Configuration {
 	@Flat
 	@Category("items")
 	public static class Items {
-		public static Object2BooleanLinkedOpenHashMap<String> enabled = new Object2BooleanLinkedOpenHashMap<>(
+		public static Map<String, Boolean> enabled = new Object2BooleanLinkedOpenHashMap<>(
 			ItemComponentType.registry().getKeys().stream().collect(Collectors.toMap(Identifier::getPath, Functions.constant(true)))
 		);
 
