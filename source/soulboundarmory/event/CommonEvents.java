@@ -25,6 +25,7 @@ import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.entity.SoulboundDaggerEntity;
+import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.module.component.EntityComponent;
 import soulboundarmory.module.component.access.EntityAccess;
 import soulboundarmory.network.ExtendedPacketBuffer;
@@ -107,8 +108,13 @@ public final class CommonEvents {
 	public static void damage(LivingDamageEvent event) {
 		var damage = event.getSource();
 		var target = event.getEntity();
+		var attacker = damage.getAttacker();
 
-		if (damage.getAttacker() instanceof ServerPlayerEntity player) {
+		if (attacker != null && target.isUsingItem() && target.getActiveItem().isOf(SoulboundItems.sword)) {
+			event.setAmount(event.getAmount() * 0.65F);
+		}
+
+		if (attacker instanceof ServerPlayerEntity player) {
 			ItemComponent.fromAttacker(target, damage).ifPresent(component -> {
 				Components.entityData.of(target).unfreeze();
 				var amount = event.getAmount();

@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class SwordComponent extends WeaponComponent<SwordComponent> {
-	protected int lightningCooldown;
-
 	public SwordComponent(MasterComponent<?> component) {
 		super(component);
 
@@ -34,7 +32,7 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 			.min(3, StatisticType.attackDamage);
 
 		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
-		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.summonLightning);
+		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment);
 	}
 
 	@Override public Text name() {
@@ -47,16 +45,6 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 
 	@Override public ItemComponentType<SwordComponent> type() {
 		return ItemComponentType.sword;
-	}
-
-	public int lightningCooldown() {
-		return this.lightningCooldown;
-	}
-
-	public void resetLightningCooldown() {
-		if (!this.player.isCreative()) {
-			this.lightningCooldown = (int) Math.round(96 / this.attackSpeed());
-		}
 	}
 
 	@Override public void attributeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> modifiers, EquipmentSlot slot) {
@@ -79,23 +67,11 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 		return 0;
 	}
 
-	@Override public void tick() {
-		if (this.isServer()) {
-			if (this.lightningCooldown > 0) {
-				this.lightningCooldown--;
-			}
-		}
-	}
-
 	@Override public void serialize(NbtCompound tag) {
 		super.serialize(tag);
-
-		tag.putInt("lightningCooldown", this.lightningCooldown());
 	}
 
 	@Override public void deserialize(NbtCompound tag) {
 		super.deserialize(tag);
-
-		this.lightningCooldown = tag.getInt("lightningCooldown");
 	}
 }

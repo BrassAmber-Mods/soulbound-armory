@@ -2,16 +2,12 @@ package soulboundarmory.item;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import soulboundarmory.component.soulbound.item.ItemComponent;
-import soulboundarmory.component.soulbound.item.weapon.SwordComponent;
-import soulboundarmory.entity.SoulboundLightningEntity;
-import soulboundarmory.skill.Skills;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
 
 public class SoulboundSwordItem extends SoulboundMeleeWeapon {
 	public SoulboundSwordItem() {
@@ -22,22 +18,16 @@ public class SoulboundSwordItem extends SoulboundMeleeWeapon {
 		return UseAction.BLOCK;
 	}
 
+	@Override public int getMaxUseTime(ItemStack stack) {
+		return 72000;
+	}
+
 	@Override public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-		var stack = player.getStackInHand(hand);
-		var component = (SwordComponent) ItemComponent.of(player, stack).get();
+		player.setCurrentHand(hand);
+		return TypedActionResult.consume(player.getStackInHand(hand));
+	}
 
-		if (!world.isClient && component.hasSkill(Skills.summonLightning) && component.lightningCooldown() <= 0) {
-			var pos = player.getPos();
-			var result = world.raycast(new RaycastContext(pos, pos.add(player.getRotationVector()).multiply(512, 512, 512), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player));
-
-			if (result != null) {
-				player.world.spawnEntity(new SoulboundLightningEntity(player.world, result.getPos(), player.getUuid()));
-				component.resetLightningCooldown();
-
-				return new TypedActionResult<>(ActionResult.SUCCESS, player.getStackInHand(hand));
-			}
-		}
-
-		return new TypedActionResult<>(ActionResult.FAIL, player.getStackInHand(hand));
+	@Override public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
+		return ToolActions.DEFAULT_SHIELD_ACTIONS.contains(toolAction);
 	}
 }
