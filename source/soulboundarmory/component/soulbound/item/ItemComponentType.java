@@ -6,6 +6,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.tool.AxeComponent;
 import soulboundarmory.component.soulbound.item.tool.PickaxeComponent;
+import soulboundarmory.component.soulbound.item.tool.ShovelComponent;
 import soulboundarmory.component.soulbound.item.tool.ToolComponent;
 import soulboundarmory.component.soulbound.item.weapon.*;
 import soulboundarmory.component.soulbound.player.MasterComponent;
@@ -26,6 +27,7 @@ public final class ItemComponentType<C extends ItemComponent<C>> extends Identif
 	@Register("trident") public static final ItemComponentType<TridentComponent> trident = weapon();
 	@Register("pickaxe") public static final ItemComponentType<PickaxeComponent> pickaxe = tool();
 	@Register("axe") public static final ItemComponentType<AxeComponent> axe = tool();
+	@Register("shovel") public static final ItemComponentType<ShovelComponent> shovel = tool();
 
 	public final EntityComponentKey<? extends MasterComponent<?>> parentKey;
 

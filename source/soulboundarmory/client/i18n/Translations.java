@@ -29,6 +29,7 @@ public interface Translations {
 	Text guiTrident = gui("trident").text();
 	Text guiPickaxe = gui("pickaxe").text();
 	Text guiAxe = gui("axe").text();
+	Text guiShovel = gui("shovel").text();
 	Text guiToolSelection = gui("selection").text();
 	Text guiButtonAttributes = gui("attributes").text();
 	Text guiButtonEnchantments = gui("enchantments").text();

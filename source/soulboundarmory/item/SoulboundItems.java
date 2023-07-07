@@ -26,6 +26,7 @@ public class SoulboundItems {
 	@Register("greatsword") public static final SoulboundGreatswordItem greatsword = new SoulboundGreatswordItem();
 	@Register("pickaxe") public static final SoulboundPickaxeItem pickaxe = new SoulboundPickaxeItem();
 	@Register("axe") public static final SoulboundAxeItem axe = new SoulboundAxeItem();
+	@Register("shovel") public static final SoulboundShovelItem shovel = new SoulboundShovelItem();
 	@Register("bigsword") public static final SoulboundBigswordItem bigsword = new SoulboundBigswordItem();
 	@Register("trident") public static final SoulboundTridentItem trident = new SoulboundTridentItem();
 
