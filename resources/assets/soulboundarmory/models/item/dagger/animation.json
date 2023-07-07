@@ -1,6 +1,4 @@
 {
 	"parent": "item/handheld",
-	"textures": {
-		"layer0": "soulboundarmory:item/dagger/animation"
-	}
+	"textures": {"layer0": "soulboundarmory:item/dagger/animation"}
 }

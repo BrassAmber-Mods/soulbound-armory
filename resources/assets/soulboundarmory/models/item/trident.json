@@ -1,25 +1,15 @@
 {
 	"parent": "item/handheld",
-	"textures": {
-		"layer0": "soulboundarmory:item/trident/0"
-	},
+	"textures": {"layer0": "soulboundarmory:item/trident/0"},
 	"overrides": [
 		{
-			"predicate": {
-				"soulboundarmory:animating": 1
-			},
+			"predicate": {"soulboundarmory:animating": 1},
 			"model": "soulboundarmory:item/trident/animation"
-		},
-		{
-			"predicate": {
-				"soulboundarmory:level": 50
-			},
+		}, {
+			"predicate": {"soulboundarmory:level": 50},
 			"model": "soulboundarmory:item/trident/50"
-		},
-		{
-			"predicate": {
-				"soulboundarmory:level": 100
-			},
+		}, {
+			"predicate": {"soulboundarmory:level": 100},
 			"model": "soulboundarmory:item/trident/100"
 		}
 	]
