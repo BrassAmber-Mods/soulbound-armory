@@ -1,7 +1,5 @@
 package soulboundarmory.component.statistics;
 
-import java.util.Iterator;
-import java.util.function.Predicate;
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -12,6 +10,9 @@ import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.statistics.history.EnchantmentHistory;
 import soulboundarmory.serial.Serializable;
 import soulboundarmory.util.Util2;
+
+import java.util.Iterator;
+import java.util.function.Predicate;
 
 public class EnchantmentStorage extends Reference2IntLinkedOpenHashMap<Enchantment> implements Iterable<Enchantment>, Serializable {
 	public final EnchantmentHistory history;
@@ -25,7 +26,7 @@ public class EnchantmentStorage extends Reference2IntLinkedOpenHashMap<Enchantme
 
 	public void initialize(Predicate<Enchantment> predicate) {
 		ForgeRegistries.ENCHANTMENTS.getValues().stream()
-			.filter(enchantment -> enchantment.type.isAcceptableItem(this.component.item())
+			.filter(enchantment -> enchantment.isAcceptableItem(this.component.item().getDefaultStack())
 				&& !enchantment.isCursed()
 				&& !Util2.contains(enchantment, Enchantments.UNBREAKING, Enchantments.MENDING))
 			.filter(predicate)
