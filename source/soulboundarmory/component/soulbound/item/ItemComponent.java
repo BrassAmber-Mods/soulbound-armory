@@ -29,14 +29,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 import soulboundarmory.client.gui.screen.*;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.Components;
-import soulboundarmory.component.soulbound.item.weapon.DaggerComponent;
 import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.*;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.entity.Attributes;
 import soulboundarmory.entity.SoulboundDaggerEntity;
-import soulboundarmory.entity.SoulboundLightningEntity;
 import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.network.ExtendedPacketBuffer;
@@ -141,9 +139,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 			attacker = target.getDamageTracker().getBiggestAttacker();
 		}
 
-		return entity instanceof SoulboundDaggerEntity ? ItemComponentType.dagger.nullable(attacker)
-			: entity instanceof SoulboundLightningEntity ? ItemComponentType.sword.nullable(attacker)
-			: Optional.empty();
+		return entity instanceof SoulboundDaggerEntity ? ItemComponentType.dagger.nullable(attacker) : Optional.empty();
 	}
 
 	/**
