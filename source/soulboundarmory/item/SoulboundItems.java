@@ -3,9 +3,7 @@ package soulboundarmory.item;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.auoeke.reflect.Invoker;
 import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ToolMaterial;
-import net.minecraft.item.ToolMaterials;
+import net.minecraft.item.*;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.common.ForgeTier;
@@ -27,6 +25,7 @@ public class SoulboundItems {
 	@Register("sword") public static final SoulboundSwordItem sword = new SoulboundSwordItem();
 	@Register("greatsword") public static final SoulboundGreatswordItem greatsword = new SoulboundGreatswordItem();
 	@Register("pickaxe") public static final SoulboundPickaxeItem pickaxe = new SoulboundPickaxeItem();
+	@Register("axe") public static final SoulboundAxeItem axe = new SoulboundAxeItem();
 	@Register("bigsword") public static final SoulboundBigswordItem bigsword = new SoulboundBigswordItem();
 	@Register("trident") public static final SoulboundTridentItem trident = new SoulboundTridentItem();
 

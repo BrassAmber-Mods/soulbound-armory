@@ -1,24 +1,21 @@
 package soulboundarmory.component.soulbound.item;
 
-import java.util.Optional;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.IForgeRegistry;
 import soulboundarmory.component.Components;
+import soulboundarmory.component.soulbound.item.tool.AxeComponent;
 import soulboundarmory.component.soulbound.item.tool.PickaxeComponent;
 import soulboundarmory.component.soulbound.item.tool.ToolComponent;
-import soulboundarmory.component.soulbound.item.weapon.BigswordComponent;
-import soulboundarmory.component.soulbound.item.weapon.DaggerComponent;
-import soulboundarmory.component.soulbound.item.weapon.GreatswordComponent;
-import soulboundarmory.component.soulbound.item.weapon.SwordComponent;
-import soulboundarmory.component.soulbound.item.weapon.TridentComponent;
-import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
+import soulboundarmory.component.soulbound.item.weapon.*;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.module.component.EntityComponentKey;
 import soulboundarmory.module.transform.Register;
 import soulboundarmory.module.transform.RegisterAll;
 import soulboundarmory.module.transform.Registry;
 import soulboundarmory.registry.Identifiable;
+
+import java.util.Optional;
 
 @RegisterAll(type = ItemComponentType.class, registry = "item_component")
 public final class ItemComponentType<C extends ItemComponent<C>> extends Identifiable {
@@ -28,6 +25,7 @@ public final class ItemComponentType<C extends ItemComponent<C>> extends Identif
 	@Register("greatsword") public static final ItemComponentType<GreatswordComponent> greatsword = weapon();
 	@Register("trident") public static final ItemComponentType<TridentComponent> trident = weapon();
 	@Register("pickaxe") public static final ItemComponentType<PickaxeComponent> pickaxe = tool();
+	@Register("axe") public static final ItemComponentType<AxeComponent> axe = tool();
 
 	public final EntityComponentKey<? extends MasterComponent<?>> parentKey;
 
