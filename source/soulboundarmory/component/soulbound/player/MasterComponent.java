@@ -105,7 +105,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	 @return the active soulbound item component
 	 */
 	public Optional<? extends ItemComponent<?>> item() {
-		return Optional.ofNullable(this.item).filter(ItemComponent::isUnlocked);
+		return Optional.ofNullable(this.item).filter(itemComponent -> itemComponent.unlocked);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 				this.bindSlot(slot);
 			}
 
-			if (item.isUnlocked()) {
+			if (item.unlocked) {
 				this.refresh();
 			} else {
 				item.unlock();

@@ -5,7 +5,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
-import soulboundarmory.component.statistics.SkillMap;
+import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.serial.Serializable;
 
@@ -22,8 +22,8 @@ public final class SkillInstance implements Comparable<SkillInstance>, Serializa
 		this.skill = skill;
 	}
 
-	public void initializeDependencies(SkillMap storage) {
-		this.dependencies.addAll(this.skill.dependencies().stream().map(storage::get).toList());
+	public void initializeDependencies(ItemComponent<?> component) {
+		this.dependencies.addAll(this.skill.dependencies().stream().map(component::skill).toList());
 	}
 
 	public boolean hasDependencies() {

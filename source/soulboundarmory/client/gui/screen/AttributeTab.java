@@ -2,8 +2,10 @@ package soulboundarmory.client.gui.screen;
 
 import net.minecraft.item.Items;
 import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.component.soulbound.item.tool.ToolComponent;
 import soulboundarmory.component.statistics.Category;
 import soulboundarmory.component.statistics.Statistic;
+import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.module.gui.widget.ItemWidget;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.module.gui.widget.WidgetBox;
@@ -33,6 +35,16 @@ public class AttributeTab extends Tab {
 			row.add(this.squareButton("+", () -> this.addPointAction(statistic)).x.end().x(1D).active(() -> component.attributePoints() > 0 && statistic.belowMax()));
 			row.text(widget -> widget.shadow().text(() -> component.format(statistic.type)));
 		})));
+
+		if (component instanceof ToolComponent tool) {
+			this.text(text -> text.present(w -> tool.nextMaterial != null)
+				.x.center()
+				.x(0.5)
+				.y.end()
+				.y(w -> this.container().xpBar.y() - 16)
+				.text(() -> component.format(StatisticType.upgradeProgress))
+			);
+		}
 	}
 
 	protected void addPointAction(Statistic statistic) {

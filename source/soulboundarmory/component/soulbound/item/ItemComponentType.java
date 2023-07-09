@@ -1,15 +1,17 @@
 package soulboundarmory.component.soulbound.item;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.IForgeRegistry;
+import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.Components;
-import soulboundarmory.component.soulbound.item.tool.AxeComponent;
-import soulboundarmory.component.soulbound.item.tool.PickaxeComponent;
-import soulboundarmory.component.soulbound.item.tool.ShovelComponent;
-import soulboundarmory.component.soulbound.item.tool.ToolComponent;
+import soulboundarmory.component.soulbound.item.tool.*;
 import soulboundarmory.component.soulbound.item.weapon.*;
 import soulboundarmory.component.soulbound.player.MasterComponent;
+import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.module.component.EntityComponentKey;
 import soulboundarmory.module.transform.Register;
 import soulboundarmory.module.transform.RegisterAll;
@@ -20,29 +22,36 @@ import java.util.Optional;
 
 @RegisterAll(type = ItemComponentType.class, registry = "item_component")
 public final class ItemComponentType<C extends ItemComponent<C>> extends Identifiable {
-	@Register("dagger") public static final ItemComponentType<DaggerComponent> dagger = weapon();
-	@Register("sword") public static final ItemComponentType<SwordComponent> sword = weapon();
-	@Register("bigsword") public static final ItemComponentType<BigswordComponent> bigsword = weapon();
-	@Register("greatsword") public static final ItemComponentType<GreatswordComponent> greatsword = weapon();
-	@Register("trident") public static final ItemComponentType<TridentComponent> trident = weapon();
-	@Register("pickaxe") public static final ItemComponentType<PickaxeComponent> pickaxe = tool();
-	@Register("axe") public static final ItemComponentType<AxeComponent> axe = tool();
-	@Register("shovel") public static final ItemComponentType<ShovelComponent> shovel = tool();
+	@Register("dagger") public static final ItemComponentType<DaggerComponent> dagger = weapon(SoulboundItems.dagger, Items.WOODEN_SWORD, Translations.guiDagger);
+	@Register("sword") public static final ItemComponentType<SwordComponent> sword = weapon(SoulboundItems.sword, Items.WOODEN_SWORD, Translations.guiSword);
+	@Register("bigsword") public static final ItemComponentType<BigswordComponent> bigsword = weapon(SoulboundItems.bigsword, Items.WOODEN_SWORD, Translations.guiBigsword);
+	@Register("greatsword") public static final ItemComponentType<GreatswordComponent> greatsword = weapon(SoulboundItems.greatsword, Items.WOODEN_SWORD, Translations.guiGreatsword);
+	@Register("trident") public static final ItemComponentType<TridentComponent> trident = weapon(SoulboundItems.trident, Items.TRIDENT, Translations.guiTrident);
+	@Register("pickaxe") public static final ItemComponentType<PickaxeComponent> pickaxe = tool(SoulboundItems.pickaxe, Items.WOODEN_PICKAXE, Translations.guiPickaxe);
+	@Register("axe") public static final ItemComponentType<AxeComponent> axe = tool(SoulboundItems.axe, Items.WOODEN_AXE, Translations.guiAxe);
+	@Register("shovel") public static final ItemComponentType<ShovelComponent> shovel = tool(SoulboundItems.shovel, Items.WOODEN_SHOVEL, Translations.guiShovel);
+	@Register("hoe") public static final ItemComponentType<HoeComponent> hoe = tool(SoulboundItems.hoe, Items.WOODEN_HOE, Translations.guiHoe);
 
 	public final EntityComponentKey<? extends MasterComponent<?>> parentKey;
+	public final Item item;
+	public final Item consumableItem;
+	public final Text name;
 
-	public ItemComponentType(EntityComponentKey<? extends MasterComponent<?>> key) {
+	public ItemComponentType(EntityComponentKey<? extends MasterComponent<?>> key, Item item, Item consumableItem, Text name) {
 		this.parentKey = key;
+		this.item = item;
+		this.consumableItem = consumableItem;
+		this.name = name;
 	}
 
 	@Registry("item_component") public static native <C extends ItemComponent<C>> IForgeRegistry<ItemComponentType<C>> registry();
 
-	public static <T extends WeaponComponent<T>> ItemComponentType<T> weapon() {
-		return new ItemComponentType<>(Components.weapon);
+	public static <T extends WeaponComponent<T>> ItemComponentType<T> weapon(Item item, Item consumableItem, Text name) {
+		return new ItemComponentType<>(Components.weapon, item, consumableItem, name);
 	}
 
-	public static <T extends ToolComponent<T>> ItemComponentType<T> tool() {
-		return new ItemComponentType<>(Components.tool);
+	public static <T extends ToolComponent<T>> ItemComponentType<T> tool(Item item, Item consumableItem, Text name) {
+		return new ItemComponentType<>(Components.tool, item, consumableItem, name);
 	}
 
 	public static ItemComponentType<?> get(Identifier id) {

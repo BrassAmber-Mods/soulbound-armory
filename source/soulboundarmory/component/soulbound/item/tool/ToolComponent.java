@@ -1,14 +1,13 @@
 package soulboundarmory.component.soulbound.item.tool;
 
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.ToolMaterials;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.tag.TagKey;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -25,13 +24,17 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComponent<T> {
+	public ToolMaterial nextMaterial;
 	protected ToolMaterial material = ToolMaterials.WOOD;
-	protected ToolMaterial nextMaterial;
 
 	public ToolComponent(MasterComponent<?> component) {
 		super(component);
 
-		this.skills.add(Skills.absorption, Skills.circumspection);
+		this.statistics
+			.min(2, StatisticType.reach)
+			.max(0, StatisticType.upgradeProgress);
+
+		this.addSkills(Skills.absorption, Skills.circumspection);
 	}
 
 	public Text materialName() {
@@ -46,15 +49,13 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 
 			if (tiers.indexOf(this.nextMaterial == null ? this.material : this.nextMaterial) >= tiers.indexOf(tool.getMaterial())) {
 				this.player.sendMessage(Translations.cannotAbsorbWeaker, true);
+			} else if (stack.isDamaged()) {
+				this.player.sendMessage(Translations.cannotAbsorbDamaged, true);
 			} else {
-				if (stack.isDamaged()) {
-					this.player.sendMessage(Translations.cannotAbsorbDamaged, true);
-				} else {
-					stack.setCount(0);
-					this.nextMaterial = tool.getMaterial();
-					this.statistic(StatisticType.upgradeProgress).max(1);
-					this.synchronize();
-				}
+				stack.decrement(1);
+				this.nextMaterial = tool.getMaterial();
+				this.statistic(StatisticType.upgradeProgress).max(1000);
+				this.synchronize();
 			}
 		}
 	}
@@ -67,9 +68,14 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 
 	@Override public void mined(BlockState state, BlockPos position) {
 		if (this.isServer() && this.itemStack.isSuitableFor(state)) {
-			var delta = Math.max(1, state.calcBlockBreakingDelta(this.player, this.player.world, position));
-			var xp = Math.round(state.getHardness(this.player.world, position)) + 4 * (1 - delta);
-			this.add(StatisticType.experience, delta == 1 ? Math.min(10, xp) : xp);
+			var hardness = state.getHardness(this.player.world, position);
+
+			if (hardness > 0) {
+				var delta = Math.min(1, state.calcBlockBreakingDelta(this.player, this.player.world, position));
+				var xp = hardness + 2 * (1 - delta);
+				xp = delta == 1 ? Math.min(10, xp) : xp;
+				this.add(StatisticType.experience, xp);
+			}
 		}
 	}
 
@@ -77,22 +83,21 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		return SoulboundItems.material(this.material);
 	}
 
-	@Override public void addAttribute(StatisticType type, int points) {
-		super.addAttribute(type, points);
+	@Override public void add(StatisticType type, double amount) {
+		if (type == StatisticType.experience && amount > 0) {
+			var upgrade = this.statistic(StatisticType.upgradeProgress);
+			upgrade.add(amount);
 
-		var upgrade = this.statistic(StatisticType.upgradeProgress);
-
-		if (this.nextMaterial != null && upgrade.intValue() == 1) {
-			upgrade.setToMin();
-			upgrade.max();
-			this.material = this.nextMaterial;
-			this.nextMaterial = null;
-			this.synchronize();
+			if (this.nextMaterial != null && upgrade.intValue() == upgrade.max()) {
+				upgrade.setToMin();
+				upgrade.max(0);
+				this.material = this.nextMaterial;
+				this.nextMaterial = null;
+				this.synchronize();
+			}
 		}
 
-		if (type == upgrade.type) {
-			this.master.refresh();
-		}
+		super.add(type, amount);
 	}
 
 	@Override public void reset() {
@@ -104,29 +109,30 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		this.synchronize();
 	}
 
-	@Override public Text format(StatisticType statistic) {
+	@Override public double increase(StatisticType type) {
+		return type == StatisticType.efficiency ? 0.5
+			: type == StatisticType.reach ? 0.1
+			: 0;
+	}
+
+	@Override public MutableText format(StatisticType statistic) {
 		if (statistic == StatisticType.upgradeProgress) {
-			return this.nextMaterial == null ? Translations.tier.text(this.materialName()) : Translations.guiUpgradeProgress.text(this.formatValue(statistic), Translations.toolMaterial(this.nextMaterial));
+			return this.nextMaterial == null ? Translations.tier.text(this.materialName())
+				: Translations.guiUpgradeProgress.translate(this.materialName(), Translations.toolMaterial(this.nextMaterial), this.formatValue(statistic));
 		}
 
 		return super.format(statistic);
 	}
 
 	@Override public List<StatisticType> screenAttributes() {
-		var types = ReferenceArrayList.of(StatisticType.efficiency, StatisticType.reach);
-
-		if (this.nextMaterial != null) {
-			types.add(StatisticType.upgradeProgress);
-		}
-
-		return types;
+		return ReferenceArrayList.of(StatisticType.efficiency, StatisticType.reach);
 	}
 
-	@Override public List<Text> tooltip() {
+	@Override public List<MutableText> tooltip() {
 		return List.of(
 			Translations.tooltipReach.translate(this.formatValue(StatisticType.reach)),
 			Translations.tooltipEfficiency.translate(this.formatValue(StatisticType.efficiency)),
-			this.nextMaterial == null ? Translations.tier.translate(this.materialName()) : Translations.tooltipUpgradeProgress.translate(this.formatValue(StatisticType.upgradeProgress), this.materialName())
+			this.nextMaterial == null ? Translations.tier.translate(this.materialName()) : Translations.tooltipUpgradeProgress.translate(this.formatValue(StatisticType.upgradeProgress), this.materialName(), Translations.toolMaterial(this.nextMaterial))
 		);
 	}
 
@@ -148,8 +154,6 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		this.material = Objects.requireNonNullElse(TierSortingRegistry.byName(new Identifier(tag.getString("material"))), this.material);
 		this.nextMaterial = TierSortingRegistry.byName(new Identifier(tag.getString("nextMaterial")));
 	}
-
-	protected abstract TagKey<Block> tag();
 
 	protected abstract boolean canAbsorb(ItemStack stack);
 }

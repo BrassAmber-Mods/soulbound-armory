@@ -1,15 +1,9 @@
 package soulboundarmory.component.soulbound.item.weapon;
 
-import net.minecraft.item.Item;
-import net.minecraft.text.Text;
-import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
-import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
-
-import java.util.stream.Stream;
 
 public class BigswordComponent extends WeaponComponent<BigswordComponent> {
 	private int chargeDelay;
@@ -18,26 +12,15 @@ public class BigswordComponent extends WeaponComponent<BigswordComponent> {
 		super(component);
 
 		this.statistics
-			.statistics(StatisticType.experience, StatisticType.level, StatisticType.skillPoints, StatisticType.attributePoints, StatisticType.enchantmentPoints)
-			.statistics(StatisticType.efficiency)
 			.min(4, StatisticType.attackDamage)
 			.min(1, StatisticType.attackSpeed)
 			.min(3, StatisticType.reach);
 
-		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
-		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment);
+		this.addSkills(Skills.circumspection, Skills.precision, Skills.nourishment);
 	}
 
 	@Override public ItemComponentType<BigswordComponent> type() {
 		return ItemComponentType.bigsword;
-	}
-
-	@Override public Item item() {
-		return SoulboundItems.bigsword;
-	}
-
-	@Override public Text name() {
-		return Translations.guiBigsword;
 	}
 
 	@Override public double increase(StatisticType type) {

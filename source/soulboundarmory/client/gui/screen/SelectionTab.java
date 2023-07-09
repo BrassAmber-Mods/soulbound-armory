@@ -35,7 +35,7 @@ public class SelectionTab extends Tab {
 
 		component.items.values().stream()
 			.filter(ItemComponent::isEnabled)
-			.filter(item -> item.isUnlocked() && component.matches(parent.stack) || item.canConsume(parent.stack))
+			.filter(item -> item.unlocked && component.matches(parent.stack) || item.canConsume(parent.stack))
 			.forEach(item -> box.add(new SelectionEntryWidget(item))
 				.primaryAction(() -> item.select(parent.slot))
 				.active(() -> ItemUtil.inventory(player()).noneMatch(item::matches) && (

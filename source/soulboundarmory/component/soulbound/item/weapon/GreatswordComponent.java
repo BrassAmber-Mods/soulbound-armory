@@ -2,21 +2,16 @@ package soulboundarmory.component.soulbound.item.weapon;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
-import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.Math2;
 import soulboundarmory.util.Util2;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class GreatswordComponent extends WeaponComponent<GreatswordComponent> {
 	public int leapDuration;
@@ -29,26 +24,15 @@ public class GreatswordComponent extends WeaponComponent<GreatswordComponent> {
 		super(component);
 
 		this.statistics
-			.statistics(StatisticType.experience, StatisticType.level, StatisticType.skillPoints, StatisticType.attributePoints, StatisticType.enchantmentPoints)
-			.statistics(StatisticType.efficiency)
 			.constant(6, StatisticType.reach)
 			.min(0.8, StatisticType.attackSpeed)
 			.min(4, StatisticType.attackDamage);
 
-		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
-		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.leaping, Skills.freezing);
+		this.addSkills(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.leaping, Skills.freezing);
 	}
 
 	@Override public ItemComponentType<GreatswordComponent> type() {
 		return ItemComponentType.greatsword;
-	}
-
-	@Override public Item item() {
-		return SoulboundItems.greatsword;
-	}
-
-	@Override public Text name() {
-		return Translations.guiGreatsword;
 	}
 
 	public float leapForce() {

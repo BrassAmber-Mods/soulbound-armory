@@ -63,7 +63,7 @@ public class SkillTab extends Tab {
 	}
 
 	private void updateWidgets() {
-		var skills = this.container().item().skills();
+		var skills = this.container().item().skills.values();
 		// 0: index of the current skill per tier (used in a loop)
 		// 1: number of skills per tier
 		var tierOrders = skills.stream().map(SkillInstance::tier).distinct().map(t -> new int[]{0, 0}).toArray(int[][]::new);

@@ -57,6 +57,13 @@ public class Util {
 		}
 	}
 
+	public static NbtCompound compoundTag(Consumer<NbtCompound> computer) {
+		var t = new NbtCompound();
+		computer.accept(t);
+
+		return t;
+	}
+
 	public static <K, V> void enumerate(Map<K, V> map, TriConsumer<K, V, Integer> action) {
 		var count = 0;
 

@@ -4,6 +4,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.tool.AxeComponent;
+import soulboundarmory.component.soulbound.item.tool.HoeComponent;
 import soulboundarmory.component.soulbound.item.tool.PickaxeComponent;
 import soulboundarmory.component.soulbound.item.tool.ShovelComponent;
 import soulboundarmory.item.SoulboundToolItem;
@@ -13,7 +14,7 @@ public class MasterToolComponent extends MasterComponent<MasterToolComponent> {
 	public MasterToolComponent(PlayerEntity player) {
 		super(player);
 
-		this.store(new PickaxeComponent(this), new AxeComponent(this), new ShovelComponent(this));
+		this.store(new PickaxeComponent(this), new AxeComponent(this), new ShovelComponent(this), new HoeComponent(this));
 	}
 
 	@Override public EntityComponentKey<MasterToolComponent> key() {

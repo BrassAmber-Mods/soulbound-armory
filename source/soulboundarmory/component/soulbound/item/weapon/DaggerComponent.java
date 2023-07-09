@@ -1,42 +1,26 @@
 package soulboundarmory.component.soulbound.item.weapon;
 
-import net.minecraft.item.Item;
-import net.minecraft.text.Text;
-import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
-import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.Util2;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class DaggerComponent extends WeaponComponent<DaggerComponent> {
 	public DaggerComponent(MasterComponent<?> component) {
 		super(component);
 
 		this.statistics
-			.statistics(StatisticType.experience, StatisticType.level, StatisticType.skillPoints, StatisticType.attributePoints, StatisticType.enchantmentPoints)
-			.statistics(StatisticType.efficiency)
 			.constant(2, StatisticType.reach)
 			.min(2, StatisticType.attackSpeed, StatisticType.attackDamage);
 
-		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
-		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.shadowClone, Skills.returne, Skills.sneakReturn);
+		this.addSkills(Skills.circumspection, Skills.precision, Skills.nourishment, Skills.shadowClone, Skills.returne, Skills.sneakReturn);
 	}
 
 	@Override public ItemComponentType<DaggerComponent> type() {
 		return ItemComponentType.dagger;
-	}
-
-	@Override public Item item() {
-		return SoulboundItems.dagger;
-	}
-
-	@Override public Text name() {
-		return Translations.guiDagger;
 	}
 
 	@Override public List<StatisticType> screenAttributes() {

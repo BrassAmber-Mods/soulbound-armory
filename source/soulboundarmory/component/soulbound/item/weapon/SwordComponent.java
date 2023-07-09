@@ -5,42 +5,25 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.Item;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
-import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.AttributeModifierIdentifiers;
 import soulboundarmory.util.Util2;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class SwordComponent extends WeaponComponent<SwordComponent> {
 	public SwordComponent(MasterComponent<?> component) {
 		super(component);
 
 		this.statistics
-			.statistics(StatisticType.experience, StatisticType.level, StatisticType.skillPoints, StatisticType.attributePoints, StatisticType.enchantmentPoints)
-			.statistics(StatisticType.efficiency)
 			.constant(3, StatisticType.reach)
 			.min(1.6, StatisticType.attackSpeed)
 			.min(3, StatisticType.attackDamage);
 
-		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
-		this.skills.add(Skills.circumspection, Skills.precision, Skills.nourishment);
-	}
-
-	@Override public Text name() {
-		return Translations.guiSword;
-	}
-
-	@Override public Item item() {
-		return SoulboundItems.sword;
+		this.addSkills(Skills.circumspection, Skills.precision, Skills.nourishment);
 	}
 
 	@Override public ItemComponentType<SwordComponent> type() {
@@ -65,13 +48,5 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 		if (type == StatisticType.efficiency) return 0.04;
 
 		return 0;
-	}
-
-	@Override public void serialize(NbtCompound tag) {
-		super.serialize(tag);
-	}
-
-	@Override public void deserialize(NbtCompound tag) {
-		super.deserialize(tag);
 	}
 }

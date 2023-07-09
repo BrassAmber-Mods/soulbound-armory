@@ -50,25 +50,21 @@ public class Statistics extends Reference2ReferenceOpenHashMap<Category, Map<Sta
 
 	public Statistics statistics(StatisticType... types) {
 		Stream.of(types).forEach(this::obtain);
-
 		return this;
 	}
 
 	public Statistics statistic(StatisticType type, Consumer<Statistic> initialize) {
 		initialize.accept(this.obtain(type));
-
 		return this;
 	}
 
 	public Statistics min(double min, StatisticType... types) {
 		Stream.of(types).forEach(type -> this.obtain(type).min(min));
-
 		return this;
 	}
 
 	public Statistics max(double max, StatisticType... types) {
 		Stream.of(types).forEach(type -> this.obtain(type).defaultMax(max));
-
 		return this;
 	}
 

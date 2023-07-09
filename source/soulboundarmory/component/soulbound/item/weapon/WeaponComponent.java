@@ -3,10 +3,8 @@ package soulboundarmory.component.soulbound.item.weapon;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
@@ -39,10 +37,6 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 		}
 
 		return false;
-	}
-
-	@Override public Item consumableItem() {
-		return Items.WOODEN_SWORD;
 	}
 
 	@Override public int levelXP(int level) {
@@ -91,7 +85,7 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 		return ReferenceArrayList.of(StatisticType.attackDamage, StatisticType.attackSpeed, StatisticType.criticalHitRate);
 	}
 
-	@Override public List<Text> tooltip() {
+	@Override public List<MutableText> tooltip() {
 		var tooltip = Util2.list(
 			Translations.tooltipAttackDamage.translate(this.formatValue(StatisticType.attackDamage)),
 			Translations.tooltipAttackSpeed.translate(this.formatValue(StatisticType.attackSpeed))

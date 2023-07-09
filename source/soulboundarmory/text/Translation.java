@@ -20,8 +20,8 @@ public class Translation extends TranslatableTextContent {
 		return new Translation(key.formatted(args));
 	}
 
-	public Text translate(Object... args) {
-		return Text.of(I18n.translate(this.getKey(), Stream.of(args).map(arg -> arg instanceof StringVisitable text ? text.getString() : arg).toArray()));
+	public MutableText translate(Object... args) {
+		return Text.literal(I18n.translate(this.getKey(), Stream.of(args).map(arg -> arg instanceof StringVisitable text ? text.getString() : arg).toArray()));
 	}
 
 	public MutableText text(Object... args) {

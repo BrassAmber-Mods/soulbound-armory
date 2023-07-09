@@ -32,19 +32,16 @@ public class ExtendedPacketBuffer extends PacketByteBuf {
 
 	public ExtendedPacketBuffer(MasterComponent<?> component) {
 		this();
-
 		this.writeIdentifier(component.key().id);
 	}
 
 	public ExtendedPacketBuffer(ItemComponent<?> component) {
 		this();
-
 		this.writeItemComponent(component);
 	}
 
 	public ExtendedPacketBuffer writeRegistryEntry(Identifiable entry) {
 		this.writeIdentifier(entry.id());
-
 		return this;
 	}
 
@@ -54,7 +51,6 @@ public class ExtendedPacketBuffer extends PacketByteBuf {
 
 	@Override public ExtendedPacketBuffer writeBoolean(boolean value) {
 		super.writeBoolean(value);
-
 		return this;
 	}
 
@@ -87,13 +83,11 @@ public class ExtendedPacketBuffer extends PacketByteBuf {
 
 	@Override public ExtendedPacketBuffer writeInt(int value) {
 		super.writeInt(value);
-
 		return this;
 	}
 
 	@Override public ExtendedPacketBuffer writeByte(int B) {
 		super.writeByte(B);
-
 		return this;
 	}
 
@@ -110,7 +104,6 @@ public class ExtendedPacketBuffer extends PacketByteBuf {
 
 	public ExtendedPacketBuffer writeItemComponent(ItemComponent<?> component) {
 		this.writeIdentifier(component.type().id());
-
 		return this;
 	}
 
@@ -120,7 +113,6 @@ public class ExtendedPacketBuffer extends PacketByteBuf {
 
 	@Override public ExtendedPacketBuffer writeNbt(NbtCompound tag) {
 		super.writeNbt(tag);
-
 		return this;
 	}
 }

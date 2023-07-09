@@ -23,7 +23,7 @@ public class SelectionEntryWidget extends ScalableWidget<SelectionEntryWidget> {
 		this.component = item.master;
 
 		if (this.icon) {
-			this.spikedRectangle(item.isUnlocked() ? 0 : 1)
+			this.spikedRectangle(item.unlocked ? 0 : 1)
 				.size(54, 54)
 				.scaleMode(ScaleMode.STRETCH)
 				.with(new ItemWidget().size(32).center().x(0.5).y(0.5).item(item.item()).tooltip());

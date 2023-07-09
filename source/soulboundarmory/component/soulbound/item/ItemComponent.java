@@ -2,6 +2,7 @@ package soulboundarmory.component.soulbound.item;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceList;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
@@ -19,6 +20,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -32,6 +34,7 @@ import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.*;
+import soulboundarmory.component.statistics.history.SkillHistory;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.entity.Attributes;
 import soulboundarmory.entity.SoulboundDaggerEntity;
@@ -43,17 +46,14 @@ import soulboundarmory.serial.Serializable;
 import soulboundarmory.skill.Skill;
 import soulboundarmory.skill.SkillInstance;
 import soulboundarmory.skill.Skills;
-import soulboundarmory.util.AttributeModifierIdentifiers;
-import soulboundarmory.util.ItemUtil;
-import soulboundarmory.util.Math2;
-import soulboundarmory.util.Sided;
+import soulboundarmory.util.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -66,17 +66,22 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	public final PlayerEntity player;
 	public final EnchantmentStorage enchantments = new EnchantmentStorage(this);
 	public final Statistics statistics = new Statistics(this);
+	public final Map<Skill, SkillInstance> skills = new Reference2ObjectLinkedOpenHashMap<>();
+	public final SkillHistory skillHistory = new SkillHistory(this);
+	public boolean unlocked;
 
-	protected final SkillMap skills = new SkillMap(this);
 	protected ItemStack itemStack;
-	protected boolean unlocked;
-	protected int animationTime;
 
 	public ItemComponent(MasterComponent<?> master) {
 		this.master = master;
 		this.player = master.player;
 
-		this.skills.add(Skills.enderPull);
+		this.statistics
+			.statistics(StatisticType.experience, StatisticType.level, StatisticType.skillPoints, StatisticType.attributePoints, StatisticType.enchantmentPoints)
+			.statistics(StatisticType.efficiency);
+
+		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
+		this.addSkills(Skills.enderPull);
 	}
 
 	/**
@@ -148,21 +153,6 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	public abstract ItemComponentType<T> type();
 
 	/**
-	 @return the item that corresponds to this component
-	 */
-	public abstract Item item();
-
-	/**
-	 @return the item that may be consumed in order to unlock this item
-	 */
-	public abstract Item consumableItem();
-
-	/**
-	 @return the name of this item without a "soulbound" prefix
-	 */
-	public abstract Text name();
-
-	/**
 	 @param type
 	 @return the increase in `statistic` per point
 	 */
@@ -182,7 +172,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	/**
 	 @return the tooltip for stacks of this item
 	 */
-	public abstract List<Text> tooltip();
+	public abstract List<? extends Text> tooltip();
 
 	public void killed(LivingEntity entity) {}
 
@@ -190,6 +180,27 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 	@Override public final boolean isClient() {
 		return this.player.world.isClient;
+	}
+
+	/**
+	 @return the item that corresponds to this component
+	 */
+	public Item item() {
+		return this.type().item;
+	}
+
+	/**
+	 @return the item that may be consumed in order to unlock this item
+	 */
+	public Item consumableItem() {
+		return this.type().consumableItem;
+	}
+
+	/**
+	 @return the name of this item without a "soulbound" prefix
+	 */
+	public Text name() {
+		return this.type().name;
 	}
 
 	public final int level() {
@@ -226,10 +237,6 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 	public final double efficiency() {
 		return this.doubleValue(StatisticType.efficiency);
-	}
-
-	public final int animationTime() {
-		return this.animationTime;
 	}
 
 	public int maxLevel() {
@@ -280,13 +287,6 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 */
 	public final boolean isEnabled() {
 		return Configuration.Items.enabled.get(this.type().id().getPath());
-	}
-
-	/**
-	 @return whether the user has permanently unlocked this item
-	 */
-	public boolean isUnlocked() {
-		return this.unlocked;
 	}
 
 	public void unlock() {
@@ -545,8 +545,12 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return this.levelXP(this.level());
 	}
 
-	public Collection<SkillInstance> skills() {
-		return this.skills.values();
+	public void addSkills(Skill... skills) {
+		for (var skill : skills) {
+			this.skills.put(skill, new SkillInstance(skill));
+		}
+
+		this.skills.values().forEach(container -> container.initializeDependencies(this));
 	}
 
 	public SkillInstance skill(Skill skill) {
@@ -709,14 +713,14 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return modifiers;
 	}
 
-	public Text format(StatisticType statistic) {
+	public MutableText format(StatisticType statistic) {
 		if (statistic == StatisticType.attackDamage) return Translations.guiAttackDamage.text(this.formatValue(statistic));
 		if (statistic == StatisticType.attackSpeed) return Translations.guiAttackSpeed.text(this.formatValue(statistic));
 		if (statistic == StatisticType.criticalHitRate) return Translations.guiCriticalHitRate.text(this.formatValue(statistic));
 		if (statistic == StatisticType.efficiency) return Translations.guiEfficiency.text(this.formatValue(statistic));
 		if (statistic == StatisticType.reach) return Translations.guiReach.text(this.formatValue(statistic));
 
-		return Text.of("%s: %s".formatted(statistic.id().getPath(), this.formatValue(statistic)));
+		return Text.literal("%s: %s".formatted(statistic.id().getPath(), this.formatValue(statistic)));
 	}
 
 	/**
@@ -736,12 +740,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return this.itemStack.copy();
 	}
 
-	/**
-	 Invoked every tick.
-	 */
-	public void tick() {
-		this.animationTime--;
-	}
+	public void tick() {}
 
 	/**
 	 Sets {@link #itemStack} to a new item stack with the most recent statistics and returns it.
@@ -778,7 +777,12 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 @return the formatted value
 	 */
 	protected String formatValue(StatisticType statistic) {
-		if (statistic == StatisticType.upgradeProgress || statistic == StatisticType.criticalHitRate) {
+		if (statistic == StatisticType.upgradeProgress) {
+			var upgrade = this.statistic(statistic);
+			return "%s/%s".formatted(upgrade.intValue(), (int) upgrade.max());
+		}
+
+		if (statistic == StatisticType.criticalHitRate) {
 			return this.formatPercentage(statistic);
 		}
 
@@ -806,15 +810,31 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	@Override public void serialize(NbtCompound tag) {
 		tag.put("statistics", this.statistics.serialize());
 		tag.put("enchantments", this.enchantments.serialize());
-		tag.put("skills", this.skills.serialize());
 		tag.putBoolean("unlocked", this.unlocked);
+
+		tag.put("skills", Util.compoundTag(skills -> {
+			for (var skill : this.skills.values()) {
+				if (skill != null) {
+					skills.put(skill.skill.string(), skill.serialize());
+				}
+			}
+		}));
 	}
 
 	@Override public void deserialize(NbtCompound tag) {
 		this.statistics.deserialize(tag.getCompound("statistics"));
 		this.enchantments.deserialize(tag.getCompound("enchantments"));
-		this.skills.deserialize(tag.getCompound("skills"));
 		this.unlocked = tag.getBoolean("unlocked");
+
+		var skills = tag.getCompound("skills");
+
+		for (var identifier : skills.getKeys()) {
+			var skill = this.skill(new Identifier(identifier));
+
+			if (skill != null) {
+				skill.deserialize(skills.getCompound(identifier));
+			}
+		}
 
 		this.updateItemStack();
 	}
