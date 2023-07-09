@@ -38,9 +38,10 @@ public class SelectionTab extends Tab {
 			.filter(item -> item.isUnlocked() && component.matches(parent.stack) || item.canConsume(parent.stack))
 			.forEach(item -> box.add(new SelectionEntryWidget(item))
 				.primaryAction(() -> item.select(parent.slot))
-				.active(() -> ItemUtil.inventory(player()).noneMatch(item::matches)
-					&& (component.cooledDown() || ItemUtil.inventory(player()).anyMatch(item.canConsume(parent.stack) ? stack -> component.item().filter(active -> !active.matches(stack)).isEmpty() : item::canConsume))
-				)
+				.active(() -> ItemUtil.inventory(player()).noneMatch(item::matches) && (
+					component.cooledDown()
+					|| ItemUtil.inventory(player()).anyMatch(item.canConsume(parent.stack) ? stack -> component.item().filter(active -> !active.matches(stack)).isEmpty() : item::canConsume)
+				))
 			);
 	}
 }

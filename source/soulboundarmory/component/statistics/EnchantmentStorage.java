@@ -45,23 +45,17 @@ public class EnchantmentStorage extends Reference2IntLinkedOpenHashMap<Enchantme
 	}
 
 	public void reset() {
-		for (var enchantment : this) {
-			this.put(enchantment, 0);
-		}
+		this.replaceAll((e, l) -> 0);
 	}
 
 	@Override public void serialize(NbtCompound tag) {
-		for (var enchantment : this) {
-			var level = this.get(enchantment);
-
+		this.forEach((enchantment, level) -> {
 			if (level != null) {
-				var identifier = ForgeRegistries.ENCHANTMENTS.getKey(enchantment);
-
-				if (identifier != null) {
-					tag.putInt(identifier.toString(), level);
-				}
+				ForgeRegistries.ENCHANTMENTS.getResourceKey(enchantment).ifPresent(key -> {
+					tag.putInt(key.getValue().toString(), level);
+				});
 			}
-		}
+		});
 	}
 
 	@Override public void deserialize(NbtCompound tag) {
