@@ -93,7 +93,6 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 				upgrade.max(0);
 				this.material = this.nextMaterial;
 				this.nextMaterial = null;
-				this.synchronize();
 			}
 		}
 
