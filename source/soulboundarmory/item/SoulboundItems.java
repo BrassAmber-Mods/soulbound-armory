@@ -27,12 +27,13 @@ public class SoulboundItems {
 	@Register("dagger") public static final SoulboundDaggerItem dagger = new SoulboundDaggerItem();
 	@Register("sword") public static final SoulboundSwordItem sword = new SoulboundSwordItem();
 	@Register("greatsword") public static final SoulboundGreatswordItem greatsword = new SoulboundGreatswordItem();
+	@Register("bigsword") public static final SoulboundBigswordItem bigsword = new SoulboundBigswordItem();
+	@Register("trident") public static final SoulboundTridentItem trident = new SoulboundTridentItem();
+
 	@Register("pickaxe") public static final SoulboundPickaxeItem pickaxe = new SoulboundPickaxeItem();
 	@Register("axe") public static final SoulboundAxeItem axe = new SoulboundAxeItem();
 	@Register("shovel") public static final SoulboundShovelItem shovel = new SoulboundShovelItem();
 	@Register("hoe") public static final SoulboundHoeItem hoe = new SoulboundHoeItem();
-	@Register("bigsword") public static final SoulboundBigswordItem bigsword = new SoulboundBigswordItem();
-	@Register("trident") public static final SoulboundTridentItem trident = new SoulboundTridentItem();
 
 	public synchronized static ToolMaterial material(ToolMaterial previous) {
 		var materials = ldc(() -> new Reference2ReferenceOpenHashMap<ToolMaterial, Map<TagKey<Block>, ToolMaterial>>());

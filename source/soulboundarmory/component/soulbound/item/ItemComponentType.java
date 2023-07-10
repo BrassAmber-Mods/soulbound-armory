@@ -27,10 +27,11 @@ public final class ItemComponentType<C extends ItemComponent<C>> extends Identif
 	@Register("bigsword") public static final ItemComponentType<BigswordComponent> bigsword = weapon(SoulboundItems.bigsword, Items.WOODEN_SWORD, Translations.guiBigsword);
 	@Register("greatsword") public static final ItemComponentType<GreatswordComponent> greatsword = weapon(SoulboundItems.greatsword, Items.WOODEN_SWORD, Translations.guiGreatsword);
 	@Register("trident") public static final ItemComponentType<TridentComponent> trident = weapon(SoulboundItems.trident, Items.TRIDENT, Translations.guiTrident);
+
 	@Register("pickaxe") public static final ItemComponentType<PickaxeComponent> pickaxe = tool(SoulboundItems.pickaxe, Items.WOODEN_PICKAXE, Translations.guiPickaxe);
-	@Register("axe") public static final ItemComponentType<AxeComponent> axe = tool(SoulboundItems.axe, Items.WOODEN_AXE, Translations.guiAxe);
-	@Register("shovel") public static final ItemComponentType<ShovelComponent> shovel = tool(SoulboundItems.shovel, Items.WOODEN_SHOVEL, Translations.guiShovel);
-	@Register("hoe") public static final ItemComponentType<HoeComponent> hoe = tool(SoulboundItems.hoe, Items.WOODEN_HOE, Translations.guiHoe);
+	@Register("axe") public static final ItemComponentType<AxeComponent> axe = tool(SoulboundItems.axe, Items.WOODEN_PICKAXE, Translations.guiAxe);
+	@Register("shovel") public static final ItemComponentType<ShovelComponent> shovel = tool(SoulboundItems.shovel, Items.WOODEN_PICKAXE, Translations.guiShovel);
+	@Register("hoe") public static final ItemComponentType<HoeComponent> hoe = tool(SoulboundItems.hoe, Items.WOODEN_PICKAXE, Translations.guiHoe);
 
 	public final EntityComponentKey<? extends MasterComponent<?>> parentKey;
 	public final Item item;
