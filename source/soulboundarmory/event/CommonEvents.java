@@ -103,10 +103,11 @@ public final class CommonEvents {
 
 	@SubscribeEvent
 	public static void block(ShieldBlockEvent event) {
+		var damage = event.getDamageSource();
 		var target = event.getEntity();
 
-		if (target.isUsingItem() && target.getActiveItem().isOf(SoulboundItems.sword)) {
-			event.setBlockedDamage(event.getBlockedDamage() * 0.65F);
+		if (target.isUsingItem() && target.getActiveItem().isOf(SoulboundItems.sword) && !damage.isExplosive() && !damage.isProjectile()) {
+			event.setBlockedDamage(event.getBlockedDamage() * 0.35F);
 		}
 	}
 
