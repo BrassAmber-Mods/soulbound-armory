@@ -106,7 +106,7 @@ public final class CommonEvents {
 		var damage = event.getDamageSource();
 		var target = event.getEntity();
 
-		if (target.isUsingItem() && target.getActiveItem().isOf(SoulboundItems.sword) && !damage.isExplosive() && !damage.isProjectile()) {
+		if (target.isUsingItem() && target.getActiveItem().isOf(SoulboundItems.sword) && !damage.isProjectile()) {
 			event.setBlockedDamage(event.getBlockedDamage() * 0.35F);
 		}
 	}
