@@ -32,11 +32,8 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	public final Map<ItemComponentType<? extends ItemComponent<?>>, ItemComponent<?>> items = new Reference2ReferenceLinkedOpenHashMap<>();
 	public final PlayerEntity player;
 
-	/**
-	 The index of the last open tab in the menu for that it may be restored when the menu is next opened.
-	 */
-	protected int tab;
-	protected int boundSlot;
+	public int boundSlot;
+	public int tab;
 	protected int cooldown;
 	protected ItemComponent<?> item;
 
@@ -58,15 +55,8 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	 */
 	public abstract boolean matches(ItemStack stack);
 
-	/**
-	 @return what the name suggests
-	 */
 	@Override public final boolean isClient() {
 		return this.player.world.isClient;
-	}
-
-	public int tab() {
-		return this.tab;
 	}
 
 	public void tab(int index) {
@@ -75,22 +65,6 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		if (this.isClient()) {
 			Packets.serverTab.send(new ExtendedPacketBuffer(this).writeByte(index));
 		}
-	}
-
-	public int boundSlot() {
-		return this.boundSlot;
-	}
-
-	public void bindSlot(int boundSlot) {
-		this.boundSlot = boundSlot;
-	}
-
-	public boolean hasBoundSlot() {
-		return this.boundSlot != -1;
-	}
-
-	public void unbindSlot() {
-		this.boundSlot = -1;
 	}
 
 	/**
@@ -129,8 +103,8 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 			this.cooldown = 600;
 			this.item = item;
 
-			if (this.hasBoundSlot()) {
-				this.bindSlot(slot);
+			if (this.boundSlot != -1) {
+				this.boundSlot = slot;
 			}
 
 			if (item.unlocked) {
@@ -159,16 +133,6 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	 */
 	public void cooldown(int cooldown) {
 		this.cooldown = cooldown;
-	}
-
-	/**
-	 Returns whether this component has cooled down.
-	 If true, then the player is not prevented from selecting a different item.
-
-	 @return whether this component has cooled down
-	 */
-	public boolean cooledDown() {
-		return this.cooldown() <= 0;
 	}
 
 	/**
@@ -236,7 +200,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		this.updateInventory();
 		this.items.values().forEach(ItemComponent::tick);
 
-		if (!this.cooledDown()) {
+		if (this.cooldown() > 0) {
 			this.cooldown--;
 		}
 	}
@@ -296,7 +260,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		}
 
 		this.tab = tag.getInt("tab");
-		this.bindSlot(tag.getInt("slot"));
+		this.boundSlot = tag.getInt("slot");
 		this.cooldown = tag.getInt("cooldown");
 	}
 
@@ -316,7 +280,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	 */
 	private void updateInventory() {
 		var active = this.item();
-		var bs = this.hasBoundSlot() && active.filter(item -> item.matches(this.stackInBoundSlot())).isPresent() ? this.boundSlot : -1;
+		var bs = this.boundSlot != -1 && active.filter(item -> item.matches(this.stackInBoundSlot())).isPresent() ? this.boundSlot : -1;
 		var inventory = this.player.getInventory();
 
 		for (var slot = 0; slot < inventory.size(); ++slot) {
@@ -330,8 +294,8 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 						if (bs == -1) {
 							bs = slot;
 
-							if (this.hasBoundSlot()) {
-								this.bindSlot(bs);
+							if (this.boundSlot != -1) {
+								this.boundSlot = bs;
 							}
 						}
 

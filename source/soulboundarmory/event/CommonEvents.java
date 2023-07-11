@@ -101,6 +101,15 @@ public final class CommonEvents {
 		}
 	}
 
+	@SubscribeEvent
+	public static void block(ShieldBlockEvent event) {
+		var target = event.getEntity();
+
+		if (target.isUsingItem() && target.getActiveItem().isOf(SoulboundItems.sword)) {
+			event.setBlockedDamage(event.getBlockedDamage() * 0.65F);
+		}
+	}
+
 	/**
 	 Determine whether player hits are critical and apply {@link Skills#nourishment}.
 	 */
@@ -108,13 +117,8 @@ public final class CommonEvents {
 	public static void damage(LivingDamageEvent event) {
 		var damage = event.getSource();
 		var target = event.getEntity();
-		var attacker = damage.getAttacker();
 
-		if (attacker != null && target.isUsingItem() && target.getActiveItem().isOf(SoulboundItems.sword)) {
-			event.setAmount(event.getAmount() * 0.65F);
-		}
-
-		if (attacker instanceof ServerPlayerEntity player) {
+		if (damage.getAttacker() instanceof ServerPlayerEntity attacker) {
 			ItemComponent.fromAttacker(target, damage).ifPresent(component -> {
 				Components.entityData.of(target).unfreeze();
 				var amount = event.getAmount();
@@ -126,7 +130,7 @@ public final class CommonEvents {
 
 				if (component.hasSkill(Skills.nourishment)) {
 					var value = (1 + component.skill(Skills.nourishment).level()) * amount / 20F;
-					player.getHungerManager().add((int) (value + 1) / 2, 1.5F * value);
+					attacker.getHungerManager().add((int) (value + 1) / 2, 1.5F * value);
 				}
 			});
 		}
@@ -137,11 +141,19 @@ public final class CommonEvents {
 	 */
 	@SubscribeEvent
 	public static void livingAttack(LivingAttackEvent event) {
-		var target = event.getEntity();
 		var damage = event.getSource();
 
-		if (target instanceof ServerPlayerEntity && ItemComponentType.greatsword.of(target).leapForce() > 0 && damage.getAttacker() != null && !damage.isExplosive() && !damage.isProjectile()) {
+		if (event.getEntity() instanceof ServerPlayerEntity target && ItemComponentType.greatsword.of(target).leapForce() > 0 && damage.getAttacker() != null && !damage.isExplosive() && !damage.isProjectile()) {
 			event.setCanceled(true);
+		}
+	}
+
+	@SubscribeEvent
+	public static void hurt(LivingHurtEvent event) {
+		if (event.getEntity() instanceof ServerPlayerEntity target) {
+			target.getInventory().armor.stream().flatMap(armor -> ItemComponent.of(target, armor).stream()).forEach(armor -> {
+				armor.tookDamage(event.getAmount());
+			});
 		}
 	}
 

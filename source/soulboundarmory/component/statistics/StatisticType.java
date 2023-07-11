@@ -1,10 +1,13 @@
 package soulboundarmory.component.statistics;
 
+import net.minecraft.text.MutableText;
 import net.minecraftforge.registries.IForgeRegistry;
+import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.module.transform.Register;
 import soulboundarmory.module.transform.RegisterAll;
 import soulboundarmory.module.transform.Registry;
 import soulboundarmory.registry.Identifiable;
+import soulboundarmory.text.Translation;
 
 import java.util.function.Consumer;
 
@@ -22,10 +25,15 @@ public class StatisticType extends Identifiable {
 	@Register("critical_hit_rate") public static final StatisticType criticalHitRate = new StatisticType(Category.attribute, statistic -> statistic.defaultMax(1));
 	@Register("efficiency") public static final StatisticType efficiency = new StatisticType(Category.attribute);
 	@Register("reach") public static final StatisticType reach = new StatisticType(Category.attribute);
+	@Register("armor") public static final StatisticType armor = new StatisticType(Category.attribute);
+	@Register("toughness") public static final StatisticType toughness = new StatisticType(Category.attribute);
+	@Register("knockback_resistance") public static final StatisticType knockbackResistance = new StatisticType(Category.attribute);
 
 	public final Category category;
 
 	private final Consumer<Statistic> initialize;
+
+	@Registry("statistic") public static native IForgeRegistry<StatisticType> registry();
 
 	public StatisticType(Category category, Consumer<Statistic> initialize) {
 		this.category = category;
@@ -36,13 +44,23 @@ public class StatisticType extends Identifiable {
 		this(category, statistic -> {});
 	}
 
-	@Registry("statistic") public static native IForgeRegistry<StatisticType> registry();
-
 	public final Statistic instantiate() {
 		var statistic = new Statistic(this);
 		this.initialize.accept(statistic);
 
 		return statistic;
+	}
+
+	public Translation guiTranslation() {
+		return Translations.gui(registry().getKey(this).getPath());
+	}
+
+	public MutableText gui(Object... arguments) {
+		return this.guiTranslation().text(arguments);
+	}
+
+	public MutableText tooltip(Object... arguments) {
+		return Translations.tooltipAttribute(registry().getKey(this).getPath()).translate(arguments);
 	}
 
 	@Override public String toString() {

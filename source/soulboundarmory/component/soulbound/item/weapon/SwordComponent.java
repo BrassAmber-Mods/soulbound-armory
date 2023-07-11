@@ -5,11 +5,11 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.item.Item;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.skill.Skills;
-import soulboundarmory.util.AttributeModifierIdentifiers;
 import soulboundarmory.util.Util2;
 
 import java.util.List;
@@ -32,8 +32,8 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 
 	@Override public void attributeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> modifiers, EquipmentSlot slot) {
 		if (slot == EquipmentSlot.MAINHAND) {
-			modifiers.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, this.weaponModifier(AttributeModifierIdentifiers.ItemAccess.attackDamageModifier, StatisticType.attackDamage));
-			modifiers.put(EntityAttributes.GENERIC_ATTACK_SPEED, this.weaponModifier(AttributeModifierIdentifiers.ItemAccess.attackSpeedModifier, StatisticType.attackSpeed));
+			modifiers.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, this.modifier(Item.ATTACK_DAMAGE_MODIFIER_ID, StatisticType.attackDamage));
+			modifiers.put(EntityAttributes.GENERIC_ATTACK_SPEED, this.modifier(Item.ATTACK_SPEED_MODIFIER_ID, StatisticType.attackSpeed));
 		}
 	}
 

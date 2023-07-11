@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 
 @ConfigurationFile
 public final class Configuration {
+	@Comment("The number of experience points required to reach the first level for armor.")
+	public static int initialArmorXP = 16;
+
 	@Comment("The number of experience points required to reach the first level for tools.")
 	public static int initialToolXP = 16;
 

@@ -5,11 +5,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.MutableText;
-import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
+import soulboundarmory.skill.Skills;
 import soulboundarmory.util.EntityUtil;
 import soulboundarmory.util.Util2;
 
@@ -21,7 +21,8 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 	public WeaponComponent(MasterComponent<?> component) {
 		super(component);
 
-		this.statistics.statistics(StatisticType.criticalHitRate);
+		this.statistics.statistics(StatisticType.efficiency, StatisticType.criticalHitRate);
+		this.addSkills(Skills.enderPull);
 	}
 
 	/**
@@ -86,15 +87,12 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 	}
 
 	@Override public List<MutableText> tooltip() {
-		var tooltip = Util2.list(
-			Translations.tooltipAttackDamage.translate(this.formatValue(StatisticType.attackDamage)),
-			Translations.tooltipAttackSpeed.translate(this.formatValue(StatisticType.attackSpeed))
-		);
+		var tooltip = Util2.list(StatisticType.attackDamage, StatisticType.attackSpeed);
 
-		if (this.criticalHitRate() > 0) tooltip.add(Translations.tooltipCriticalHitRate.translate(this.formatValue(StatisticType.criticalHitRate)));
-		if (this.efficiency() > 0) tooltip.add(Translations.tooltipEfficiency.translate(this.formatValue(StatisticType.efficiency)));
+		if (this.criticalHitRate() > 0) tooltip.add(StatisticType.criticalHitRate);
+		if (this.efficiency() > 0) tooltip.add(StatisticType.efficiency);
 
-		return tooltip;
+		return tooltip.stream().map(this::formatTooltip).toList();
 	}
 
 	@Override public void serialize(NbtCompound tag) {

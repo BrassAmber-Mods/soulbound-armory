@@ -20,7 +20,7 @@ abstract class EntityAttributeModifierMixin {
 
 	@Inject(method = "<init>(Ljava/util/UUID;Ljava/lang/String;DLnet/minecraft/entity/attribute/EntityAttributeModifier$Operation;)V", at = @At("RETURN"))
 	public void construct(UUID uuid, String name, double value, EntityAttributeModifier.Operation operation, CallbackInfo info) {
-		var original = AttributeModifierIdentifiers.get(uuid);
+		var original = AttributeModifierIdentifiers.reserved.get(uuid);
 
 		if (original != null) {
 			this.uuid = original;

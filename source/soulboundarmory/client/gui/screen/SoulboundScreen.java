@@ -9,11 +9,15 @@ import soulboundarmory.client.gui.bar.ExperienceBar;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.client.keyboard.GUIKeyBinding;
 import soulboundarmory.component.soulbound.item.ItemComponent;
+import soulboundarmory.component.soulbound.item.armor.ArmorComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.module.config.ConfigurationManager;
 import soulboundarmory.module.gui.screen.ScreenWidget;
-import soulboundarmory.module.gui.widget.*;
+import soulboundarmory.module.gui.widget.ScalableWidget;
+import soulboundarmory.module.gui.widget.TooltipWidget;
+import soulboundarmory.module.gui.widget.Widget;
+import soulboundarmory.module.gui.widget.WidgetBox;
 import soulboundarmory.module.gui.widget.slider.SliderWidget;
 import soulboundarmory.network.ExtendedPacketBuffer;
 import soulboundarmory.network.Packets;
@@ -96,7 +100,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 
 		if (this.displayTabs()) {
 			this.tabs.addAll(this.item.tabs());
-			this.tab = this.tabs.get(MathHelper.clamp(this.component.tab(), 0, this.tabs.size() - 1));
+			this.tab = this.tabs.get(MathHelper.clamp(this.component.tab, 0, this.tabs.size() - 1));
 		} else {
 			this.tabs.add(this.tab = this.component.selectionTab());
 		}
@@ -110,16 +114,18 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 
 		this.tab(this.tab);
 
-		this.add(new ScalableWidget<>())
-			.button()
-			.alignEnd()
-			.x(w -> this.options.x() + 100)
-			.y(15D / 16)
-			.width(button -> this.tab instanceof AttributeTab || this.tab instanceof EnchantmentTab ? 80 : 100)
-			.height(20)
-			.text(() -> this.bound() ? Translations.guiButtonUnbind : Translations.guiButtonBind)
-			.present(this::displayTabs)
-			.primaryAction(() -> Packets.serverBindSlot.send(new ExtendedPacketBuffer(this.component).writeInt(this.bound() ? -1 : this.slot)));
+		if (!(this.item instanceof ArmorComponent)) {
+			this.add(new ScalableWidget<>())
+				.button()
+				.alignEnd()
+				.x(w -> this.options.x() + 100)
+				.y(15D / 16)
+				.width(button -> this.tab instanceof AttributeTab || this.tab instanceof EnchantmentTab ? 80 : 100)
+				.height(20)
+				.text(() -> this.bound() ? Translations.guiButtonUnbind : Translations.guiButtonBind)
+				.present(this::displayTabs)
+				.primaryAction(() -> Packets.serverBindSlot.send(new ExtendedPacketBuffer(this.component).writeInt(this.bound() ? -1 : this.slot)));
+		}
 
 		this.add(this.options);
 	}
@@ -164,7 +170,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 	}
 
 	private boolean bound() {
-		return this.component.boundSlot() == this.slot;
+		return this.component.boundSlot == this.slot;
 	}
 
 	private int optionY(int row) {

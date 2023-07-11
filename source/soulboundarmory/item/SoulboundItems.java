@@ -3,6 +3,7 @@ package soulboundarmory.item;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.auoeke.reflect.Invoker;
 import net.minecraft.block.Block;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.ToolMaterials;
@@ -34,6 +35,8 @@ public class SoulboundItems {
 	@Register("axe") public static final SoulboundAxeItem axe = new SoulboundAxeItem();
 	@Register("shovel") public static final SoulboundShovelItem shovel = new SoulboundShovelItem();
 	@Register("hoe") public static final SoulboundHoeItem hoe = new SoulboundHoeItem();
+
+	@Register("helmet") public static final SoulboundArmorItem helmet = new SoulboundArmorItem(EquipmentSlot.HEAD);
 
 	public synchronized static ToolMaterial material(ToolMaterial previous) {
 		var materials = ldc(() -> new Reference2ReferenceOpenHashMap<ToolMaterial, Map<TagKey<Block>, ToolMaterial>>());

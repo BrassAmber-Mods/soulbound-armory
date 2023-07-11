@@ -27,8 +27,8 @@ abstract class PlayerInventoryMixin {
 	@Inject(method = "insertStack(Lnet/minecraft/item/ItemStack;)Z", at = @At("HEAD"), cancellable = true)
 	public void insertIntoBoundSlot(ItemStack stack, CallbackInfoReturnable<Boolean> info) {
 		MasterComponent.of(this.player, stack).ifPresent(component -> {
-			if (component.hasBoundSlot() && component.stackInBoundSlot().isEmpty()) {
-				info.setReturnValue(this.insertStack(component.boundSlot(), stack));
+			if (component.boundSlot != -1 && component.stackInBoundSlot().isEmpty()) {
+				info.setReturnValue(this.insertStack(component.boundSlot, stack));
 			}
 		});
 	}
@@ -39,6 +39,6 @@ abstract class PlayerInventoryMixin {
 	@Redirect(method = "getEmptySlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/collection/DefaultedList;get(I)Ljava/lang/Object;"))
 	private Object reserveBoundSlot(DefaultedList<ItemStack> inventory, int index) {
 		var stack = inventory.get(index);
-		return Components.soulbound(this.player).allMatch(component -> component.boundSlot() != index || component.matches(stack)) ? stack : new ItemStack(Items.STONE, Integer.MAX_VALUE);
+		return Components.soulbound(this.player).allMatch(component -> component.boundSlot != index || component.matches(stack)) ? stack : new ItemStack(Items.STONE, Integer.MAX_VALUE);
 	}
 }

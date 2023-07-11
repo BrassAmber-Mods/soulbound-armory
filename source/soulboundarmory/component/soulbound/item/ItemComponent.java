@@ -16,6 +16,7 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterial;
@@ -36,7 +37,6 @@ import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.*;
 import soulboundarmory.component.statistics.history.SkillHistory;
 import soulboundarmory.config.Configuration;
-import soulboundarmory.entity.Attributes;
 import soulboundarmory.entity.SoulboundDaggerEntity;
 import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.module.gui.widget.Widget;
@@ -76,12 +76,8 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		this.master = master;
 		this.player = master.player;
 
-		this.statistics
-			.statistics(StatisticType.experience, StatisticType.level, StatisticType.skillPoints, StatisticType.attributePoints, StatisticType.enchantmentPoints)
-			.statistics(StatisticType.efficiency);
-
+		this.statistics.statistics(StatisticType.experience, StatisticType.level, StatisticType.skillPoints, StatisticType.attributePoints, StatisticType.enchantmentPoints);
 		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
-		this.addSkills(Skills.enderPull);
 	}
 
 	/**
@@ -178,6 +174,8 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 	public void mined(BlockState state, BlockPos position) {}
 
+	public void tookDamage(float damage) {}
+
 	@Override public final boolean isClient() {
 		return this.player.world.isClient;
 	}
@@ -200,7 +198,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 @return the name of this item without a "soulbound" prefix
 	 */
 	public Text name() {
-		return this.type().name;
+		return this.type().name();
 	}
 
 	public final int level() {
@@ -312,7 +310,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 			var inventory = this.player.getInventory();
 
-			if (!this.master.cooledDown()) {
+			if (this.master.cooldown() > 0) {
 				var auxSlot = (int) ItemUtil.inventory(this.player)
 					.takeWhile(Predicate.not(this.canConsume(inventory.getStack(slot)) ? stack -> this.master.item().filter(active -> !active.matches(stack)).isEmpty() : this::canConsume))
 					.count();
@@ -696,10 +694,15 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 */
 	public void attributeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> modifiers, EquipmentSlot slot) {
 		if (slot == EquipmentSlot.MAINHAND) {
-			modifiers.put(EntityAttributes.GENERIC_ATTACK_SPEED, this.weaponModifier(AttributeModifierIdentifiers.ItemAccess.attackSpeedModifier, StatisticType.attackSpeed));
-			modifiers.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, this.weaponModifier(AttributeModifierIdentifiers.ItemAccess.attackDamageModifier, StatisticType.attackDamage));
-			modifiers.put(ForgeMod.ATTACK_RANGE.get(), this.weaponModifier(Attributes.reach, StatisticType.reach));
-			modifiers.put(ForgeMod.REACH_DISTANCE.get(), this.weaponModifier(Attributes.reach, StatisticType.reach));
+			modifiers.put(EntityAttributes.GENERIC_ATTACK_SPEED, this.modifier(Item.ATTACK_SPEED_MODIFIER_ID, StatisticType.attackSpeed));
+			modifiers.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, this.modifier(Item.ATTACK_DAMAGE_MODIFIER_ID, StatisticType.attackDamage));
+			modifiers.put(ForgeMod.ATTACK_RANGE.get(), this.modifier(AttributeModifierIdentifiers.reach, StatisticType.reach));
+			modifiers.put(ForgeMod.REACH_DISTANCE.get(), this.modifier(AttributeModifierIdentifiers.reach, StatisticType.reach));
+		} else if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+			var id = ArmorItem.MODIFIERS[slot.getEntitySlotId()];
+			modifiers.put(EntityAttributes.GENERIC_ARMOR, this.modifier(id, StatisticType.armor));
+			modifiers.put(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, this.modifier(id, StatisticType.toughness));
+			modifiers.put(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, this.modifier(id, StatisticType.knockbackResistance));
 		}
 	}
 
@@ -714,13 +717,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	}
 
 	public MutableText format(StatisticType statistic) {
-		if (statistic == StatisticType.attackDamage) return Translations.guiAttackDamage.text(this.formatValue(statistic));
-		if (statistic == StatisticType.attackSpeed) return Translations.guiAttackSpeed.text(this.formatValue(statistic));
-		if (statistic == StatisticType.criticalHitRate) return Translations.guiCriticalHitRate.text(this.formatValue(statistic));
-		if (statistic == StatisticType.efficiency) return Translations.guiEfficiency.text(this.formatValue(statistic));
-		if (statistic == StatisticType.reach) return Translations.guiReach.text(this.formatValue(statistic));
-
-		return Text.literal("%s: %s".formatted(statistic.id().getPath(), this.formatValue(statistic)));
+		return statistic.gui(this.formatValue(statistic));
 	}
 
 	/**
@@ -756,7 +753,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 			for (var attribute : attributeModifiers.keySet()) {
 				for (var modifier : attributeModifiers.get(attribute)) {
-					this.itemStack.addAttributeModifier(attribute, modifier, EquipmentSlot.MAINHAND);
+					this.itemStack.addAttributeModifier(attribute, modifier, slot);
 				}
 			}
 		}
@@ -793,18 +790,15 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return Integer.toString((int) (this.floatValue(statistic) * 100));
 	}
 
-	/**
-	 @return an addition weapon attribute modifier with the given UUID and whose value is the relative value of the given statistic type
-	 */
-	protected final EntityAttributeModifier weaponModifier(UUID attribute, StatisticType statistic) {
-		return new EntityAttributeModifier(attribute, "Weapon modifier", this.attributeRelative(statistic), EntityAttributeModifier.Operation.ADDITION);
+	protected MutableText formatTooltip(StatisticType statistic) {
+		return statistic.tooltip(this.formatValue(statistic));
 	}
 
 	/**
-	 @return an addition tool attribute modifier with the given UUID and whose value is the relative value of the given statistic type
+	 @return an addition weapon attribute modifier with the given UUID and whose value is the relative value of the given statistic type
 	 */
-	protected final EntityAttributeModifier toolModifier(UUID attribute, StatisticType statistic) {
-		return new EntityAttributeModifier(attribute, "Tool modifier", this.attributeRelative(statistic), EntityAttributeModifier.Operation.ADDITION);
+	protected final EntityAttributeModifier modifier(UUID attribute, StatisticType statistic) {
+		return new EntityAttributeModifier(attribute, "", this.attributeRelative(statistic), EntityAttributeModifier.Operation.ADDITION);
 	}
 
 	@Override public void serialize(NbtCompound tag) {

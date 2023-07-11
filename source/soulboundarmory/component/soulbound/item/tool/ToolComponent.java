@@ -31,10 +31,11 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		super(component);
 
 		this.statistics
+			.statistics(StatisticType.efficiency)
 			.min(2, StatisticType.reach)
 			.max(0, StatisticType.upgradeProgress);
 
-		this.addSkills(Skills.absorption, Skills.circumspection);
+		this.addSkills(Skills.absorption, Skills.circumspection, Skills.enderPull);
 	}
 
 	public Text materialName() {
@@ -117,7 +118,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 	@Override public MutableText format(StatisticType statistic) {
 		if (statistic == StatisticType.upgradeProgress) {
 			return this.nextMaterial == null ? Translations.tier.text(this.materialName())
-				: Translations.guiUpgradeProgress.translate(this.materialName(), Translations.toolMaterial(this.nextMaterial), this.formatValue(statistic));
+				: StatisticType.upgradeProgress.guiTranslation().translate(this.materialName(), Translations.toolMaterial(this.nextMaterial), this.formatValue(statistic));
 		}
 
 		return super.format(statistic);
@@ -129,9 +130,9 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 
 	@Override public List<MutableText> tooltip() {
 		return List.of(
-			Translations.tooltipReach.translate(this.formatValue(StatisticType.reach)),
-			Translations.tooltipEfficiency.translate(this.formatValue(StatisticType.efficiency)),
-			this.nextMaterial == null ? Translations.tier.translate(this.materialName()) : Translations.tooltipUpgradeProgress.translate(this.formatValue(StatisticType.upgradeProgress), this.materialName(), Translations.toolMaterial(this.nextMaterial))
+			this.formatTooltip(StatisticType.reach),
+			this.formatTooltip(StatisticType.efficiency),
+			this.nextMaterial == null ? Translations.tier.translate(this.materialName()) : StatisticType.upgradeProgress.tooltip(this.formatValue(StatisticType.upgradeProgress), this.materialName(), Translations.toolMaterial(this.nextMaterial))
 		);
 	}
 
