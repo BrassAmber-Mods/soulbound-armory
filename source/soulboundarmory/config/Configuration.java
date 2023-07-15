@@ -37,7 +37,7 @@ public final class Configuration {
 	})
 	public static int maxLevel = -1;
 
-	@Comment("The minimum level wherefrom items are preserved after death.")
+	@Comment("The minimum level wherefrom soulbound items are preserved after death.")
 	public static int preservationLevel = 0;
 
 	@Comment("Point restoration does not cost experience levels.")
