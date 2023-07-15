@@ -5,9 +5,12 @@ import it.unimi.dsi.fastutil.objects.ReferenceList;
 import net.minecraft.text.MutableText;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import soulboundarmory.client.gui.screen.*;
+import soulboundarmory.client.gui.screen.AttributeTab;
+import soulboundarmory.client.gui.screen.EnchantmentTab;
+import soulboundarmory.client.gui.screen.SelectionTab;
+import soulboundarmory.client.gui.screen.Tab;
 import soulboundarmory.component.soulbound.item.ItemComponent;
-import soulboundarmory.component.soulbound.player.MasterComponent;
+import soulboundarmory.component.soulbound.player.MasterArmorComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.util.Util2;
@@ -15,7 +18,7 @@ import soulboundarmory.util.Util2;
 import java.util.List;
 
 public abstract class ArmorComponent<T extends ItemComponent<T>> extends ItemComponent<T> {
-	public ArmorComponent(MasterComponent<?> component) {
+	public ArmorComponent(MasterArmorComponent component) {
 		super(component);
 
 		this.statistics.statistics(StatisticType.armor, StatisticType.toughness, StatisticType.knockbackResistance);
