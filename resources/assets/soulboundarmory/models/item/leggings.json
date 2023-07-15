@@ -1,0 +1,16 @@
+{
+	"parent": "item/handheld",
+	"textures": {"layer0": "soulboundarmory:item/leggings/0"},
+	"overrides": [
+		{
+			"predicate": {"soulboundarmory:animating": 1},
+			"model": "soulboundarmory:item/leggings/animation"
+		}, {
+			"predicate": {"soulboundarmory:level": 50},
+			"model": "soulboundarmory:item/leggings/50"
+		}, {
+			"predicate": {"soulboundarmory:level": 100},
+			"model": "soulboundarmory:item/leggings/100"
+		}
+	]
+}

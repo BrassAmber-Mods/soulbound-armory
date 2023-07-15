@@ -4,13 +4,13 @@ import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.component.soulbound.player.MasterArmorComponent;
 import soulboundarmory.component.statistics.StatisticType;
 
-public class HelmetComponent extends ArmorComponent<HelmetComponent> {
-	public HelmetComponent(MasterArmorComponent component) {
+public class BootsComponent extends ArmorComponent<BootsComponent> {
+	public BootsComponent(MasterArmorComponent component) {
 		super(component);
 	}
 
-	@Override public ItemComponentType<HelmetComponent> type() {
-		return ItemComponentType.helmet;
+	@Override public ItemComponentType<BootsComponent> type() {
+		return ItemComponentType.boots;
 	}
 
 	@Override public double increase(StatisticType type) {

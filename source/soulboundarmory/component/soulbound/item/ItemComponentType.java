@@ -8,8 +8,7 @@ import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.IForgeRegistry;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.Components;
-import soulboundarmory.component.soulbound.item.armor.ArmorComponent;
-import soulboundarmory.component.soulbound.item.armor.HelmetComponent;
+import soulboundarmory.component.soulbound.item.armor.*;
 import soulboundarmory.component.soulbound.item.tool.*;
 import soulboundarmory.component.soulbound.item.weapon.*;
 import soulboundarmory.component.soulbound.player.MasterComponent;
@@ -36,6 +35,9 @@ public final class ItemComponentType<C extends ItemComponent<C>> extends Identif
 	@Register("hoe") public static final ItemComponentType<HoeComponent> hoe = tool(SoulboundItems.hoe, Items.WOODEN_PICKAXE);
 
 	@Register("helmet") public static final ItemComponentType<HelmetComponent> helmet = armor(SoulboundItems.helmet, Items.LEATHER_HELMET);
+	@Register("chestplate") public static final ItemComponentType<ChestplateComponent> chestplate = armor(SoulboundItems.chestplate, Items.LEATHER_HELMET);
+	@Register("leggings") public static final ItemComponentType<LeggingsComponent> leggings = armor(SoulboundItems.leggings, Items.LEATHER_HELMET);
+	@Register("boots") public static final ItemComponentType<BootsComponent> boots = armor(SoulboundItems.boots, Items.LEATHER_HELMET);
 
 	public final EntityComponentKey<? extends MasterComponent<?>> parentKey;
 	public final Item item;

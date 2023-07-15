@@ -37,6 +37,9 @@ public class SoulboundItems {
 	@Register("hoe") public static final SoulboundHoeItem hoe = new SoulboundHoeItem();
 
 	@Register("helmet") public static final SoulboundArmorItem helmet = new SoulboundArmorItem(EquipmentSlot.HEAD);
+	@Register("chestplate") public static final SoulboundArmorItem chestplate = new SoulboundArmorItem(EquipmentSlot.CHEST);
+	@Register("leggings") public static final SoulboundArmorItem leggings = new SoulboundArmorItem(EquipmentSlot.LEGS);
+	@Register("boots") public static final SoulboundArmorItem boots = new SoulboundArmorItem(EquipmentSlot.FEET);
 
 	public synchronized static ToolMaterial material(ToolMaterial previous) {
 		var materials = ldc(() -> new Reference2ReferenceOpenHashMap<ToolMaterial, Map<TagKey<Block>, ToolMaterial>>());
