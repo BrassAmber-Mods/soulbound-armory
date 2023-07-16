@@ -11,7 +11,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.RegisterEvent;
 import soulboundarmory.SoulboundArmory;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.registry.Identifiable;
 import soulboundarmory.util.Util;

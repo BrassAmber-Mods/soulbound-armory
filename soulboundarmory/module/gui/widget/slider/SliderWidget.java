@@ -2,7 +2,7 @@ package soulboundarmory.module.gui.widget.slider;
 
 import java.text.NumberFormat;
 import net.minecraft.text.Text;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.module.gui.widget.ScalableWidget;
 import soulboundarmory.module.gui.widget.TextWidget;
 

@@ -3,7 +3,7 @@ package soulboundarmory.client.gui.screen;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.component.statistics.Category;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.module.gui.widget.*;

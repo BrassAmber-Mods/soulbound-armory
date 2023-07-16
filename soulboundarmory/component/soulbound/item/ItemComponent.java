@@ -32,7 +32,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 import soulboundarmory.client.gui.screen.*;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;

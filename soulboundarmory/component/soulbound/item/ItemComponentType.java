@@ -6,7 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.IForgeRegistry;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.armor.*;
 import soulboundarmory.component.soulbound.item.tool.*;

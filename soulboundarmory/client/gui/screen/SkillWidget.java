@@ -3,7 +3,7 @@ package soulboundarmory.client.gui.screen;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.module.gui.widget.*;
 import soulboundarmory.skill.SkillInstance;
 

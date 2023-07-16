@@ -1,4 +1,4 @@
-package soulboundarmory.client.i18n;
+package soulboundarmory.text;
 
 import java.util.List;
 import java.util.stream.Stream;

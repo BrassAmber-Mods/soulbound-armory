@@ -3,7 +3,7 @@ package soulboundarmory.client.gui.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceLinkedOpenHashMap;
 import net.minecraft.item.Items;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.module.gui.widget.ItemWidget;
 import soulboundarmory.module.gui.widget.TextWidget;
 import soulboundarmory.module.gui.widget.Widget;

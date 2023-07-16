@@ -3,7 +3,7 @@ package soulboundarmory.module.gui.screen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.module.gui.widget.Widget;
 
 public abstract class ScreenWidget<T extends ScreenWidget<T>> extends Widget<T> {

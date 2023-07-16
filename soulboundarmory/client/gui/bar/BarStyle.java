@@ -3,7 +3,7 @@ package soulboundarmory.client.gui.bar;
 import java.util.List;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.text.Text;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 
 public enum BarStyle {
 	EXPERIENCE(64, Translations.xpStyle),

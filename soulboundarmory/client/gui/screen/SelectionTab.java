@@ -1,7 +1,7 @@
 package soulboundarmory.client.gui.screen;
 
 import soulboundarmory.client.gui.widget.SelectionEntryWidget;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.item.SoulboundItems;

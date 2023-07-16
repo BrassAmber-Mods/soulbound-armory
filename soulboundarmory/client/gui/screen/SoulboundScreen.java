@@ -6,7 +6,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import soulboundarmory.client.gui.bar.BarStyle;
 import soulboundarmory.client.gui.bar.ExperienceBar;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.client.keyboard.GUIKeyBinding;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.item.armor.ArmorComponent;

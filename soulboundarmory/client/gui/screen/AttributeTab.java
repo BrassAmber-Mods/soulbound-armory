@@ -1,7 +1,7 @@
 package soulboundarmory.client.gui.screen;
 
 import net.minecraft.item.Items;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.component.soulbound.item.tool.ToolComponent;
 import soulboundarmory.component.statistics.Category;
 import soulboundarmory.component.statistics.Statistic;

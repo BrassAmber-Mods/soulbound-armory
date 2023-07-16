@@ -2,7 +2,7 @@ package soulboundarmory.component.statistics;
 
 import net.minecraft.text.MutableText;
 import net.minecraftforge.registries.IForgeRegistry;
-import soulboundarmory.client.i18n.Translations;
+import soulboundarmory.text.Translations;
 import soulboundarmory.module.transform.Register;
 import soulboundarmory.module.transform.RegisterAll;
 import soulboundarmory.module.transform.Registry;
