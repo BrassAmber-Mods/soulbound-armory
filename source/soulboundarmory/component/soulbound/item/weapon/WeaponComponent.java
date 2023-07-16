@@ -5,6 +5,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.MutableText;
+import net.minecraftforge.common.Tags;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
@@ -57,7 +58,7 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 				* (1 + EntityUtil.attribute(entity, EntityAttributes.GENERIC_ARMOR) * Configuration.Multipliers.armor)
 				* (damage <= 0 ? Configuration.Multipliers.passive : 1 + damage * Configuration.Multipliers.attackDamage)
 				* (1 + speed * Configuration.Multipliers.attackSpeed)
-				* (EntityUtil.isBoss(entity) ? Configuration.Multipliers.boss : 1)
+				* (entity.getType().isIn(Tags.EntityTypes.BOSSES) ? Configuration.Multipliers.boss : 1)
 				* (this.player.world.getServer().isHardcore() ? Configuration.Multipliers.hardcore : 1)
 				* (damage > 0 && entity.isBaby() ? Configuration.Multipliers.hostileBaby : 1)
 			));
