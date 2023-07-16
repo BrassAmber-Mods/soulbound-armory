@@ -14,9 +14,6 @@ public class HelmetComponent extends ArmorComponent<HelmetComponent> {
 	}
 
 	@Override public double increase(StatisticType type) {
-		return type == StatisticType.armor ? 3D / 75
-			: type == StatisticType.toughness ? 3D / 20
-			: type == StatisticType.knockbackResistance ? 1D / 20
-			: 0;
+		return type == StatisticType.armor ? 3D / 75 : super.increase(type);
 	}
 }

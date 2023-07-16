@@ -24,6 +24,12 @@ public abstract class ArmorComponent<T extends ItemComponent<T>> extends ItemCom
 		this.statistics.statistics(StatisticType.armor, StatisticType.toughness, StatisticType.knockbackResistance);
 	}
 
+	@Override public double increase(StatisticType type) {
+		return type == StatisticType.toughness ? 3D / 20
+			: type == StatisticType.knockbackResistance ? 1D / 20
+			: 0;
+	}
+
 	@Override public int levelXP(int level) {
 		return this.canLevelUp()
 			? Configuration.initialArmorXP + 3 * (int) Math.round(Math.pow(level, 1.25))

@@ -44,14 +44,10 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		return Components.soulbound(entity).filter(component -> component.matches(stack)).findAny();
 	}
 
-	/**
-	 @return this component's {@linkplain ComponentRegistry#entity registered} {@linkplain EntityComponentKey key}
-	 */
+	/** @return this component's {@linkplain ComponentRegistry#entity registered} {@linkplain EntityComponentKey key} */
 	public abstract EntityComponentKey<? extends MasterComponent<?>> key();
 
-	/**
-	 @return whether the given item stack matches any of this component's subcomponents
-	 */
+	/** @return whether the given item stack matches any of this component's subcomponents */
 	public abstract boolean matches(ItemStack stack);
 
 	@Override public final boolean isClient() {
@@ -105,27 +101,16 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		}
 	}
 
-	/**
-	 Returns the remaining item selection cooldown period which is always 0 for players in creative mode.
-
-	 @return the remaining cooldown period
-	 */
+	/** @return the remaining item selection cooldown period which is always 0 for players in creative mode */
 	public int cooldown() {
 		return this.player.isCreative() ? 0 : this.cooldown;
 	}
 
-	/**
-	 Sets an item selection cooldown period.
-
-	 @param cooldown a new cooldown period
-	 */
+	/** Sets an item selection cooldown period. */
 	public void cooldown(int cooldown) {
 		this.cooldown = cooldown;
 	}
 
-	/**
-	 @return the selection tab for this component
-	 */
 	@OnlyIn(Dist.CLIENT)
 	public Tab selectionTab() {
 		return new SelectionTab();
@@ -135,9 +120,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		return this.items().filter(item -> item.matches(stack)).findAny();
 	}
 
-	/**
-	 @return the item component corresponding to the first held item stack that matches this component
-	 */
+	/** @return the item component corresponding to the first held item stack that matches this component */
 	public Optional<ItemComponent<?>> heldItemComponent() {
 		return ItemUtil.handStacks(this.player).flatMap(stack -> this.item(stack).stream()).findFirst();
 	}
@@ -158,9 +141,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		return false;
 	}
 
-	/**
-	 Reinitialize the current {@linkplain SoulboundScreen menu} if open.
-	 */
+	/** Reinitialize the current {@linkplain SoulboundScreen menu} if open. */
 	public void refresh() {
 		if (this.isClient()) {
 			if (Widget.cellScreen() instanceof SoulboundScreen screen) {
@@ -190,20 +171,13 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		}
 	}
 
-	/**
-	 Add an item component to this component.
-
-	 @param item the item component
-	 */
 	protected void store(ItemComponent<?>... items) {
 		for (var item : items) {
 			this.items.put(item.type(), item);
 		}
 	}
 
-	/**
-	 Update item components' item stacks and synchronize them.
-	 */
+	/** Update item components' item stacks and synchronize them. */
 	@Override public void spawn() {
 		this.items.values().forEach(ItemComponent::updateItemStack);
 		this.synchronize();

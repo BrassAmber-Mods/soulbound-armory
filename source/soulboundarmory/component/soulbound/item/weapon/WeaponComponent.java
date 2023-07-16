@@ -51,25 +51,16 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 			var speed = EntityUtil.attribute(entity, EntityAttributes.GENERIC_ATTACK_SPEED);
 			var difficulty = this.player.world.getDifficulty().getId();
 
-			var xp = entity.getMaxHealth()
+			this.add(StatisticType.experience, Math.round(
+				entity.getMaxHealth()
 				* (difficulty == 0 ? Configuration.Multipliers.peaceful : difficulty) * Configuration.Multipliers.difficulty
 				* (1 + EntityUtil.attribute(entity, EntityAttributes.GENERIC_ARMOR) * Configuration.Multipliers.armor)
 				* (damage <= 0 ? Configuration.Multipliers.passive : 1 + damage * Configuration.Multipliers.attackDamage)
-				* (1 + speed * Configuration.Multipliers.attackSpeed);
-
-			if (EntityUtil.isBoss(entity)) {
-				xp *= Configuration.Multipliers.boss;
-			}
-
-			if (this.player.world.getServer().isHardcore()) {
-				xp *= Configuration.Multipliers.hardcore;
-			}
-
-			if (damage > 0 && entity.isBaby()) {
-				xp *= Configuration.Multipliers.hostileBaby;
-			}
-
-			this.add(StatisticType.experience, Math.round(xp));
+				* (1 + speed * Configuration.Multipliers.attackSpeed)
+				* (EntityUtil.isBoss(entity) ? Configuration.Multipliers.boss : 1)
+				* (this.player.world.getServer().isHardcore() ? Configuration.Multipliers.hardcore : 1)
+				* (damage > 0 && entity.isBaby() ? Configuration.Multipliers.hostileBaby : 1)
+			));
 		}
 	}
 
