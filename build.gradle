@@ -137,7 +137,7 @@ loom {
 				net.auoeke.reflect.Accessor.putReference(run, "environmentVariables", new HashMap<String, String>() {
 					String put(String key, String value) {
 						// Ignore Gradle's output because it interferes even if it is last.
-						return key == "MOD_CLASSES" && this["MOD_CLASSES"] ? null : super.put(key, value)
+						return key == "MOD_CLASSES" && this[key] ? null : super.put(key, value)
 					}
 				// Use IntelliJ IDEA's output.
 				}.tap {it["MOD_CLASSES"] = ["main", "dev"]*.with {"main%%" + file("out/production/$project.name.$it")}.join(File.pathSeparator)})
