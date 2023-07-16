@@ -16,7 +16,7 @@ import soulboundarmory.util.ItemUtil;
  */
 public class SelectionTab extends Tab {
 	public SelectionTab() {
-		super(Translations.guiToolSelection);
+		super(Translations.toolSelection);
 	}
 
 	@Override public Widget<?> icon() {

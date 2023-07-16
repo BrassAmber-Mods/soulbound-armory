@@ -1,4 +1,4 @@
-package soulboundarmory.client.render;
+package soulboundarmory.client;
 
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;

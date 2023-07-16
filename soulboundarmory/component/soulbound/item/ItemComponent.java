@@ -715,7 +715,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	}
 
 	public MutableText format(StatisticType statistic) {
-		return statistic.gui(this.formatValue(statistic));
+		return statistic.display(this.formatValue(statistic));
 	}
 
 	/**
@@ -792,9 +792,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return statistic.tooltip(this.formatValue(statistic));
 	}
 
-	/**
-	 @return an addition weapon attribute modifier with the given UUID and whose value is the relative value of the given statistic type
-	 */
+	/** @return an addition weapon attribute modifier with the given UUID and whose value is the relative value of the given statistic type */
 	protected final EntityAttributeModifier modifier(UUID attribute, StatisticType statistic) {
 		return new EntityAttributeModifier(attribute, "", this.attributeRelative(statistic), EntityAttributeModifier.Operation.ADDITION);
 	}

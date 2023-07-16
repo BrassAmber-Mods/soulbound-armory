@@ -26,14 +26,6 @@ public class MixinUtil {
 	}
 
 	private static String map(INameMappingService.Domain domain, String production) {
-		if (FMLEnvironment.production) {
-			return production;
-		}
-
-		if (mapper == null) {
-			mapper = FMLLoader.getNameFunction("srg").get();
-		}
-
-		return mapper.apply(domain, production);
+		return FMLEnvironment.production ? production : (mapper == null ? mapper = FMLLoader.getNameFunction("srg").get() : mapper).apply(domain, production);
 	}
 }

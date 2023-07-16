@@ -119,7 +119,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 	@Override public MutableText format(StatisticType statistic) {
 		if (statistic == StatisticType.upgradeProgress) {
 			return this.nextMaterial == null ? Translations.tier.text(this.materialName())
-				: StatisticType.upgradeProgress.guiTranslation().translate(this.materialName(), Translations.toolMaterial(this.nextMaterial), this.formatValue(statistic));
+				: StatisticType.upgradeProgress.displayTranslation().translate(this.materialName(), Translations.toolMaterial(this.nextMaterial), this.formatValue(statistic));
 		}
 
 		return super.format(statistic);
@@ -133,7 +133,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 		return List.of(
 			this.formatTooltip(StatisticType.reach),
 			this.formatTooltip(StatisticType.efficiency),
-			this.nextMaterial == null ? Translations.tier.translate(this.materialName()) : StatisticType.upgradeProgress.tooltip(this.formatValue(StatisticType.upgradeProgress), this.materialName(), Translations.toolMaterial(this.nextMaterial))
+			this.nextMaterial == null ? Translations.tooltipTier.translate(this.materialName()) : StatisticType.upgradeProgress.tooltip(this.formatValue(StatisticType.upgradeProgress), this.materialName(), Translations.toolMaterial(this.nextMaterial))
 		);
 	}
 

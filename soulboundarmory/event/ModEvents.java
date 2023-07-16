@@ -5,11 +5,13 @@ import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.command.argument.serialize.ArgumentSerializer;
 import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.util.registry.Registry;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegisterEvent;
 import soulboundarmory.SoulboundArmory;
+import soulboundarmory.client.GUIKeyBinding;
 import soulboundarmory.command.argument.ItemComponentArgumentType;
 import soulboundarmory.command.argument.RegistryArgumentType;
 import soulboundarmory.component.Components;
@@ -23,6 +25,11 @@ public final class ModEvents {
 			registerArgumentType(helper, "item_component", ItemComponentArgumentType.class, ConstantArgumentSerializer.of(ItemComponentArgumentType::itemComponents));
 			registerArgumentType(helper, "registry", RegistryArgumentType.class, new RegistryArgumentType.Serializer());
 		});
+	}
+
+	@SubscribeEvent
+	public static void register(RegisterKeyMappingsEvent event) {
+		event.register(GUIKeyBinding.instance);
 	}
 
 	@SubscribeEvent

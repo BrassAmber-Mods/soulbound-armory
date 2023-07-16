@@ -7,7 +7,7 @@ import net.minecraft.util.math.MathHelper;
 import soulboundarmory.client.gui.bar.BarStyle;
 import soulboundarmory.client.gui.bar.ExperienceBar;
 import soulboundarmory.text.Translations;
-import soulboundarmory.client.keyboard.GUIKeyBinding;
+import soulboundarmory.client.GUIKeyBinding;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.item.armor.ArmorComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
@@ -122,7 +122,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 				.y(15D / 16)
 				.width(button -> this.tab instanceof AttributeTab || this.tab instanceof EnchantmentTab ? 80 : 100)
 				.height(20)
-				.text(() -> this.bound() ? Translations.guiButtonUnbind : Translations.guiButtonBind)
+				.text(() -> this.bound() ? Translations.unbind : Translations.bind)
 				.present(this::displayTabs)
 				.primaryAction(() -> Packets.serverBindSlot.send(new ExtendedPacketBuffer(this.item).writeInt(this.bound() ? -1 : this.slot)));
 		}

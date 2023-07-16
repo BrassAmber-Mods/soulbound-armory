@@ -20,7 +20,6 @@ import soulboundarmory.component.statistics.StatisticType;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -37,7 +36,7 @@ public final class SoulboundArmoryCommand {
 	private static final String CATEGORY = "category";
 	private static final String PLAYERS = "players";
 
-	private static final DynamicCommandExceptionType noItemException = new DynamicCommandExceptionType(player -> Translations.commandNoItem.text(((PlayerEntity) player).getName()));
+	private static final DynamicCommandExceptionType noItemException = new DynamicCommandExceptionType(player -> Translations.noItem.text(((PlayerEntity) player).getName()));
 	private static final Predicate<ServerCommandSource> isPrivileged = source -> source.hasPermissionLevel(2);
 
 	public static void register(RegisterCommandsEvent event) {
@@ -96,7 +95,7 @@ public final class SoulboundArmoryCommand {
 					.withFormatting(Formatting.DARK_RED)
 					.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackContent(item.stack())))
 				), false);
-				statistics(context).forEach(statistic -> context.getSource().sendFeedback(item.format(statistic), false));
+				statistics(context).stream().filter(type -> item.statistic(type) != null).forEach(statistic -> context.getSource().sendFeedback(item.format(statistic), false));
 			});
 		});
 
@@ -149,11 +148,11 @@ public final class SoulboundArmoryCommand {
 		return 1;
 	}
 
-	private static Set<ItemComponentType<?>> componentTypes(CommandContext<ServerCommandSource> context) {
+	private static List<ItemComponentType<?>> componentTypes(CommandContext<ServerCommandSource> context) {
 		return RegistryArgumentType.get(context, ITEM);
 	}
 
-	private static Set<StatisticType> statistics(CommandContext<ServerCommandSource> context) {
+	private static List<StatisticType> statistics(CommandContext<ServerCommandSource> context) {
 		return RegistryArgumentType.get(context, STATISTIC);
 	}
 

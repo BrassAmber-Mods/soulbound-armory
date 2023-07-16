@@ -64,7 +64,7 @@ public final class ItemComponentType<C extends ItemComponent<C>> extends Identif
 	}
 
 	public Text name() {
-		return Translations.gui(ItemComponentType.<C>registry().getKey(this).getPath()).text();
+		return Translations.of("item", ItemComponentType.<C>registry().getKey(this).getPath()).text();
 	}
 
 	public static ItemComponentType<?> get(Identifier id) {

@@ -1,4 +1,4 @@
-package soulboundarmory.client.keyboard;
+package soulboundarmory.client;
 
 import net.minecraft.client.option.KeyBinding;
 import org.lwjgl.glfw.GLFW;

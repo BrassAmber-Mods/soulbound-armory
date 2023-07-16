@@ -103,7 +103,7 @@ public final class Configuration {
 		@Comment("Display option button and sliders in the menu.")
 		public static boolean displayOptions;
 
-		@Comment("Use a custom experience bar for the currently held soulbound item.")
+		@Comment("Display an experience bar for the currently held soulbound item.")
 		public static boolean overlayExperienceBar = true;
 
 		@Comment("Enable enchantment glint.")

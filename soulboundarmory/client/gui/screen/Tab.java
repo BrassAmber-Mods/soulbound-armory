@@ -68,6 +68,6 @@ public abstract class Tab extends Widget<Tab> {
 	}
 
 	protected Text pointText(int points) {
-		return points == 0 ? Translations.empty : Translations.guiUnspentPoints.text(points);
+		return points == 0 ? Translations.empty : Translations.unspentPoints.text(points);
 	}
 }

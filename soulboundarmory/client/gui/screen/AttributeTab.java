@@ -14,7 +14,7 @@ import soulboundarmory.network.Packets;
 
 public class AttributeTab extends Tab {
 	public AttributeTab() {
-		super(Translations.guiButtonAttributes);
+		super(Translations.buttonAttributes);
 	}
 
 	@Override public Widget<?> icon() {

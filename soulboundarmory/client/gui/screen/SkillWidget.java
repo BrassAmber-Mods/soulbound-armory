@@ -28,14 +28,14 @@ public class SkillWidget extends Widget<SkillWidget> {
 
 			if (this.skill.learned()) {
 				if (this.skill.skill.isTiered()) {
-					genericSections.add(this.skill.skill.maxLevel < 0 ? Translations.guiLevel.text(this.skill.level()) : Translations.guiLevelFinite.text(this.skill.level(), this.skill.skill.maxLevel));
+					genericSections.add(this.skill.skill.maxLevel < 0 ? Translations.level.text(this.skill.level()) : Translations.finiteLevel.text(this.skill.level(), this.skill.skill.maxLevel));
 
 					if (this.skill.canUpgrade()) {
-						genericSections.add(Translations.guiSkillUpgradeCost.text(cost));
+						genericSections.add(Translations.upgradeCost.text(cost));
 					}
 				}
 			} else if (this.skill.dependenciesFulfilled()) {
-				genericSections.add(Translations.guiSkillLearnCost.text(cost));
+				genericSections.add(Translations.learnCost.text(cost));
 			}
 
 			var sections = ReferenceArrayList.<List<? extends StringVisitable>>of();

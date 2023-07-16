@@ -1,7 +1,6 @@
 package soulboundarmory.event;
 
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.particle.DamageParticle;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
@@ -11,12 +10,13 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import soulboundarmory.SoulboundArmory;
-import soulboundarmory.client.render.SoulboundDaggerEntityRenderer;
+import soulboundarmory.client.SoulboundDaggerEntityRenderer;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.item.ItemMarkerComponent;
 import soulboundarmory.entity.SoulboundDaggerEntity;
 import soulboundarmory.item.SoulboundItem;
+import soulboundarmory.particle.CriticalHitParticle;
 import soulboundarmory.particle.UnlockParticle;
 import soulboundarmory.util.Util;
 
@@ -51,7 +51,7 @@ public class ClientModEvents {
 	}
 
 	@SubscribeEvent public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
-		event.register(SoulboundArmory.criticalHitParticleType, DamageParticle.Factory::new);
+		event.register(SoulboundArmory.criticalHitParticleType, CriticalHitParticle.Factory::new);
 		event.register(SoulboundArmory.unlockParticle, UnlockParticle.Factory::new);
 	}
 }

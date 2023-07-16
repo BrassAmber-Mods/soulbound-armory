@@ -1,6 +1,5 @@
 package soulboundarmory.event;
 
-import java.util.stream.IntStream;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -9,6 +8,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import soulboundarmory.SoulboundArmory;
 import soulboundarmory.component.soulbound.item.ItemComponent;
+
+import java.util.stream.IntStream;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = SoulboundArmory.ID)
 public final class ClientEvents {
@@ -20,7 +21,6 @@ public final class ClientEvents {
 				.sum();
 
 			var prior = new ReferenceArrayList<>(tooltip).subList(0, startIndex);
-
 			tooltip.clear();
 			tooltip.addAll(prior);
 			tooltip.addAll(component.tooltip());

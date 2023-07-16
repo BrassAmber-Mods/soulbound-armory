@@ -1,14 +1,15 @@
 package soulboundarmory.command.argument;
 
-import java.util.Set;
-import java.util.stream.Stream;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.util.Util2;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 public class ItemComponentArgumentType<C extends ItemComponent<C>> extends RegistryArgumentType<ItemComponentType<C>> {
 	protected ItemComponentArgumentType() {
@@ -19,15 +20,14 @@ public class ItemComponentArgumentType<C extends ItemComponent<C>> extends Regis
 		return new ItemComponentArgumentType();
 	}
 
-	@Override public Set<ItemComponentType<C>> parse(StringReader reader) {
+	@Override public List<ItemComponentType<C>> parse(StringReader reader) {
 		var cursor = reader.getCursor();
 
 		if (Util2.containsIgnoreCase(reader.readString(), "current")) {
-			return ReferenceOpenHashSet.of();
+			return ReferenceArrayList.of();
 		}
 
 		reader.setCursor(cursor);
-
 		return super.parse(reader);
 	}
 

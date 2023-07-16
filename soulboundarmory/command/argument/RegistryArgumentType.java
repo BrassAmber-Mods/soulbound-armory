@@ -1,8 +1,5 @@
 package soulboundarmory.command.argument;
 
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -10,8 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.serialize.ArgumentSerializer;
@@ -20,7 +16,11 @@ import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryManager;
 
-public class RegistryArgumentType<T> implements ArgumentType<Set<T>> {
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
+
+public class RegistryArgumentType<T> implements ArgumentType<List<T>> {
 	protected final IForgeRegistry<T> registry;
 
 	protected RegistryArgumentType(IForgeRegistry<T> registry) {
@@ -31,20 +31,20 @@ public class RegistryArgumentType<T> implements ArgumentType<Set<T>> {
 		return new RegistryArgumentType<>(registry);
 	}
 
-	public static <T> Set<T> get(CommandContext<?> context, String name) {
-		return context.getArgument(name, Set.class);
+	public static <T> List<T> get(CommandContext<?> context, String name) {
+		return context.getArgument(name, List.class);
 	}
 
-	@Override public Set<T> parse(StringReader reader) {
+	@Override public List<T> parse(StringReader reader) {
 		var input = reader.readString();
 
 		if (input.equalsIgnoreCase("all")) {
-			return new ReferenceOpenHashSet<>(this.registry.getValues());
+			return new ReferenceArrayList(this.registry.getValues());
 		}
 
 		for (var name : this.registry.getKeys()) {
 			if (input.equalsIgnoreCase(name.toString()) || input.equalsIgnoreCase(name.getPath())) {
-				return ReferenceSet.of(this.registry.getValue(name));
+				return ReferenceArrayList.of(this.registry.getValue(name));
 			}
 		}
 

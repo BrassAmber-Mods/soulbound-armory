@@ -51,16 +51,16 @@ public class StatisticType extends Identifiable {
 		return statistic;
 	}
 
-	public Translation guiTranslation() {
-		return Translations.gui(registry().getKey(this).getPath());
+	public Translation displayTranslation() {
+		return Translations.display(registry().getKey(this).getPath());
 	}
 
-	public MutableText gui(Object... arguments) {
-		return this.guiTranslation().text(arguments);
+	public MutableText display(Object... arguments) {
+		return this.displayTranslation().text(arguments);
 	}
 
 	public MutableText tooltip(Object... arguments) {
-		return Translations.tooltipAttribute(registry().getKey(this).getPath()).translate(arguments);
+		return Translations.tooltip(registry().getKey(this).getPath()).translate(arguments);
 	}
 
 	@Override public String toString() {

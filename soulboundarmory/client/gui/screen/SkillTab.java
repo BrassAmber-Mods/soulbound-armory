@@ -22,7 +22,7 @@ public class SkillTab extends Tab {
 	protected float brightness = 1;
 
 	public SkillTab() {
-		super(Translations.guiSkills);
+		super(Translations.skills);
 	}
 
 	@Override public Widget<?> icon() {

@@ -1,4 +1,4 @@
-package soulboundarmory.client.texture;
+package soulboundarmory.client;
 
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.texture.NativeImage;

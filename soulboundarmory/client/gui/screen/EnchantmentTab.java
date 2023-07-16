@@ -12,7 +12,7 @@ import soulboundarmory.network.Packets;
 
 public class EnchantmentTab extends Tab {
 	public EnchantmentTab() {
-		super(Translations.guiButtonEnchantments);
+		super(Translations.buttonEnchantments);
 	}
 
 	@Override public Widget<?> icon() {
