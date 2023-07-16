@@ -22,6 +22,11 @@ gronk {
 
 sourceSets {
 	main {
+		java {
+			srcDirs = ["."]
+			include("soulboundarmory/")
+		}
+
 		resources {
 			include("assets/", "META-INF/", "pack.mcmeta", "*.json")
 			exclude("**/*.xcf")
