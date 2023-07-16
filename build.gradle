@@ -34,7 +34,11 @@ sourceSets {
 	}
 
 	dev {
-		java.srcDirs = ["dev"]
+		java {
+			srcDirs = ["."]
+			include("dev/")
+		}
+
 		compileClasspath += main.compileClasspath + main.output
 	}
 }
