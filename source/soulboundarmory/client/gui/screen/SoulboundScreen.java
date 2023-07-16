@@ -124,7 +124,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 				.height(20)
 				.text(() -> this.bound() ? Translations.guiButtonUnbind : Translations.guiButtonBind)
 				.present(this::displayTabs)
-				.primaryAction(() -> Packets.serverBindSlot.send(new ExtendedPacketBuffer(this.component).writeInt(this.bound() ? -1 : this.slot)));
+				.primaryAction(() -> Packets.serverBindSlot.send(new ExtendedPacketBuffer(this.item).writeInt(this.bound() ? -1 : this.slot)));
 		}
 
 		this.add(this.options);
@@ -170,7 +170,7 @@ public class SoulboundScreen extends ScreenWidget<SoulboundScreen> {
 	}
 
 	private boolean bound() {
-		return this.component.boundSlot == this.slot;
+		return this.item != null && this.item.boundSlot == this.slot;
 	}
 
 	private int optionY(int row) {

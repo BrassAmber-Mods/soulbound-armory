@@ -14,7 +14,6 @@ public class MasterArmorComponent extends MasterComponent<MasterArmorComponent> 
 	public MasterArmorComponent(PlayerEntity player) {
 		super(player);
 
-		this.boundSlot = -1;
 		this.store(new HelmetComponent(this), new ChestplateComponent(this), new LeggingsComponent(this), new BootsComponent(this));
 	}
 

@@ -1,41 +1,28 @@
 package soulboundarmory.network;
 
 import soulboundarmory.SoulboundArmory;
-import soulboundarmory.network.client.S2CBindSlot;
-import soulboundarmory.network.client.S2CCriticalHitParticles;
-import soulboundarmory.network.client.S2CEnchant;
-import soulboundarmory.network.client.S2CFreeze;
-import soulboundarmory.network.client.S2CRefresh;
-import soulboundarmory.network.client.S2CSync;
-import soulboundarmory.network.client.S2CSyncItem;
-import soulboundarmory.network.client.S2CUnlock;
-import soulboundarmory.network.server.C2SAttribute;
-import soulboundarmory.network.server.C2SBindSlot;
-import soulboundarmory.network.server.C2SConfig;
-import soulboundarmory.network.server.C2SEnchant;
-import soulboundarmory.network.server.C2SReset;
-import soulboundarmory.network.server.C2SSelectItem;
-import soulboundarmory.network.server.C2SSkill;
-import soulboundarmory.network.server.C2STab;
+import soulboundarmory.network.client.*;
+import soulboundarmory.network.server.*;
+import soulboundarmory.util.Util2;
 
 public final class Packets {
-	public static final PacketKey.Server<ExtendedPacketBuffer, C2SAttribute> serverAttribute = server(C2SAttribute.class);
-	public static final PacketKey.Server<ExtendedPacketBuffer, C2SBindSlot> serverBindSlot = server(C2SBindSlot.class);
-	public static final PacketKey.Server<ExtendedPacketBuffer, C2SConfig> serverConfig = server(C2SConfig.class);
-	public static final PacketKey.Server<ExtendedPacketBuffer, C2SEnchant> serverEnchant = server(C2SEnchant.class);
-	public static final PacketKey.Server<ExtendedPacketBuffer, C2SSelectItem> serverSelectItem = server(C2SSelectItem.class);
-	public static final PacketKey.Server<ExtendedPacketBuffer, C2SReset> serverReset = server(C2SReset.class);
-	public static final PacketKey.Server<ExtendedPacketBuffer, C2SSkill> serverSkill = server(C2SSkill.class);
-	public static final PacketKey.Server<ExtendedPacketBuffer, C2STab> serverTab = server(C2STab.class);
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2SAttribute> serverAttribute = server();
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2SBindSlot> serverBindSlot = server();
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2SConfig> serverConfig = server();
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2SEnchant> serverEnchant = server();
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2SSelectItem> serverSelectItem = server();
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2SReset> serverReset = server();
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2SSkill> serverSkill = server();
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2STab> serverTab = server();
 
-	public static final PacketKey.Client<ExtendedPacketBuffer, S2CBindSlot> clientBindSlot = client(S2CBindSlot.class);
-	public static final PacketKey.Client<ExtendedPacketBuffer, S2CCriticalHitParticles> clientCriticalHitParticles = client(S2CCriticalHitParticles.class);
-	public static final PacketKey.Client<ExtendedPacketBuffer, S2CEnchant> clientEnchant = client(S2CEnchant.class);
-	public static final PacketKey.Client<ExtendedPacketBuffer, S2CFreeze> clientFreeze = client(S2CFreeze.class);
-	public static final PacketKey.Client<ExtendedPacketBuffer, S2CRefresh> clientRefresh = client(S2CRefresh.class);
-	public static final PacketKey.Client<ExtendedPacketBuffer, S2CSync> clientSync = client(S2CSync.class);
-	public static final PacketKey.Client<ExtendedPacketBuffer, S2CSyncItem> clientSyncItem = client(S2CSyncItem.class);
-	public static final PacketKey.Client<ExtendedPacketBuffer, S2CUnlock> clientUnlock = client(S2CUnlock.class);
+	public static final PacketKey.Client<ExtendedPacketBuffer, S2CBindSlot> clientBindSlot = client();
+	public static final PacketKey.Client<ExtendedPacketBuffer, S2CCriticalHitParticles> clientCriticalHitParticles = client();
+	public static final PacketKey.Client<ExtendedPacketBuffer, S2CEnchant> clientEnchant = client();
+	public static final PacketKey.Client<ExtendedPacketBuffer, S2CFreeze> clientFreeze = client();
+	public static final PacketKey.Client<ExtendedPacketBuffer, S2CRefresh> clientRefresh = client();
+	public static final PacketKey.Client<ExtendedPacketBuffer, S2CSync> clientSync = client();
+	public static final PacketKey.Client<ExtendedPacketBuffer, S2CSyncItem> clientSyncItem = client();
+	public static final PacketKey.Client<ExtendedPacketBuffer, S2CUnlock> clientUnlock = client();
 
 	private static byte id;
 
@@ -59,11 +46,11 @@ public final class Packets {
 		return key;
 	}
 
-	private static <T, P extends Packet<T>> PacketKey.Server<T, P> server(Class<P> type) {
-		return register(new PacketKey.Server<>(type));
+	private static <T, P extends Packet<T>> PacketKey.Server<T, P> server(P... dummy) {
+		return register(new PacketKey.Server<>(Util2.componentType(dummy)));
 	}
 
-	private static <T, P extends Packet<T>> PacketKey.Client<T, P> client(Class<P> type) {
-		return register(new PacketKey.Client<>(type));
+	private static <T, P extends Packet<T>> PacketKey.Client<T, P> client(P... dummy) {
+		return register(new PacketKey.Client<>(Util2.componentType(dummy)));
 	}
 }

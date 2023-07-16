@@ -1,19 +1,14 @@
 package soulboundarmory.network.server;
 
-import soulboundarmory.component.soulbound.player.MasterComponent;
-import soulboundarmory.network.ComponentPacket;
+import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.network.ExtendedPacketBuffer;
+import soulboundarmory.network.ItemComponentPacket;
 import soulboundarmory.network.Packets;
 
-public final class C2SBindSlot extends ComponentPacket {
-	@Override public void execute(MasterComponent<?> component) {
+public final class C2SBindSlot extends ItemComponentPacket {
+	@Override public void execute(ItemComponent<?> component) {
 		var slot = this.message.readInt();
-
-		if (component.boundSlot == slot) {
-			slot = -1;
-		}
-
-		component.boundSlot = slot;
-		Packets.clientBindSlot.send(component.player, new ExtendedPacketBuffer(component).writeInt(slot));
+		component.boundSlot = component.boundSlot == slot ? -1 : slot;
+		Packets.clientBindSlot.send(component.player, new ExtendedPacketBuffer(component).writeInt(component.boundSlot));
 	}
 }

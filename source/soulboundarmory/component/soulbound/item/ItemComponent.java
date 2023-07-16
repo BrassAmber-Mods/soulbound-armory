@@ -16,6 +16,7 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,6 +30,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 import soulboundarmory.client.gui.screen.*;
 import soulboundarmory.client.i18n.Translations;
 import soulboundarmory.component.Components;
@@ -56,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public abstract class ItemComponent<T extends ItemComponent<T>> implements Serializable, Sided {
@@ -69,6 +70,8 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	public final Map<Skill, SkillInstance> skills = new Reference2ObjectLinkedOpenHashMap<>();
 	public final SkillHistory skillHistory = new SkillHistory(this);
 	public boolean unlocked;
+	public boolean active;
+	public int boundSlot = -1;
 
 	protected ItemStack itemStack;
 
@@ -109,7 +112,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		for (var stack : entity.getHandItems()) {
 			for (var component : components) {
 				if (component.matches(stack)) {
-					return component.component(stack);
+					return component.item(stack);
 				}
 			}
 		}
@@ -201,6 +204,10 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return this.type().name();
 	}
 
+	public ItemStack stackInBoundSlot() {
+		return this.player.getInventory().getStack(this.boundSlot);
+	}
+
 	public final int level() {
 		return this.intValue(StatisticType.level);
 	}
@@ -288,9 +295,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	}
 
 	public void unlock() {
-		if (!this.unlocked && this.isEnabled()) {
-			this.unlocked = true;
-
+		if (this.unlocked ^ (this.unlocked = true) && this.isEnabled()) {
 			if (this.isClient()) {
 				if (Widget.cellScreen() instanceof SoulboundScreen screen) {
 					screen.close();
@@ -304,33 +309,25 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 	public void select(int slot) {
 		if (this.isEnabled()) {
-			if (this.master.isClient()) {
-				Packets.serverSelectItem.send(new ExtendedPacketBuffer(this).writeInt(slot));
-			}
+			Packets.serverSelectItem.sendIfClient(() -> new ExtendedPacketBuffer(this).writeInt(slot));
 
 			var inventory = this.player.getInventory();
 
 			if (this.master.cooldown() > 0) {
-				var auxSlot = (int) ItemUtil.inventory(this.player)
-					.takeWhile(Predicate.not(this.canConsume(inventory.getStack(slot)) ? stack -> this.master.item().filter(active -> !active.matches(stack)).isEmpty() : this::canConsume))
-					.count();
+				var canConsume = this.canConsume(inventory.getStack(slot));
+				var removed = Inventories.remove(inventory, canConsume ? stack -> this.master.item(stack).filter(item -> item.level() < 100).isPresent() : this::canConsume, 1, false);
 
-				if (auxSlot < inventory.size()) {
-					inventory.removeStack(auxSlot);
-				} else {
+				if (!canConsume && removed == 0) {
 					return; // todo error
 				}
 			}
 
 			inventory.setStack(slot, this.stack());
-			this.master.set(this, slot);
+			this.master.activate(this, slot);
 		} else; // todo error
 	}
 
-	/**
-	 @return this component's instance of a statistic type if it is present or null
-	 */
-	public Statistic statistic(StatisticType statistic) {
+	public @Nullable Statistic statistic(StatisticType statistic) {
 		return this.statistics.get(statistic);
 	}
 
@@ -616,7 +613,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 		this.updateItemStack();
 
-		Packets.clientEnchant.sendIfServer(this.player, new ExtendedPacketBuffer(this)
+		Packets.clientEnchant.sendIfServer(this.player, () -> new ExtendedPacketBuffer(this)
 			.writeIdentifier(ForgeRegistries.ENCHANTMENTS.getKey(enchantment))
 			.writeInt(current + change)
 			.writeInt(enchantmentPoints.intValue())
@@ -670,6 +667,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		}
 
 		this.unlocked = false;
+		this.active = false;
 		this.synchronize();
 	}
 
@@ -727,7 +725,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 @see #deserialize(NbtCompound)
 	 */
 	public void synchronize() {
-		Packets.clientSyncItem.sendIfServer(this.player, new ExtendedPacketBuffer(this).writeNbt(this.serialize()));
+		Packets.clientSyncItem.sendIfServer(this.player, () -> new ExtendedPacketBuffer(this).writeNbt(this.serialize()));
 	}
 
 	/**
@@ -805,6 +803,8 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		tag.put("statistics", this.statistics.serialize());
 		tag.put("enchantments", this.enchantments.serialize());
 		tag.putBoolean("unlocked", this.unlocked);
+		tag.putBoolean("active", this.active);
+		tag.putInt("boundSlot", this.boundSlot);
 
 		tag.put("skills", Util.compoundTag(skills -> {
 			for (var skill : this.skills.values()) {
@@ -819,6 +819,8 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		this.statistics.deserialize(tag.getCompound("statistics"));
 		this.enchantments.deserialize(tag.getCompound("enchantments"));
 		this.unlocked = tag.getBoolean("unlocked");
+		this.active = tag.getBoolean("active");
+		this.boundSlot = tag.getInt("boundSlot");
 
 		var skills = tag.getCompound("skills");
 

@@ -33,7 +33,6 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 
 		if (this.criticalHitProgress >= 1) {
 			this.criticalHitProgress--;
-
 			return true;
 		}
 

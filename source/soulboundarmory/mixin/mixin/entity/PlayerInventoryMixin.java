@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import soulboundarmory.component.Components;
-import soulboundarmory.component.soulbound.player.MasterComponent;
+import soulboundarmory.component.soulbound.item.ItemComponent;
 
 @Mixin(PlayerInventory.class)
 abstract class PlayerInventoryMixin {
@@ -26,7 +25,7 @@ abstract class PlayerInventoryMixin {
 	 */
 	@Inject(method = "insertStack(Lnet/minecraft/item/ItemStack;)Z", at = @At("HEAD"), cancellable = true)
 	public void insertIntoBoundSlot(ItemStack stack, CallbackInfoReturnable<Boolean> info) {
-		MasterComponent.of(this.player, stack).ifPresent(component -> {
+		ItemComponent.of(this.player, stack).ifPresent(component -> {
 			if (component.boundSlot != -1 && component.stackInBoundSlot().isEmpty()) {
 				info.setReturnValue(this.insertStack(component.boundSlot, stack));
 			}
@@ -39,6 +38,6 @@ abstract class PlayerInventoryMixin {
 	@Redirect(method = "getEmptySlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/collection/DefaultedList;get(I)Ljava/lang/Object;"))
 	private Object reserveBoundSlot(DefaultedList<ItemStack> inventory, int index) {
 		var stack = inventory.get(index);
-		return Components.soulbound(this.player).allMatch(component -> component.boundSlot != index || component.matches(stack)) ? stack : new ItemStack(Items.STONE, Integer.MAX_VALUE);
+		return ItemComponent.all(this.player).allMatch(item -> item.boundSlot != index || item.matches(stack)) ? stack : new ItemStack(Items.STONE, Integer.MAX_VALUE);
 	}
 }

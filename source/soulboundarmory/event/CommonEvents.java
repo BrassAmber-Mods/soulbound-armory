@@ -42,18 +42,18 @@ public final class CommonEvents {
 	public static void playerDrops(LivingDropsEvent event) {
 		if (event.getEntity() instanceof PlayerEntity player) {
 			if (!player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-				Components.soulbound(player)
-					.flatMap(masterComponent -> masterComponent.item().stream())
-					.filter(component -> component != null && component.level() >= Configuration.preservationLevel)
-					.forEach(component -> event.getDrops().removeIf(drop -> component.matches(drop.getStack()) && player.getInventory().insertStack(drop.getStack())));
+				event.getDrops().removeIf(drop ->
+					ItemComponent.of(player, drop.getStack()).filter(component -> component.level() >= Configuration.preservationLevel).isPresent()
+					&& player.getInventory().insertStack(drop.getStack())
+				);
 			}
-		} else {
-			ItemComponent.fromAttacker(event.getEntity(), event.getSource()).ifPresent(component -> {
-				if (component.hasSkill(Skills.enderPull)) {
-					event.getDrops().forEach(drop -> component.player.getInventory().insertStack(drop.getStack()));
-				}
-			});
 		}
+
+		ItemComponent.fromAttacker(event.getEntity(), event.getSource()).ifPresent(component -> {
+			if (component.hasSkill(Skills.enderPull)) {
+				event.getDrops().forEach(drop -> component.player.getInventory().insertStack(drop.getStack()));
+			}
+		});
 	}
 
 	/**
@@ -70,7 +70,6 @@ public final class CommonEvents {
 				}
 			} else if (efficiency == 0) {
 				event.setNewSpeed(0);
-
 				return;
 			}
 

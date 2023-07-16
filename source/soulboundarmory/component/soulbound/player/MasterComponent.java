@@ -27,15 +27,14 @@ import soulboundarmory.util.Util;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public abstract class MasterComponent<C extends MasterComponent<C>> implements EntityComponent<C>, Sided {
 	public final Map<ItemComponentType<? extends ItemComponent<?>>, ItemComponent<?>> items = new Reference2ReferenceLinkedOpenHashMap<>();
 	public final PlayerEntity player;
 
-	public int boundSlot;
 	public int tab;
 	protected int cooldown;
-	protected ItemComponent<?> item;
 
 	public MasterComponent(PlayerEntity player) {
 		this.player = player;
@@ -61,25 +60,15 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 
 	public void tab(int index) {
 		this.tab = index;
-
-		if (this.isClient()) {
-			Packets.serverTab.send(new ExtendedPacketBuffer(this).writeByte(index));
-		}
+		Packets.serverTab.sendIfClient(() -> new ExtendedPacketBuffer(this).writeByte(index));
 	}
 
-	/**
-	 @return the item stack in the bound slot
-	 @throws ArrayIndexOutOfBoundsException if no slot is bound
-	 */
-	public final ItemStack stackInBoundSlot() {
-		return this.player.getInventory().getStack(this.boundSlot);
+	public Stream<ItemComponent<?>> items() {
+		return this.items.values().stream();
 	}
 
-	/**
-	 @return the active soulbound item component
-	 */
-	public Optional<? extends ItemComponent<?>> item() {
-		return Optional.ofNullable(this.item).filter(itemComponent -> itemComponent.unlocked);
+	public Stream<ItemComponent<?>> active() {
+		return this.items().filter(item -> item.active);
 	}
 
 	/**
@@ -93,18 +82,17 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		return (S) this.items.get(type);
 	}
 
-	/**
-	 Set the currently active soulbound item, ensure that it is unlocked, update bound slot and synchronize.
+	public void activate(ItemComponent<?> item, int slot) {
+		if (item.isEnabled() && !item.active) {
+			if (item.level() < 100) {
+				this.active().filter(subcomponent -> subcomponent.level() < 100).forEach(active -> active.active = false);
+			}
 
-	 @param item the item's component
-	 */
-	public void set(ItemComponent<?> item, int slot) {
-		if (item.isEnabled() && this.item().filter(i -> i == item).isEmpty()) {
+			item.active = true;
 			this.cooldown = 600;
-			this.item = item;
 
-			if (this.boundSlot != -1) {
-				this.boundSlot = slot;
+			if (item.boundSlot != -1) {
+				item.boundSlot = slot;
 			}
 
 			if (item.unlocked) {
@@ -143,18 +131,15 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		return new SelectionTab();
 	}
 
-	/**
-	 @return the item component that matches `stack`
-	 */
-	public Optional<ItemComponent<?>> component(ItemStack stack) {
-		return this.items.values().stream().filter(component -> component.matches(stack)).findAny();
+	public Optional<ItemComponent<?>> item(ItemStack stack) {
+		return this.items().filter(item -> item.matches(stack)).findAny();
 	}
 
 	/**
 	 @return the item component corresponding to the first held item stack that matches this component
 	 */
 	public Optional<ItemComponent<?>> heldItemComponent() {
-		return ItemUtil.handStacks(this.player).flatMap(stack -> this.component(stack).stream()).findFirst();
+		return ItemUtil.handStacks(this.player).flatMap(stack -> this.item(stack).stream()).findFirst();
 	}
 
 	/**
@@ -165,7 +150,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	 @return whether a GUI was opened
 	 */
 	public boolean tryOpenGUI(ItemStack stack, int slot) {
-		if (this.matches(stack) || this.items.values().stream().anyMatch(item -> item.canConsume(stack))) {
+		if (this.matches(stack) || this.items().anyMatch(item -> item.canConsume(stack))) {
 			new SoulboundScreen(this, slot).open();
 			return true;
 		}
@@ -193,7 +178,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 	 @see #deserialize(NbtCompound)
 	 */
 	public void synchronize() {
-		Packets.clientSync.sendIfServer(this.player, new ExtendedPacketBuffer(this).writeNbt(this.serialize()));
+		Packets.clientSync.sendIfServer(this.player, () -> new ExtendedPacketBuffer(this).writeNbt(this.serialize()));
 	}
 
 	@Override public void tickStart() {
@@ -228,82 +213,46 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 		EntityComponent.super.copy(copy);
 
 		if (!this.player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-			this.item().ifPresent(component -> {
-				if (component.level() >= Configuration.preservationLevel) {
-					this.player.getInventory().insertStack(component.stack());
-				}
+			this.active().filter(item -> item.level() >= Configuration.preservationLevel).forEach(item -> {
+				copy.player.giveItemStack(item.stack());
 			});
 		}
 	}
 
 	@Override public void serialize(NbtCompound tag) {
-		this.item().ifPresent(itemComponent -> tag.putString("item", itemComponent.type().id().toString()));
-
 		for (var storage : this.items.values()) {
 			tag.put(storage.type().id().toString(), storage.serialize());
 		}
 
 		tag.putInt("tab", this.tab);
-		tag.putInt("slot", this.boundSlot);
 		tag.putInt("cooldown", this.cooldown);
 	}
 
 	@Override public void deserialize(NbtCompound tag) {
-		var type = ItemComponentType.get(tag.getString("item"));
-
-		if (type != null) {
-			this.item = this.item(type);
-		}
-
 		for (var item : this.items.values()) {
 			Util.ifPresent(tag, item.type().string(), item::deserialize);
 		}
 
 		this.tab = tag.getInt("tab");
-		this.boundSlot = tag.getInt("slot");
 		this.cooldown = tag.getInt("cooldown");
 	}
 
-	/**
-	 Scan the inventory and clean it up.
-	 <p>
-	 Let {@code bs} = this.boundSlot if the bound slot contains an item matching the active subcomponent; else -1.
-	 <p>
-	 - Remove {@link ItemComponent#isEnabled disabled} subcomponent items.
-	 <br>
-	 - If a slot is bound and does not contain an item matching the active subcomponent and a different such slot is encountered, then bind it the first time.
-	 <br>
-	 - If the player is not in creative mode,
-	 then replace subcomponent items stacks that do not match the active component or are not in {@code bs} by their {@link ItemComponent#consumableItem}s.
-	 <br>
-	 - If a matching item stack is encountered and it does not equal {@link ItemComponent#stack}, then replace it by a copy thereof.
-	 */
-	private void updateInventory() {
-		var active = this.item();
-		var bs = this.boundSlot != -1 && active.filter(item -> item.matches(this.stackInBoundSlot())).isPresent() ? this.boundSlot : -1;
+	void updateInventory() {
 		var inventory = this.player.getInventory();
 
 		for (var slot = 0; slot < inventory.size(); ++slot) {
 			var stack = inventory.getStack(slot);
 
 			if (this.matches(stack)) {
-				var item = this.component(stack).get();
+				var item = this.item(stack).get();
+				var bs = item.boundSlot != -1 && item.matches(item.stackInBoundSlot()) ? item.boundSlot : -1;
 
-				if (item.isEnabled() && (this.player.isCreative() || item == active.orElse(null) && (slot == bs || bs == -1))) {
-					if (item == active.orElse(null)) {
-						if (bs == -1) {
-							bs = slot;
-
-							if (this.boundSlot != -1) {
-								this.boundSlot = bs;
-							}
-						}
-
-						if (slot == bs) {
-							inventory.setStack(bs, item.stack());
-						}
+				if (item.isEnabled() && (this.player.isCreative() || item.active && (slot == bs || bs == -1))) {
+					if (item.active) {
+						if (bs == -1) bs = item.boundSlot == -1 ? slot : (item.boundSlot = slot);
+						if (slot == bs) inventory.setStack(bs, item.stack());
 					} else if (stack == this.player.getMainHandStack()) {
-						this.set(item, slot);
+						this.activate(item, slot);
 					}
 				} else {
 					inventory.setStack(slot, item.consumableItem().getDefaultStack());

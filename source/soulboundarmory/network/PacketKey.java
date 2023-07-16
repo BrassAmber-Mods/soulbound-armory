@@ -8,6 +8,8 @@ import net.minecraftforge.network.PacketDistributor;
 import soulboundarmory.SoulboundArmory;
 import soulboundarmory.util.Util;
 
+import java.util.function.Supplier;
+
 /**
  A key to a registered packet type; used for sending packets.
 
@@ -17,11 +19,11 @@ import soulboundarmory.util.Util;
 public abstract sealed class PacketKey<T, P extends Packet<T>> permits PacketKey.Client, PacketKey.Server {
 	public final Class<P> type;
 
-	protected PacketKey(Class<P> type) {
+	PacketKey(Class<P> type) {
 		this.type = type;
 	}
 
-	protected final P store(T message) {
+	final P store(T message) {
 		var packet = this.instantiate();
 		packet.message = message;
 
@@ -50,9 +52,9 @@ public abstract sealed class PacketKey<T, P extends Packet<T>> permits PacketKey
 			SoulboundArmory.channel.sendTo(this.store(message), ((ServerPlayerEntity) player).networkHandler.connection, NetworkDirection.PLAY_TO_CLIENT);
 		}
 
-		public void sendIfServer(Entity player, T message) {
+		public void sendIfServer(Entity player, Supplier<T> message) {
 			if (!player.world.isClient) {
-				this.send(player, message);
+				this.send(player, message.get());
 			}
 		}
 
@@ -60,9 +62,9 @@ public abstract sealed class PacketKey<T, P extends Packet<T>> permits PacketKey
 			SoulboundArmory.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), this.store(message));
 		}
 
-		public void sendNearbyIfServer(Entity entity, T message) {
+		public void sendNearbyIfServer(Entity entity, Supplier<T> message) {
 			if (!entity.world.isClient) {
-				this.sendNearby(entity, message);
+				this.sendNearby(entity, message.get());
 			}
 		}
 	}
@@ -82,9 +84,9 @@ public abstract sealed class PacketKey<T, P extends Packet<T>> permits PacketKey
 			SoulboundArmory.channel.sendToServer(this.store(message));
 		}
 
-		public void sendIfClient(T message) {
+		public void sendIfClient(Supplier<T> message) {
 			if (Util.isClient()) {
-				this.send(message);
+				this.send(message.get());
 			}
 		}
 	}
