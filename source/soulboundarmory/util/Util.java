@@ -1,6 +1,9 @@
 package soulboundarmory.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
@@ -18,7 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.ObjIntConsumer;
 
-public class Util {
+public class Util extends Util2 {
 	public static final boolean isPhysicalClient = FMLEnvironment.dist == Dist.CLIENT;
 	public static final IntSupplier zeroSupplier = () -> 0;
 
@@ -78,5 +81,15 @@ public class Util {
 		for (var element : iterable) {
 			action.accept(element, count++);
 		}
+	}
+
+	public static double speed(Entity entity) {
+		var velocity = entity.getVelocity();
+		return Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
+	}
+
+	public static double attribute(LivingEntity entity, EntityAttribute attribute) {
+		var instance = entity.getAttributeInstance(attribute);
+		return instance == null ? 0 : instance.getValue();
 	}
 }

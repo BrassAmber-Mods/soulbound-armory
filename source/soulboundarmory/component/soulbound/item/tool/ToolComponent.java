@@ -19,6 +19,7 @@ import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.item.SoulboundItems;
 import soulboundarmory.skill.Skills;
+import soulboundarmory.util.Math2;
 
 import java.util.List;
 import java.util.Objects;
@@ -63,7 +64,7 @@ public abstract class ToolComponent<T extends ItemComponent<T>> extends ItemComp
 
 	@Override public int levelXP(int level) {
 		return this.canLevelUp()
-			? Configuration.initialToolXP + (int) Math.round(4 * Math.pow(level, 1.25))
+			? Configuration.initialToolXP + Math2.iround(4 * Math.pow(level, 1.25))
 			: -1;
 	}
 

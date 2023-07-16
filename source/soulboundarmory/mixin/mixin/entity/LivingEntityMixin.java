@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.skill.Skills;
-import soulboundarmory.util.EntityUtil;
+import soulboundarmory.util.Util;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ abstract class LivingEntityMixin {
 
 			if (leapForce > 0) {
 				if (greatsword.hasSkill(Skills.freezing)) {
-					entities.stream().filter(greatsword::canFreeze).forEach(entity -> greatsword.freeze(entity, (int) (20 * leapForce), (float) EntityUtil.speed(player) * leapForce));
+					entities.stream().filter(greatsword::canFreeze).forEach(entity -> greatsword.freeze(entity, (int) (20 * leapForce), (float) Util.speed(player) * leapForce));
 				}
 
 				if (greatsword.leapDuration <= 0 && player.isOnGround() && (player.getVelocity().y <= 0.01 || player.isCreative())) {

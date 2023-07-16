@@ -13,6 +13,7 @@ import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.player.MasterArmorComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
+import soulboundarmory.util.Math2;
 import soulboundarmory.util.Util2;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public abstract class ArmorComponent<T extends ItemComponent<T>> extends ItemCom
 
 	@Override public int levelXP(int level) {
 		return this.canLevelUp()
-			? Configuration.initialArmorXP + 3 * (int) Math.round(Math.pow(level, 1.25))
+			? Configuration.initialArmorXP + 3 * Math2.iround(Math.pow(level, 1.25))
 			: -1;
 	}
 

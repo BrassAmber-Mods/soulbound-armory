@@ -11,7 +11,8 @@ import soulboundarmory.component.soulbound.player.MasterComponent;
 import soulboundarmory.component.statistics.StatisticType;
 import soulboundarmory.config.Configuration;
 import soulboundarmory.skill.Skills;
-import soulboundarmory.util.EntityUtil;
+import soulboundarmory.util.Math2;
+import soulboundarmory.util.Util;
 import soulboundarmory.util.Util2;
 
 import java.util.List;
@@ -42,26 +43,25 @@ public abstract class WeaponComponent<T extends ItemComponent<T>> extends ItemCo
 
 	@Override public int levelXP(int level) {
 		return this.canLevelUp()
-			? Configuration.initialWeaponXP + 3 * (int) Math.round(Math.pow(level, 1.65))
+			? Configuration.initialWeaponXP + 3 * Math2.iround(Math.pow(level, 1.65))
 			: -1;
 	}
 
 	@Override public void killed(LivingEntity entity) {
 		if (this.isServer()) {
-			var damage = EntityUtil.attribute(entity, EntityAttributes.GENERIC_ATTACK_DAMAGE);
-			var speed = EntityUtil.attribute(entity, EntityAttributes.GENERIC_ATTACK_SPEED);
+			var damage = Util.attribute(entity, EntityAttributes.GENERIC_ATTACK_DAMAGE);
+			var speed = Util.attribute(entity, EntityAttributes.GENERIC_ATTACK_SPEED);
 			var difficulty = this.player.world.getDifficulty().getId();
 
-			this.add(StatisticType.experience, Math.round(
-				entity.getMaxHealth()
+			this.add(StatisticType.experience, entity.getMaxHealth()
 				* (difficulty == 0 ? Configuration.Multipliers.peaceful : difficulty) * Configuration.Multipliers.difficulty
-				* (1 + EntityUtil.attribute(entity, EntityAttributes.GENERIC_ARMOR) * Configuration.Multipliers.armor)
+				* (1 + Util.attribute(entity, EntityAttributes.GENERIC_ARMOR) * Configuration.Multipliers.armor)
 				* (damage <= 0 ? Configuration.Multipliers.passive : 1 + damage * Configuration.Multipliers.attackDamage)
 				* (1 + speed * Configuration.Multipliers.attackSpeed)
 				* (entity.getType().isIn(Tags.EntityTypes.BOSSES) ? Configuration.Multipliers.boss : 1)
 				* (this.player.world.getServer().isHardcore() ? Configuration.Multipliers.hardcore : 1)
 				* (damage > 0 && entity.isBaby() ? Configuration.Multipliers.hostileBaby : 1)
-			));
+			);
 		}
 	}
 
