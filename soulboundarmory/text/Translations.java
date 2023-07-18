@@ -61,7 +61,7 @@ public interface Translations {
 	}
 
 	static Text skillName(Skill skill) {
-		return Text.of(Util2.capitalize(I18n.translate("%s:skill.%s.name".formatted(skill.id().getNamespace(), skill.id().getPath()))));
+		return Text.of(Util2.capitalize(I18n.translate("%s:skill.name.%s".formatted(skill.id().getNamespace(), skill.id().getPath()))));
 	}
 
 	static Text toolMaterial(ToolMaterial material) {
@@ -69,7 +69,7 @@ public interface Translations {
 	}
 
 	static List<Text> skillDescription(Skill skill) {
-		return Stream.of(I18n.translate("%s:skill.%s.desc".formatted(skill.id().getNamespace(), skill.id().getPath())).split("\n")).map(Text::of).toList();
+		return Stream.of(I18n.translate("%s:skill.desc.%s".formatted(skill.id().getNamespace(), skill.id().getPath())).split("\n")).map(Text::of).toList();
 	}
 
 	static Translation tooltip(String path) {

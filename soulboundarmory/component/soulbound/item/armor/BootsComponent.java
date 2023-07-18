@@ -9,7 +9,7 @@ public class BootsComponent extends ArmorComponent<BootsComponent> {
 	public BootsComponent(MasterArmorComponent component) {
 		super(component);
 
-		this.addSkills(Skills.shoeSpikes);
+		this.addSkills(Skills.shoeSpikes, Skills.cushion);
 	}
 
 	@Override public ItemComponentType<BootsComponent> type() {

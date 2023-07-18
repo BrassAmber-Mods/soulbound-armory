@@ -19,7 +19,9 @@ import soulboundarmory.skill.weapon.greatsword.LeapingSkill;
 public class Skills {
 	// public static final Skill ambidexterity = new AmbidexteritySkill(SoulboundArmory.id("ambidexterity"));
 	@Register("absorption") public static final Skill absorption = new AbsorptionSkill();
+	@Register("cushion") public static final Skill cushion = new CushionSkill();
 	@Register("circumspection") public static final Skill circumspection = new CircumspectionSkill();
+	@Register("climbing_claws") public static final Skill climbingClaws = new ClimbingSkill();
 	@Register("ender_pull") public static final Skill enderPull = new EnderPullSkill();
 	@Register("freezing") public static final Skill freezing = new FreezingSkill();
 	@Register("leaping") public static final Skill leaping = new LeapingSkill();
@@ -27,9 +29,8 @@ public class Skills {
 	@Register("precision") public static final Skill precision = new PrecisionSkill();
 	@Register("return") public static final Skill returne = new ReturnSkill();
 	@Register("shadow_clone") public static final Skill shadowClone = new ShadowCloneSkill();
-	@Register("sneak_return") public static final Skill sneakReturn = new SneakReturnSkill();
-	@Register("climbing_claws") public static final Skill climbingClaws = new ClimbingSkill();
 	@Register("shoe_spikes") public static final Skill shoeSpikes = new ClimbingSkill();
+	@Register("sneak_return") public static final Skill sneakReturn = new SneakReturnSkill();
 
 	@Registry("skill") public static native IForgeRegistry<Skill> registry();
 }

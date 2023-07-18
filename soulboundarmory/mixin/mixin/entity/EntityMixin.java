@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.skill.Skill;
@@ -40,6 +41,13 @@ abstract class EntityMixin {
 	void disableCollisionWithClimbingClawsAndShoeSpikes(MovementType movementType, Vec3d movement, CallbackInfo control) {
 		if (Util.<Entity>cast(this) instanceof PlayerEntity player && Components.armor.of(player).climbing > 0 && player.isHoldingOntoLadder()) {
 			player.verticalCollision = false;
+		}
+	}
+
+	@Inject(method = "bypassesSteppingEffects", cancellable = true, at = @At(value = "HEAD"))
+	void applyAwareness(CallbackInfoReturnable<Boolean> control) {
+		if (Util.<Entity>cast(this) instanceof PlayerEntity player && has(player, ItemComponentType.boots, EquipmentSlot.FEET, Skills.cushion) == 1) {
+			control.setReturnValue(true);
 		}
 	}
 
