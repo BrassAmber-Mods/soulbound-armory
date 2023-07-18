@@ -11,6 +11,8 @@ import soulboundarmory.item.SoulboundArmorItem;
 import soulboundarmory.module.component.EntityComponentKey;
 
 public class MasterArmorComponent extends MasterComponent<MasterArmorComponent> {
+	public int climbing;
+
 	public MasterArmorComponent(PlayerEntity player) {
 		super(player);
 

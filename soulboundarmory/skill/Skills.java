@@ -28,6 +28,8 @@ public class Skills {
 	@Register("return") public static final Skill returne = new ReturnSkill();
 	@Register("shadow_clone") public static final Skill shadowClone = new ShadowCloneSkill();
 	@Register("sneak_return") public static final Skill sneakReturn = new SneakReturnSkill();
+	@Register("climbing_claws") public static final Skill climbingClaws = new ClimbingSkill();
+	@Register("shoe_spikes") public static final Skill shoeSpikes = new ClimbingSkill();
 
 	@Registry("skill") public static native IForgeRegistry<Skill> registry();
 }

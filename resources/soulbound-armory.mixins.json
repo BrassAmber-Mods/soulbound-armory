@@ -11,6 +11,7 @@
 		"MiningToolItemMixin",
 		"ServerPlayerInteractionManagerMixin",
 		"ServerPlayNetworkHandlerMixin",
+		"entity.EntityMixin",
 		"entity.EntityAttributeModifierMixin",
 		"entity.LightningEntityMixin",
 		"entity.LivingEntityMixin",

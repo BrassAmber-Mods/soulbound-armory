@@ -3,7 +3,7 @@ package soulboundarmory.component.soulbound.item;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ReferenceList;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -32,7 +32,6 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 import soulboundarmory.client.gui.screen.*;
-import soulboundarmory.text.Translations;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.weapon.WeaponComponent;
 import soulboundarmory.component.soulbound.player.MasterComponent;
@@ -48,6 +47,7 @@ import soulboundarmory.serial.Serializable;
 import soulboundarmory.skill.Skill;
 import soulboundarmory.skill.SkillInstance;
 import soulboundarmory.skill.Skills;
+import soulboundarmory.text.Translations;
 import soulboundarmory.util.*;
 
 import java.math.BigDecimal;
@@ -280,7 +280,8 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 */
 	@OnlyIn(Dist.CLIENT)
 	public List<Tab> tabs() {
-		return ReferenceList.of(new SelectionTab(), new AttributeTab(), new EnchantmentTab(), new SkillTab());
+		var tabs = ReferenceArrayList.of(new SelectionTab(), new AttributeTab(), new EnchantmentTab());
+		return this.skills.isEmpty() ? tabs : Util.add(tabs, new SkillTab());
 	}
 
 	/**

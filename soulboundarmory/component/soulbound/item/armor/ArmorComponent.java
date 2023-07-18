@@ -1,14 +1,7 @@
 package soulboundarmory.component.soulbound.item.armor;
 
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
-import it.unimi.dsi.fastutil.objects.ReferenceList;
 import net.minecraft.text.MutableText;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import soulboundarmory.client.gui.screen.AttributeTab;
-import soulboundarmory.client.gui.screen.EnchantmentTab;
-import soulboundarmory.client.gui.screen.SelectionTab;
-import soulboundarmory.client.gui.screen.Tab;
 import soulboundarmory.component.soulbound.item.ItemComponent;
 import soulboundarmory.component.soulbound.player.MasterArmorComponent;
 import soulboundarmory.component.statistics.StatisticType;
@@ -54,10 +47,5 @@ public abstract class ArmorComponent<T extends ItemComponent<T>> extends ItemCom
 		if (this.doubleValue(StatisticType.knockbackResistance) > 0) tooltip.add(StatisticType.knockbackResistance);
 
 		return tooltip.stream().map(this::formatTooltip).toList();
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override public List<Tab> tabs() {
-		return ReferenceList.of(new SelectionTab(), new AttributeTab(), new EnchantmentTab());
 	}
 }

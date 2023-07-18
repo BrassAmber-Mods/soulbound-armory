@@ -244,9 +244,6 @@ public final class CommonEvents {
 		}
 	}
 
-	/**
-	 Tick components.
-	 */
 	@SubscribeEvent
 	public static void livingTick(LivingEvent.LivingTickEvent event) {
 		((EntityAccess) event.getEntity()).soulboundarmory$components().values().forEach(EntityComponent::tickStart);
