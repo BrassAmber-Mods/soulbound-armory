@@ -7,10 +7,13 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
 import soulboundarmory.skill.Skill;
@@ -31,6 +34,13 @@ abstract class EntityMixin {
 		}
 
 		return adjustedMovement;
+	}
+
+	@Inject(method = "move", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER, target = "Lnet/minecraft/entity/Entity;verticalCollision:Z"))
+	void disableCollisionWithClimbingClawsAndShoeSpikes(MovementType movementType, Vec3d movement, CallbackInfo control) {
+		if (Util.<Entity>cast(this) instanceof PlayerEntity player && Components.armor.of(player).climbing > 0 && player.isHoldingOntoLadder()) {
+			player.verticalCollision = false;
+		}
 	}
 
 	@Unique private static int has(LivingEntity entity, ItemComponentType type, EquipmentSlot slot, Skill skill) {

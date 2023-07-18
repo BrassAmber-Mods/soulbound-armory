@@ -59,7 +59,7 @@ abstract class LivingEntityMixin {
 	}
 
 	@Inject(method = "isClimbing", cancellable = true, at = @At(value = "HEAD"))
-	void applyClimbingClawsAndShoeSpikes(CallbackInfoReturnable<Boolean> info) {
+	void applyClimbingClawsOrShoeSpikes(CallbackInfoReturnable<Boolean> info) {
 		Components.armor.optional(Util.cast(this)).ifPresent(armor -> {
 			if (armor.climbing > 0) {
 				info.setReturnValue(true);
@@ -68,7 +68,7 @@ abstract class LivingEntityMixin {
 	}
 
 	@ModifyConstant(method = "applyMovementInput", constant = @Constant(doubleValue = 0.2))
-	double slideWithClimbingClawsAndShoeSpikes(double point2) {
+	double slideWithClimbingClawsOrShoeSpikes(double point2) {
 		return Components.armor.optional(Util.cast(this)).filter(armor -> armor.climbing > 0).map(armor -> Math.min(0, armor.player.getVelocity().y)).orElse(point2);
 	}
 
