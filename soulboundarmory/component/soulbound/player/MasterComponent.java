@@ -94,7 +94,7 @@ public abstract class MasterComponent<C extends MasterComponent<C>> implements E
 			if (item.unlocked) {
 				this.refresh();
 			} else {
-				item.unlock();
+				item.unlock(slot);
 			}
 
 			item.synchronize();

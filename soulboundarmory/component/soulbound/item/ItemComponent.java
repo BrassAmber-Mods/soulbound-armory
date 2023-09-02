@@ -295,7 +295,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return Configuration.Items.enabled.get(this.type().id().getPath());
 	}
 
-	public void unlock() {
+	public void unlock(int slot) {
 		if (this.unlocked ^ (this.unlocked = true) && this.isEnabled()) {
 			if (this.isClient()) {
 				if (Widget.cellScreen() instanceof SoulboundScreen screen) {
@@ -303,7 +303,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 					this.master.tab(1);
 				}
 			} else {
-				Packets.clientUnlock.sendNearby(this.player, new ExtendedPacketBuffer().writeEntity(this.player).writeItemStack(this.itemStack));
+				Packets.clientUnlock.sendNearby(this.player, new ExtendedPacketBuffer().writeEntity(this.player).writeInt(slot));
 			}
 		}
 	}

@@ -15,13 +15,13 @@ import java.util.Optional;
  <br><br>
  buffer: <br>
  - int (player) <br>
- - ItemStack (unlocked item) <br>
+ - int (unlocked item's slot) <br>
  */
 public final class S2CUnlock extends BufferPacket {
 	@OnlyIn(Dist.CLIENT)
 	@Override protected void execute() {
 		this.message.<AbstractClientPlayerEntity>readEntity().ifPresent(player -> {
-			var marker = Components.marker.of(this.message.readItemStack());
+			var marker = Components.marker.of(player.getInventory().getStack(this.message.readInt()));
 			Components.entityData.of(player).unlockedStack = Optional.of(marker);
 			marker.unlock();
 

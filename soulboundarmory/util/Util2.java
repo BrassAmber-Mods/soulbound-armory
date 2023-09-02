@@ -115,6 +115,11 @@ public class Util2 {
 		return IntStream.iterate(l.size() - 1, i -> i >= 0, i -> i - 1).mapToObj(l::get);
 	}
 
+	public static <T> T log(T t) {
+		SoulboundArmory.logger.info(t);
+		return t;
+	}
+
 	public static boolean containsIgnoreCase(String string, String substring) {
 		return Pattern.compile(substring, Pattern.CASE_INSENSITIVE | Pattern.LITERAL | Pattern.UNICODE_CASE).matcher(string).find();
 	}
