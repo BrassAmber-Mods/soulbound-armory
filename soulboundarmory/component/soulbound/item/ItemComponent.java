@@ -83,25 +83,17 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		this.enchantments.initialize(enchantment -> Stream.of("soulbound", "holding", "smelt").noneMatch(enchantment.getTranslationKey().toLowerCase()::contains));
 	}
 
-	/**
-	 @return all item components attached to `entity`
-	 */
+	/** @return all item components attached to `entity` */
 	public static Stream<ItemComponent<?>> all(Entity entity) {
 		return Components.soulbound(entity).flatMap(component -> component.items.values().stream());
 	}
 
-	/**
-	 @return the component attached to `entity` that matches `stack`
-	 */
+	/** @return the component attached to `entity` that matches `stack` */
 	public static Optional<ItemComponent<?>> of(Entity entity, ItemStack stack) {
 		return Components.soulbound(entity).filter(component -> component.matches(stack)).flatMap(component -> component.items.values().stream().filter(item -> item.matches(stack))).findAny();
 	}
 
-	/**
-	 Find the first component that matches an item held by an entity.
-
-	 @return the component
-	 */
+	/** @return the first component that matches an item held by an entity. */
 	public static Optional<ItemComponent<?>> fromHands(Entity entity) {
 		if (entity == null) {
 			return Optional.empty();
@@ -146,14 +138,9 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return entity instanceof SoulboundDaggerEntity ? ItemComponentType.dagger.nullable(attacker) : Optional.empty();
 	}
 
-	/**
-	 @return the type of this item
-	 */
 	public abstract ItemComponentType<T> type();
 
-	/**
-	 @return the increase in `statistic` per point
-	 */
+	/** @return the increment in `statistic` per point */
 	public abstract double increase(StatisticType type);
 
 	/**
@@ -162,14 +149,10 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 */
 	public abstract int levelXP(int level);
 
-	/**
-	 @return a list of attributes for display on the attribute tab for this item
-	 */
+	/** @return a list of attributes for display on the attribute tab for this item */
 	public abstract List<StatisticType> screenAttributes();
 
-	/**
-	 @return the tooltip for stacks of this item
-	 */
+	/** @return the tooltip for stacks of this item */
 	public abstract List<? extends Text> tooltip();
 
 	public void killed(LivingEntity entity) {}
@@ -182,23 +165,17 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return this.player.world.isClient;
 	}
 
-	/**
-	 @return the item that corresponds to this component
-	 */
+	/** @return the item that corresponds to this component */
 	public Item item() {
 		return this.type().item;
 	}
 
-	/**
-	 @return the item that may be consumed in order to unlock this item
-	 */
+	/** @return the item that may be consumed in order to unlock this item */
 	public Item consumableItem() {
 		return this.type().consumableItem;
 	}
 
-	/**
-	 @return the name of this item without a "soulbound" prefix
-	 */
+	/** @return the name of this item without a "soulbound" prefix */
 	public Text name() {
 		return this.type().name();
 	}
@@ -247,21 +224,16 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return Configuration.maxLevel;
 	}
 
-	/**
-	 @return this item's current tool material
-	 */
+	/** @return this item's current tool material */
 	public ToolMaterial material() {
 		return SoulboundItems.baseMaterial;
 	}
 
 	public int totalXP(int level) {
-		var total = 0;
-
-		for (; level > 0; level--) {
+		for (var total = 0;; level--) {
+			if (level == 0) return total;
 			total += this.levelXP(level);
 		}
-
-		return total;
 	}
 
 	/**
@@ -274,9 +246,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return stack.getItem() == this.item();
 	}
 
-	/**
-	 @return the tabs to display in the menu for this item
-	 */
+	/** @return the tabs to display in the menu for this item */
 	@OnlyIn(Dist.CLIENT)
 	public List<Tab> tabs() {
 		var tabs = ReferenceArrayList.of(new SelectionTab(), new AttributeTab(), new EnchantmentTab());
@@ -375,25 +345,19 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		return this.doubleValue(attribute);
 	}
 
-	/**
-	 @return the integral value of a statistic if it is present or 0
-	 */
+	/** @return the integral value of a statistic if it is present or 0 */
 	public int intValue(StatisticType type) {
 		var statistic = this.statistic(type);
 		return statistic == null ? 0 : statistic.intValue();
 	}
 
-	/**
-	 @return the float value of a statistic if it is present or 0
-	 */
+	/** @return the float value of a statistic if it is present or 0 */
 	public float floatValue(StatisticType type) {
 		var statistic = this.statistic(type);
 		return statistic == null ? 0 : statistic.floatValue();
 	}
 
-	/**
-	 @return the double value of a statistic if it is present or 0
-	 */
+	/** @return the double value of a statistic if it is present or 0 */
 	public double doubleValue(StatisticType type) {
 		var statistic = this.statistic(type);
 		return statistic == null ? 0 : statistic.doubleValue();
@@ -498,17 +462,13 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		this.synchronize();
 	}
 
-	/**
-	 Set the value of a statistic and synchronize.
-	 */
+	/** Set the value of a statistic and synchronize. */
 	public void set(StatisticType statistic, Number value) {
 		this.statistics.put(statistic, value);
 		this.synchronize();
 	}
 
-	/**
-	 @return whether this item can level up further, taking the configuration into account
-	 */
+	/** @return whether this item can level up further, taking the configuration into account */
 	public boolean canLevelUp() {
 		return this.level() < Configuration.maxLevel || Configuration.maxLevel < 0;
 	}
@@ -533,9 +493,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		this.add(StatisticType.attributePoints, sign);
 	}
 
-	/**
-	 @return the XP required in order to reach the next level
-	 */
+	/** @return the XP required in order to reach the next level */
 	public int nextLevelXP() {
 		return this.levelXP(this.level());
 	}
@@ -579,9 +537,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		}
 	}
 
-	/**
-	 @return the current level of `enchantment`
-	 */
+	/** @return the current level of `enchantment` */
 	public int enchantment(Enchantment enchantment) {
 		return this.enchantments.get(enchantment);
 	}
@@ -652,9 +608,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		this.synchronize();
 	}
 
-	/**
-	 {@linkplain #reset(Category) Reset} all statistic categories and lock this item.
-	 */
+	/** {@linkplain #reset(Category) Reset} all statistic categories and lock this item. */
 	public void reset() {
 		var level = this.level();
 
@@ -671,16 +625,12 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		this.synchronize();
 	}
 
-	/**
-	 @return whether the given item stack may be consumed in order to unlock this item
-	 */
+	/** @return whether the given item stack may be consumed in order to unlock this item */
 	public boolean canConsume(ItemStack stack) {
 		return this.consumableItem() == stack.getItem();
 	}
 
-	/**
-	 @return whether an item stack in any of the player's hands matches this component
-	 */
+	/** @return whether an item stack in any of the player's hands matches this component */
 	public boolean isItemEquipped() {
 		return ItemUtil.handStacks(this.player).anyMatch(this::matches);
 	}
@@ -704,9 +654,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		}
 	}
 
-	/**
-	 @return the attribute modifiers for new stacks of this item
-	 */
+	/** @return the attribute modifiers for new stacks of this item */
 	public final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers(EquipmentSlot slot) {
 		var modifiers = LinkedHashMultimap.<EntityAttribute, EntityAttributeModifier>create();
 		this.attributeModifiers(modifiers, slot);
@@ -728,9 +676,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 		Packets.clientSyncItem.sendIfServer(this.player, () -> new ExtendedPacketBuffer(this).writeNbt(this.serialize()));
 	}
 
-	/**
-	 @return a copy of the current item stack
-	 */
+	/** @return a copy of the current item stack */
 	public ItemStack stack() {
 		return this.itemStack.copy();
 	}
