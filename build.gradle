@@ -90,23 +90,17 @@ tasks.findByName("ideaSyncTask")?.tap {
 }
 
 afterEvaluate {
-	if (tasks.findByName("genSourcesWithCfr")) {
-		tasks.withType(genSourcesWithCfr.class) {
-			final marker = new File(outputJar.asFile.get().parentFile, project.name + "-marker")
-			onlyIf {!marker.exists()}
+	tasks.withType(genSourcesWithCfr.class) {
+		final marker = new File(outputJar.asFile.get().parentFile, project.name + "-marker")
+		onlyIf {!marker.exists()}
 
-			doLast {
-				marker.createNewFile()
-			}
+		doLast {
+			marker.createNewFile()
 		}
+	}
 
-		unpickJar {
-			onlyIf {!outputJar.asFile.get().exists()}
-		}
-
-		genSources {
-			dependsOn = [genSourcesWithFernFlower]
-		}
+	genSources {
+		dependsOn = [genSourcesWithFernFlower]
 	}
 }
 
