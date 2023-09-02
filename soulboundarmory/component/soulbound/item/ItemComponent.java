@@ -152,7 +152,6 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	public abstract ItemComponentType<T> type();
 
 	/**
-	 @param type
 	 @return the increase in `statistic` per point
 	 */
 	public abstract double increase(StatisticType type);
