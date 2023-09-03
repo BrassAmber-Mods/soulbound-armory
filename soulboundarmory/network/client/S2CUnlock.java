@@ -22,8 +22,7 @@ public final class S2CUnlock extends BufferPacket {
 	@Override protected void execute() {
 		this.message.<AbstractClientPlayerEntity>readEntity().ifPresent(player -> {
 			var marker = Components.marker.of(player.getInventory().getStack(this.message.readInt()));
-			Components.entityData.of(player).unlockedStack = Optional.of(marker);
-			marker.unlock();
+			Components.entityData.of(player).animatingItem = Optional.of(marker);
 
 			Widget.client.particleManager.addEmitter(player, SoulboundArmory.unlockParticle, 30);
 			player.world.playSound(player.getX(), player.getY(), player.getZ(), SoulboundArmory.unlockSound, player.getSoundCategory(), 1, 1, false);

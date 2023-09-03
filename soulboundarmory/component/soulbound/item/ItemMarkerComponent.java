@@ -1,22 +1,29 @@
 package soulboundarmory.component.soulbound.item;
 
 import net.minecraft.client.item.TooltipData;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import soulboundarmory.SoulboundArmory;
 import soulboundarmory.client.gui.bar.ExperienceBar;
 import soulboundarmory.module.component.ItemStackComponent;
 import soulboundarmory.module.gui.widget.Widget;
 import soulboundarmory.util.Util;
 
-import java.util.Optional;
-
 public class ItemMarkerComponent implements ItemStackComponent<ItemMarkerComponent>, TooltipData {
-	public final ItemStack stack;
+	static final int
+		MIN = 2,
+		MAX = 15,
+		END = MAX + 5;
 
-	private ItemComponent<?> item;
-	private int animationTick = 40;
+	public ItemStack stack;
+	public ItemComponent<?> item;
+
+	int animationTick = END;
+	boolean forward = true;
 
 	public ItemMarkerComponent(ItemStack stack) {
 		this.stack = stack;
@@ -26,28 +33,20 @@ public class ItemMarkerComponent implements ItemStackComponent<ItemMarkerCompone
 		}
 	}
 
-	public Optional<ItemComponent<?>> optionalItem() {
-		return Optional.ofNullable(this.item());
-	}
-
 	public ItemComponent<?> item() {
-		if (this.item == null && Util.isClient()) {
-			return this.initializeItem();
-		}
-
-		return this.item;
-	}
-
-	public void item(ItemComponent<?> item) {
-		this.item = item;
+		return this.item == null && Util.isClient() ? this.initializeItem() : this.item;
 	}
 
 	public boolean animating() {
-		return this.animationTick < 30;
+		return this.forward ? this.animationTick <= MAX : this.animationTick >= MIN;
 	}
 
-	public void unlock() {
-		this.animationTick = 0;
+	public void animate(boolean forward, ItemStack previous) {
+		this.animationTick = forward ? 0 : MAX;
+		this.forward = forward;
+		if (!forward) this.stack = previous;
+
+		this.upload();
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -56,14 +55,27 @@ public class ItemMarkerComponent implements ItemStackComponent<ItemMarkerCompone
 	}
 
 	@Override public void tickStart() {
-		if (Util.isClient() && this.animating()) this.animationTick++;
+		if (Util.isClient()) {
+			if (this.forward) {
+				if (this.animationTick >= END) return;
+				++this.animationTick;
+			} else if (this.animationTick == MIN) {
+				this.stack = this.item.itemStack;
+				this.forward = true;
+				++this.animationTick;
+			} else {
+				--this.animationTick;
+			}
+
+			this.upload();
+		}
 	}
 
 	@Override public void serialize(NbtCompound tag) {
-		this.optionalItem().ifPresent(item -> {
-			tag.putUuid("player", item.player.getUuid());
-			tag.putString("item", item.type().string());
-		});
+		if (this.item() != null) {
+			tag.putUuid("player", this.item.player.getUuid());
+			tag.putString("item", this.item.type().string());
+		}
 	}
 
 	@Override public void deserialize(NbtCompound tag) {
@@ -72,8 +84,27 @@ public class ItemMarkerComponent implements ItemStackComponent<ItemMarkerCompone
 		}
 	}
 
+	@Override public void copy(ItemMarkerComponent copy) {
+		ItemStackComponent.super.copy(copy);
+		copy.stack = this.stack;
+	}
+
 	@OnlyIn(Dist.CLIENT)
 	private ItemComponent<?> initializeItem() {
 		return this.item = ItemComponent.of(Widget.player(), this.stack).orElse(null);
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	private void upload() {
+		var player = this.item.player;
+		var animation = (Sprite.Animation) Widget.itemRenderer.getModel(this.stack, player.world, player, player.getId()).getParticleSprite().getAnimation();
+
+		SoulboundArmory.logger.info("animation {} tick {}", animation, this.animationTick);
+
+		if (animation != null) {
+			animation.frameTicks = Integer.MIN_VALUE;
+			Widget.bind(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
+			animation.upload(Math.max(0, this.animationTick - 3));
+		}
 	}
 }

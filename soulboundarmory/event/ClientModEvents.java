@@ -33,14 +33,14 @@ public class ClientModEvents {
 					Util.id("animating"),
 					(stack, world, holder, entityID) -> Components.marker.optional(stack)
 						.filter(ItemMarkerComponent::animating)
-						.or(() -> Components.entityData.optional(holder).flatMap(data -> data.unlockedStack).filter(marker -> marker.animating() && marker.item() != null && marker.item().matches(stack)))
+						.or(() -> Components.entityData.optional(holder).flatMap(data -> data.animatingItem).filter(marker -> marker.animating() && marker.item() != null && marker.stack.isItemEqualIgnoreDamage(stack)))
 						.isPresent() ? 1 : 0
 				);
 
 				ModelPredicateProviderRegistry.register(
 					item,
 					Util.id("level"),
-					(stack, world, holder, entityID) -> Components.marker.optional(stack).flatMap(ItemMarkerComponent::optionalItem).map(ItemComponent::level).orElse(0)
+					(stack, world, holder, entityID) -> Components.marker.optional(stack).map(ItemMarkerComponent::item).map(ItemComponent::level).orElse(0)
 				);
 			}
 		);

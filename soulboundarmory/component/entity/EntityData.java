@@ -20,7 +20,7 @@ public final class EntityData implements EntityComponent<EntityData> {
 	public final Entity entity;
 	public float tickDelta;
 	public float animationProgress;
-	public Optional<ItemMarkerComponent> unlockedStack = Optional.empty();
+	public Optional<ItemMarkerComponent> animatingItem = Optional.empty();
 
 	private int freezeTicks;
 	private int blockTeleportTicks;

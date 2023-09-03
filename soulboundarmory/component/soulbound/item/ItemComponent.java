@@ -279,21 +279,28 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 
 	public void select(int slot) {
 		if (this.isEnabled()) {
-			Packets.serverSelectItem.sendIfClient(() -> new ExtendedPacketBuffer(this).writeInt(slot));
-
 			var inventory = this.player.getInventory();
+			var stack = inventory.getStack(slot);
+			var isSoulbound = this.master.matches(stack);
 
 			if (this.master.cooldown() > 0) {
-				var canConsume = this.canConsume(inventory.getStack(slot));
-				var removed = Inventories.remove(inventory, canConsume ? stack -> this.master.item(stack).filter(item -> item.level() < 100).isPresent() : this::canConsume, 1, false);
+				var removed = Inventories.remove(inventory, isSoulbound ? this::canConsume : stacc -> this.master.item(stacc).filter(item -> item.level() < 100).isPresent(), 1, false);
 
-				if (!canConsume && removed == 0) {
+				if (isSoulbound && removed == 0) {
 					return; // todo error
 				}
 			}
 
 			inventory.setStack(slot, this.stack());
 			this.master.activate(this, slot);
+
+			if (this.isClient()) {
+				var marker = Components.marker.of(inventory.getStack(slot));
+				Components.entityData.of(this.player).animatingItem = Optional.of(marker);
+				marker.animate(!isSoulbound, stack);
+
+				Packets.serverSelectItem.send(new ExtendedPacketBuffer(this).writeInt(slot));
+			}
 		} else; // todo error
 	}
 
@@ -690,7 +697,7 @@ public abstract class ItemComponent<T extends ItemComponent<T>> implements Seria
 	 */
 	public ItemStack updateItemStack() {
 		this.itemStack = this.item().getDefaultStack();
-		Components.marker.of(this.itemStack).item(this);
+		Components.marker.of(this.itemStack).item = this;
 
 		for (var slot : EquipmentSlot.values()) {
 			var attributeModifiers = this.attributeModifiers(slot);
