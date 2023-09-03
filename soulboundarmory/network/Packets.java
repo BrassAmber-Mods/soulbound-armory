@@ -14,6 +14,7 @@ public final class Packets {
 	public static final PacketKey.Server<ExtendedPacketBuffer, C2SReset> serverReset = server();
 	public static final PacketKey.Server<ExtendedPacketBuffer, C2SSkill> serverSkill = server();
 	public static final PacketKey.Server<ExtendedPacketBuffer, C2STab> serverTab = server();
+	public static final PacketKey.Server<ExtendedPacketBuffer, C2SClimb> serverClimb = server();
 
 	public static final PacketKey.Client<ExtendedPacketBuffer, S2CBindSlot> clientBindSlot = client();
 	public static final PacketKey.Client<ExtendedPacketBuffer, S2CCriticalHitParticles> clientCriticalHitParticles = client();

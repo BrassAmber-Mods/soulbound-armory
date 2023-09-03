@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import soulboundarmory.component.Components;
 import soulboundarmory.component.soulbound.item.ItemComponentType;
+import soulboundarmory.network.ExtendedPacketBuffer;
+import soulboundarmory.network.Packets;
 import soulboundarmory.skill.Skill;
 import soulboundarmory.skill.Skills;
 import soulboundarmory.util.Util;
@@ -26,11 +28,21 @@ abstract class EntityMixin {
 	@ModifyVariable(method = "move", ordinal = 1, at = @At(value = "STORE", ordinal = 0))
 	Vec3d recordClimbingClawsAndShoeSpikes(Vec3d adjustedMovement, MovementType movementType, Vec3d movement) {
 		if (Util.<Entity>cast(this) instanceof PlayerEntity player) {
-			var climbing = Components.armor.of(player).climbing = adjustedMovement.y >= 0 || (adjustedMovement.x == movement.x && adjustedMovement.z == movement.z) ? 0
-				: has(player, ItemComponentType.chestplate, EquipmentSlot.CHEST, Skills.climbingClaws) + has(player, ItemComponentType.boots, EquipmentSlot.FEET, Skills.shoeSpikes);
+			var armor = Components.armor.of(player);
 
-			if (climbing > 0 && player.isHoldingOntoLadder()) {
-				return adjustedMovement.withAxis(Direction.Axis.Y, Math.max(adjustedMovement.y, 0));
+			if (armor.climbing > 0) {
+				player.onLanding();
+			}
+
+			if (player.world.isClient) {
+				armor.climbing = adjustedMovement.y >= 0 || (adjustedMovement.x == movement.x && adjustedMovement.z == movement.z) ? 0
+					: has(player, ItemComponentType.chestplate, EquipmentSlot.CHEST, Skills.climbingClaws) + has(player, ItemComponentType.boots, EquipmentSlot.FEET, Skills.shoeSpikes);
+
+				Packets.serverClimb.send(new ExtendedPacketBuffer().writeByte(armor.climbing));
+
+				if (armor.climbing > 0 && player.isHoldingOntoLadder()) {
+					return adjustedMovement.withAxis(Direction.Axis.Y, Math.max(adjustedMovement.y, 0));
+				}
 			}
 		}
 

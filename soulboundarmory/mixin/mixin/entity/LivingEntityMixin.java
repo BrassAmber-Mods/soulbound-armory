@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -77,8 +78,9 @@ abstract class LivingEntityMixin {
 		if (this.jumping && this.jumpingCooldown == 0) {
 			Components.armor.optional(Util.cast(this)).ifPresent(armor -> {
 				if (armor.climbing > 0) {
-					armor.player.jump();
-					armor.player.setVelocity(armor.player.getVelocity().add(armor.player.getRotationVector().multiply(-0.1, 0, -0.1)));
+					var player = armor.player;
+					player.setVelocity(player.getVelocity().multiply(1, 0, 1).add(Entity.movementInputToVelocity(new Vec3d(player.sidewaysSpeed, 0, player.forwardSpeed), 1, player.getYaw()).normalize().multiply(-0.1)));
+					player.jump();
 					this.jumpingCooldown = 10;
 				}
 			});
