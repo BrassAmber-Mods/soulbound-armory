@@ -7,7 +7,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import soulboundarmory.SoulboundArmory;
 import soulboundarmory.client.gui.bar.ExperienceBar;
 import soulboundarmory.module.component.ItemStackComponent;
 import soulboundarmory.module.gui.widget.Widget;
@@ -98,8 +97,6 @@ public class ItemMarkerComponent implements ItemStackComponent<ItemMarkerCompone
 	private void upload() {
 		var player = this.item.player;
 		var animation = (Sprite.Animation) Widget.itemRenderer.getModel(this.stack, player.world, player, player.getId()).getParticleSprite().getAnimation();
-
-		SoulboundArmory.logger.info("animation {} tick {}", animation, this.animationTick);
 
 		if (animation != null) {
 			animation.frameTicks = Integer.MIN_VALUE;
