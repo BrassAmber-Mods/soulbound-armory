@@ -1,4 +1,4 @@
-package soulboundarmory.skill.weapon.greatsword;
+package soulboundarmory.skill.weapon;
 
 import java.util.Collections;
 import java.util.Set;

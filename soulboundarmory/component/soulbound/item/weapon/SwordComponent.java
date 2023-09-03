@@ -23,7 +23,7 @@ public class SwordComponent extends WeaponComponent<SwordComponent> {
 			.min(1.6, StatisticType.attackSpeed)
 			.min(3, StatisticType.attackDamage);
 
-		this.addSkills(Skills.circumspection, Skills.precision, Skills.nourishment);
+		this.addSkills(Skills.circumspection, Skills.floccinaucinihilipilification, Skills.precision, Skills.nourishment);
 	}
 
 	@Override public ItemComponentType<SwordComponent> type() {

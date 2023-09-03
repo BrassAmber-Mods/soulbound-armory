@@ -103,9 +103,9 @@ public final class CommonEvents {
 	@SubscribeEvent
 	public static void block(ShieldBlockEvent event) {
 		var damage = event.getDamageSource();
-		var target = event.getEntity();
+		var blocker = event.getEntity();
 
-		if (target.isUsingItem() && target.getActiveItem().isOf(SoulboundItems.sword) && !damage.isProjectile()) {
+		if (blocker.isUsingItem() && !damage.isProjectile() && blocker.getActiveItem().isOf(SoulboundItems.sword) && !ItemComponentType.sword.of(blocker).hasSkill(Skills.floccinaucinihilipilification)) {
 			event.setBlockedDamage(event.getBlockedDamage() * 0.35F);
 		}
 	}

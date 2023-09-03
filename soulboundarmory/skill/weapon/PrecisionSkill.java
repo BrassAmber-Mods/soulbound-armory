@@ -1,4 +1,4 @@
-package soulboundarmory.skill.weapon.common;
+package soulboundarmory.skill.weapon;
 
 import net.minecraft.item.Items;
 import soulboundarmory.module.gui.widget.Widget;

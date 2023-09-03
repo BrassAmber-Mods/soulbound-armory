@@ -7,13 +7,7 @@ import soulboundarmory.module.transform.Registry;
 import soulboundarmory.skill.tool.common.AbsorptionSkill;
 import soulboundarmory.skill.tool.common.CircumspectionSkill;
 import soulboundarmory.skill.tool.common.EnderPullSkill;
-import soulboundarmory.skill.weapon.common.NourishmentSkill;
-import soulboundarmory.skill.weapon.common.PrecisionSkill;
-import soulboundarmory.skill.weapon.dagger.ReturnSkill;
-import soulboundarmory.skill.weapon.dagger.ShadowCloneSkill;
-import soulboundarmory.skill.weapon.dagger.SneakReturnSkill;
-import soulboundarmory.skill.weapon.greatsword.FreezingSkill;
-import soulboundarmory.skill.weapon.greatsword.LeapingSkill;
+import soulboundarmory.skill.weapon.*;
 
 @RegisterAll(type = Skill.class, registry = "skill")
 public class Skills {
@@ -23,6 +17,7 @@ public class Skills {
 	@Register("circumspection") public static final Skill circumspection = new CircumspectionSkill();
 	@Register("climbing_claws") public static final Skill climbingClaws = new ClimbingSkill();
 	@Register("ender_pull") public static final Skill enderPull = new EnderPullSkill();
+	@Register("floccinaucinihilipilification") public static final Skill floccinaucinihilipilification = new FloccinaucinihilipilificationSkill();
 	@Register("freezing") public static final Skill freezing = new FreezingSkill();
 	@Register("leaping") public static final Skill leaping = new LeapingSkill();
 	@Register("nourishment") public static final Skill nourishment = new NourishmentSkill();
