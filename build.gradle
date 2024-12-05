@@ -62,7 +62,7 @@ remapJar {
 dependencies {
 	minecraft("com.mojang:minecraft:" + versions.minecraft)
 	mappings("net.fabricmc:yarn:${versions.minecraft}+build.${versions.yarn}:v2")
-	forge("net.minecraftforge:forge:${versions.minecraft}-+")
+	forge("net.minecraftforge:forge:1.19.2-43.4.6")
 
 	annotationProcessor("net.auoeke:dycon-javac")
 	compileOnly("net.auoeke:dycon")
